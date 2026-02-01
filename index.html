@@ -139,8 +139,33 @@
         
         /* FINAL STAGES */
         #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
-        #beatingHeart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; cursor: pointer; display: none; z-index: 600; animation: pBeat 0.8s infinite; }
-        @keyframes pBeat { 50% { transform: translate(-50%, -50%) scale(1.3); } }
+        
+        /* Updated Beating Heart & Text */
+        #beatingHeart { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            display: none; z-index: 600; cursor: pointer; text-align: center;
+        }
+        #heartEmoji {
+            font-size: 100px;
+            animation: pBeat 0.8s infinite;
+        }
+        #heartText {
+            color: #ff4d6d;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            font-family: 'Segoe UI', sans-serif;
+            text-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
+            white-space: nowrap;
+            animation: fadeText 1.5s infinite alternate;
+        }
+        @keyframes pBeat { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.3); } 
+            100% { transform: scale(1); } 
+        }
+        @keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
+
         #glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
         
         /* FRUIT NINJA ITEMS */
@@ -323,7 +348,10 @@
 </div>
 
 <div id="blackout"></div>
-<div id="beatingHeart">❤️</div>
+<div id="beatingHeart">
+    <div id="heartEmoji">❤️</div>
+    <div id="heartText">Mere dil pe tap karo babe</div>
+</div>
 <div id="glassOverlay"></div>
 
 <div id="cupidFinale">
@@ -536,7 +564,7 @@
         startFruitNinja();
     }
 
-    // --- ZOOM LOGIC: Updated sliceHandler ---
+    // --- ZOOM LOGIC ---
     function startFruitNinja() {
         const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
         const spawnItem = () => {
@@ -583,7 +611,7 @@
                         item.style.left = "50%";
                         item.style.top = "50%";
                         item.style.zIndex = "10000";
-                        // Force transform next tick to ensure transition happens
+                        // Force transform next tick
                         requestAnimationFrame(() => {
                             item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)";
                             item.style.opacity = "0"; // Fade out during zoom
