@@ -1,0 +1,173 @@
+/* ===============================
+   GLOBAL
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #ffc0cb;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    cursor: none;
+}
+
+
+
+/* ===============================
+   CENTER BOX
+================================ */
+
+.centerBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+
+
+/* ===============================
+   BUTTONS
+================================ */
+
+button {
+    padding: 14px 28px;
+    font-size: 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin: 15px;
+}
+
+#yesBtn {
+    background: #ff4d6d;
+    color: white;
+}
+
+#noBtn {
+    position: absolute;
+}
+
+
+
+/* ===============================
+   GIFS
+================================ */
+
+.gif {
+    width: 300px;
+    margin-top: 20px;
+    display: none;
+}
+
+
+
+/* ===============================
+   CAKE
+================================ */
+
+#cake {
+    width: 360px;
+    margin-top: 20px;
+    position: relative;
+    z-index: 5;
+}
+
+
+
+/* ===============================
+   HEARTS
+================================ */
+
+.heart {
+    position: fixed;
+    top: -10px;
+    font-size: 26px;
+    animation: fall 4s linear;
+    z-index: 3;
+}
+
+@keyframes fall {
+    from {
+        top: -10px;
+        opacity: 1;
+    }
+    to {
+        top: 100vh;
+        opacity: 0;
+    }
+}
+
+
+
+/* ===============================
+   SWORD CURSOR
+================================ */
+
+#sword {
+    position: fixed;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    pointer-events: none;
+
+    background: radial-gradient(circle, white, hotpink);
+    box-shadow:
+        0 0 15px hotpink,
+        0 0 30px deeppink,
+        0 0 60px hotpink;
+
+    z-index: 999999;
+}
+
+
+
+/* ===============================
+   SLASH EFFECT
+================================ */
+
+.slash {
+    position: fixed;
+    width: 90px;
+    height: 8px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        white,
+        hotpink,
+        transparent
+    );
+
+    transform: rotate(45deg);
+    pointer-events: none;
+
+    animation: slashFade 0.25s linear;
+    z-index: 999998;
+}
+
+@keyframes slashFade {
+    from {
+        opacity: 1;
+        transform: scale(1) rotate(45deg);
+    }
+    to {
+        opacity: 0;
+        transform: scale(2) rotate(45deg);
+    }
+}
+
+
+
+/* ===============================
+   HIDDEN
+================================ */
+
+.hidden {
+    display: none;
+}
