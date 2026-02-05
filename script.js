@@ -1,206 +1,344 @@
-let mouseX = 0, mouseY = 0, lastX = 0, lastY = 0, cupidX = 0, cupidY = 0;
-    let cakeHealth = 19;
-    let isGameOver = false;
-    let musicStarted = false;
-    let lettersOpened = 0; // Track opened letters
-    const totalRequired = 5;
-
-    // Element selection
-    const cuteMusic = document.getElementById("cuteMusic");
-    const finaleMusic = document.getElementById("finaleMusic");
-    const sliceSound = document.getElementById("sliceSound");
-    const yaySound = document.getElementById("yaySound");
-    const sadSound = document.getElementById("sadSound");
-    const afterCakeSound = document.getElementById("afterCakeSound");
-    const heartSound = document.getElementById("heartSound");
-    const sword = document.getElementById("sword");
+// --- RESPONSIVE TOUCH & CURSOR LOGIC ---
+function updateCupid(x, y) {
     const cupid = document.getElementById("cupid-img");
-    const cake = document.getElementById("cake");
-    const counterDisplay = document.getElementById("counter");
+    if (cupid) {
+        cupid.style.left = (x + 15) + "px";
+        cupid.style.top = (y + 15) + "px";
+    }
+}
 
-    // 1. DYNAMIC CURSOR & MOVEMENT
-    document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX; mouseY = e.clientY;
-        sword.style.left = mouseX + "px";
-        sword.style.top = mouseY + "px";
-        let dx = mouseX - lastX;
-        let dy = mouseY - lastY;
-        let speed = Math.sqrt(dx*dx + dy*dy);
-        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        if (speed > 12) {
-            createSlash(mouseX, mouseY, angle);
-            if (!isGameOver) checkCakeHit(mouseX, mouseY, speed);
+document.addEventListener("touchmove", function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    mouse.x = touch.clientX;
+    mouse.y = touch.clientY;
+    updateSword();
+    updateCupid(mouse.x, mouse.y); 
+
+    const element = document.elementFromPoint(mouse.x, mouse.y);
+    
+    // Handle Game Slicing
+    if(element && element.classList.contains('toss-item') && !element.hit) {
+        element.hit = true; 
+        element.sliceHandler();
+    }
+    
+    // Handle Cake Slicing
+    if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) {
+        checkHit();
+    }
+}, { passive: false });
+
+// --- MAIN LOGIC ---
+window.onload = function() {
+    const rainContainer = document.getElementById('rainBox');
+    for(let i=0; i<45; i++) {
+        const span = document.createElement('span');
+        span.innerText = "14 Feb"; span.className = "rain-text";
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+        span.style.fontSize = (Math.random() * 12 + 12) + 'px';
+        rainContainer.appendChild(span);
+    }
+
+    let load = 0;
+    const txt = document.getElementById('loadingText');
+    const interval = setInterval(() => {
+        load++; document.getElementById('fillBar').style.width = load + "%";
+        if(load < 25) txt.innerText = "Preparing surprise for Mannu... 🎁";
+        else if(load < 50) txt.innerText = "Adding extra love & kisses... 💋";
+        else if(load < 80) txt.innerText = "Bas thoda sa aur baby... 🤏";
+        else txt.innerText = "Ye lo aapka gift! ❤️";
+        if(load >= 100) { clearInterval(interval); document.getElementById('loaderBox').style.display = 'none'; document.getElementById('startBtn').style.display = 'inline-block'; }
+    }, 45);
+};
+
+function triggerIntro() {
+    // --- 1. SILENT AUDIO UNLOCK (FIXED) ---
+    // We strictly mute and set volume to 0 BEFORE playing to prevent the "explosion" of sound.
+    const silentUnlockList = [
+        'letterMusic', 'sliceSound', 'yaySound', 'sadSound', 
+        'afterCakeSound', 'heartSound', 'chaloSound', 
+        'tugayaSound', 'bounceSound', 'sadIndianSound'
+    ];
+
+    silentUnlockList.forEach(id => { 
+        const el = document.getElementById(id); 
+        if(el) {
+            el.volume = 0; // Double safety: Volume 0
+            el.muted = true; // Triple safety: Muted
+            
+            // Play briefly to unlock the audio engine on mobile
+            el.play().then(() => { 
+                el.pause(); 
+                el.currentTime = 0; 
+                
+                // Only restore volume after a safe delay
+                setTimeout(() => {
+                    el.volume = 1;
+                    el.muted = false;
+                }, 500); 
+            }).catch(e => console.log("Audio unlock skipped for:", id)); 
         }
-        lastX = mouseX; lastY = mouseY;
     });
 
-    function createSlash(x, y, angle) {
-        const s = document.createElement("div");
-        s.className = "slash";
-        s.style.left = x + "px"; s.style.top = y + "px";
-        s.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-        document.body.appendChild(s);
-        setTimeout(() => s.remove(), 400);
+    // --- 2. PLAY BGM ---
+    const bgm = document.getElementById('cuteMusic');
+    if(bgm) {
+        bgm.volume = 0.3; 
+        bgm.play().catch(e => console.log("BGM play failed"));
     }
 
-    // 2. CAKE SLICING
-    function checkCakeHit(x, y, speed) {
-        if (document.getElementById("cakeScreen").classList.contains("hidden") || cakeHealth <= 0) return;
-        const rect = cake.getBoundingClientRect();
-        if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom && speed > 25) {
-            let now = Date.now();
-            if (now - (window.lastHit || 0) > 200) { 
-                cakeHealth--;
-                counterDisplay.innerText = `Slices left: ${cakeHealth}`;
-                sliceSound.currentTime = 0;
-                sliceSound.play();
-                cake.style.transform = "scale(0.9) rotate(4deg)";
-                setTimeout(() => cake.style.transform = "scale(1)", 100);
-                if (cakeHealth === 0) {
-                    afterCakeSound.play();
-                    cake.src = "sliced cake.png";
-                    counterDisplay.style.display = "none";
-                    document.getElementById("cakeText").innerText = "Success! Who gets a piece?";
-                    document.getElementById("cakeChoices").classList.remove("hidden");
-                }
-                window.lastHit = now;
-            }
-        }
-    }
+    // --- 3. START VISUALS ---
+    document.getElementById('startScreen').style.display = 'none';
+    const scene = document.getElementById('introScene');
+    scene.style.display = 'flex';
 
-    // 3. NO & YES LOGIC
-    document.getElementById("yesBtn").onclick = () => {
-        yaySound.play();
-        cuteMusic.play();
-        document.getElementById("valentineBox").style.display = "none";
-        document.getElementById("cakeScreen").classList.remove("hidden");
-    };
+    const vText = document.getElementById('valentineText');
+    const bText = document.getElementById('birthdayText');
+    const flash = document.getElementById('impactFlash');
+    const bounce = document.getElementById('bounceSound');
 
-    document.getElementById("noBtn").addEventListener("mouseover", () => {
-        sadSound.currentTime = 0; sadSound.play();
-        const x = Math.random() * (window.innerWidth - 150);
-        const y = Math.random() * (window.innerHeight - 100);
-        noBtn.style.position = "fixed";
-        noBtn.style.left = x + "px"; noBtn.style.top = y + "px";
-    });
+    setTimeout(() => { vText.classList.add('pop-in'); }, 300);
 
-    function animateCupid() {
-        cupidX += (mouseX + 110 - cupidX) * 0.06;
-        cupidY += (mouseY - 70 - cupidY) * 0.06;
-        cupid.style.left = cupidX + "px";
-        cupid.style.top = cupidY + "px";
-        requestAnimationFrame(animateCupid);
-    }
-    animateCupid();
-
-    // 4. TRANSITIONS
-    function triggerBlackout() {
-        isGameOver = true;
-        document.getElementById("cakeScreen").classList.add("hidden");
-        document.getElementById("guiltPopup").classList.add("hidden");
-        const b = document.getElementById("blackout");
-        b.style.display = "block";
-        setTimeout(() => b.style.opacity = "1", 100);
+    setTimeout(() => {
+        bText.classList.add('crash-in');
         setTimeout(() => {
-            document.getElementById("beatingHeart").style.display = "block";
-            heartSound.play();
-        }, 3000);
+            // Unmute bounce specifically for this moment
+            bounce.volume = 1; 
+            bounce.muted = false; 
+            bounce.play().catch(e => {}); 
+            
+            scene.classList.add('screen-shake');
+            flash.classList.add('flash-now');
+            vText.classList.add('knockout');
+        }, 300); 
+
+        setTimeout(() => { document.getElementById('letsGoBtn').style.display = 'block'; }, 1500);
+    }, 1500);
+}
+
+function startMainExperience() {
+    const bounce = document.getElementById('bounceSound');
+    bounce.pause(); bounce.currentTime = 0;
+
+    const bgm = document.getElementById('cuteMusic');
+    bgm.volume = 0.2; bgm.play();
+    document.getElementById('introScene').style.display = 'none';
+    document.getElementById('stage1').classList.remove('hidden');
+}
+
+let mouse = { x:0, y:0, lx:0, ly:0 };
+let slices = 19;
+let letterScore = 0;
+const targetScore = 19;
+let isGameOver = false;
+let stopGame = false;
+
+document.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX; mouse.y = e.clientY;
+    updateSword();
+    updateCupid(mouse.x, mouse.y); 
+
+    let speed = Math.sqrt(Math.pow(mouse.x - mouse.lx, 2) + Math.pow(mouse.y - mouse.ly, 2));
+    if (speed > 15) {
+        createSlash(mouse.x, mouse.y);
+        if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) checkHit();
     }
+    mouse.lx = mouse.x; mouse.ly = mouse.y;
+});
 
-    // 5. FINALE WITH PROGRESS BAR
-    document.getElementById("beatingHeart").onclick = function() {
-        heartSound.pause();
-        this.style.display = "none";
-        document.getElementById("blackout").style.display = "none";
-        document.getElementById("glassOverlay").style.display = "block";
-        
-        // Create Progress Bar Container
-        const barContainer = document.createElement("div");
-        barContainer.id = "progressBarContainer";
-        Object.assign(barContainer.style, {
-            position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
-            width: '300px', height: '20px', background: 'rgba(255,255,255,0.3)',
-            borderRadius: '10px', overflow: 'hidden', zIndex: '4000', border: '2px solid white'
-        });
-        
-        const barFill = document.createElement("div");
-        barFill.id = "barFill";
-        Object.assign(barFill.style, {
-            width: '0%', height: '100%', background: '#ff4d6d', transition: '0.5s'
-        });
-        
-        const barText = document.createElement("div");
-        barText.id = "barText";
-        barText.innerText = "Open 5 letters: 0/5";
-        Object.assign(barText.style, {
-            position: 'fixed', top: '45px', left: '50%', transform: 'translateX(-50%)',
-            color: 'white', fontWeight: 'bold', textShadow: '0 0 5px black', zIndex: '4000'
-        });
+function updateSword() {
+    const sword = document.getElementById("sword");
+    sword.style.left = mouse.x + "px"; sword.style.top = mouse.y + "px";
+}
 
-        barContainer.appendChild(barFill);
-        document.body.appendChild(barContainer);
-        document.body.appendChild(barText);
+function createSlash(x, y) {
+    const s = document.createElement("div"); s.className = "slash";
+    s.style.left = x + "px"; s.style.top = y + "px";
+    s.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(y - mouse.ly, x - mouse.lx) * 180 / Math.PI}deg)`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 400);
+}
 
-        cuteMusic.pause();
-        finaleMusic.play();
-        startFallingLetters();
-    };
+function toStage2() { document.getElementById("yaySound").play(); document.getElementById("stage1").classList.add("hidden"); document.getElementById("noBtn").style.display = "none"; document.getElementById("stage2").classList.remove("hidden"); }
 
-    function startFallingLetters() {
-        const msgs = [
-            "Mannu, you're the best! ❤️", "I love you 3000! ✨", 
-            "You make me so happy! 😍", "Forever yours! ♾️", "You're my favorite! 🍰"
-        ];
-        
-        setInterval(() => {
-            const l = document.createElement("img");
-            l.src = "letter.png";
-            l.className = "falling-letter";
-            l.style.left = Math.random() * 85 + 5 + "vw";
-            l.onclick = function() {
-                // If it's a new letter click
-                if (!this.classList.contains('opened')) {
-                    this.classList.add('opened');
-                    lettersOpened++;
-                    updateProgress();
-                }
-                document.getElementById("letterContent").innerText = msgs[Math.floor(Math.random()*msgs.length)];
-                document.getElementById("letterPopup").classList.add("active");
-            };
-            document.body.appendChild(l);
-            setTimeout(() => l.remove(), 9000);
-        }, 1800);
-    }
+document.getElementById("noBtn").addEventListener('mouseover', function() {
+    const btn = this; document.getElementById("sadSound").currentTime = 0; document.getElementById("sadSound").play();
+    if (btn.parentNode.id !== 'body') { document.body.appendChild(btn); }
+    btn.style.position = "fixed"; btn.style.left = Math.random() * 80 + "vw"; btn.style.top = Math.random() * 80 + "vh";
+});
 
-    function updateProgress() {
-        const fill = document.getElementById("barFill");
-        const text = document.getElementById("barText");
-        const percentage = (lettersOpened / totalRequired) * 100;
-        
-        fill.style.width = Math.min(percentage, 100) + "%";
-        text.innerText = `Letters collected: ${Math.min(lettersOpened, 5)}/5`;
-
-        if (lettersOpened === 5) {
-            revealFinalStep();
+function checkHit() {
+    if(slices <= 0) return; 
+    const rect = document.getElementById("cake").getBoundingClientRect();
+    if(mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) {
+        if(Date.now() - (window.lh || 0) > 150) {
+            slices--; 
+            if (slices < 0) slices = 0;
+            document.getElementById("counter").innerText = `Slices left: ${slices}`;
+            const s = document.getElementById("sliceSound"); s.currentTime = 0; s.play();
+            if(slices === 0) { document.getElementById("afterCakeSound").play(); document.getElementById("cake").src = "sliced cake.png"; document.getElementById("cakeChoices").classList.remove("hidden"); }
+            window.lh = Date.now();
         }
     }
+}
 
-    function revealFinalStep() {
-        const finalBtn = document.createElement("button");
-        finalBtn.className = "actionBtn";
-        finalBtn.innerText = "Click for Final Surprise 🎁";
-        Object.assign(finalBtn.style, {
-            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-            zIndex: '5000', padding: '20px 40px', fontSize: '24px', animation: 'premiumBeat 0.8s infinite'
-        });
-        
-        finalBtn.onclick = () => {
-            alert("Happy Valentine's Day, Mannu! I love you! ❤️"); // You can replace this with a new stage!
+function eatSelf() { 
+    document.getElementById("guiltPopup").classList.remove("hidden"); 
+    document.getElementById("cuteMusic").pause();
+    document.getElementById("sadIndianSound").play();
+}
+
+function showDimpu() { 
+    document.getElementById("sadIndianSound").pause();
+    document.getElementById("sadIndianSound").currentTime = 0;
+    document.getElementById("cuteMusic").play();
+    document.getElementById("stage2").classList.add("hidden"); 
+    document.getElementById("guiltPopup").classList.add("hidden"); 
+    document.getElementById("dimpuStage").classList.remove("hidden"); 
+}
+
+function checkYear() {
+    const val = document.getElementById("adiYear").value;
+    const img = document.getElementById("dimpuImg");
+    const tugaya = document.getElementById("tugayaSound");
+    if(val === "2004") { tugaya.pause(); tugaya.currentTime = 0; document.getElementById("chaloSound").play(); img.src = "dimpu2.png"; setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); setTimeout(() => { triggerRealBlackout(); }, 3000); }
+    else { tugaya.currentTime = 0; tugaya.play(); img.src = "dimpuangry.png"; alert("Wrong year! Try again 😼"); }
+}
+
+function triggerRealBlackout() { isGameOver = true; document.getElementById("dimpuStage").classList.add("hidden"); document.getElementById("blackout").style.display = "block"; setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); setTimeout(() => { document.getElementById("beatingHeart").style.display = "block"; document.getElementById("heartSound").play(); }, 3000); }
+
+document.getElementById("beatingHeart").onclick = function() { document.getElementById("heartSound").pause(); this.style.display = "none"; document.getElementById("blackout").style.display = "none"; document.getElementById("glassOverlay").style.display = "block"; document.getElementById("rulesPopup").classList.remove("hidden"); };
+
+function startFinalGame() {
+    document.getElementById("rulesPopup").classList.add("hidden");
+    document.getElementById("progressWrapper").style.display = "block";
+    document.getElementById("gameHUD").classList.remove("hidden");
+    document.getElementById("gameHUD").style.display = "flex";
+    
+    const bgm = document.getElementById("cuteMusic"); bgm.pause();
+    document.getElementById("letterMusic").play();
+    startFruitNinja();
+}
+
+// --- ZOOM LOGIC ---
+function startFruitNinja() {
+    const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
+    const spawnItem = () => {
+        if (stopGame) return;
+        const item = document.createElement("img");
+        const isBomb = Math.random() > 0.7; 
+        const type = isBomb ? (Math.random() > 0.5 ? "dal.png" : "roti.png") : "letter.png";
+        item.src = type; item.className = "toss-item";
+        const size = isBomb ? (Math.random() * 60 + 80) : (Math.random() * 100 + 150); 
+        item.style.width = size + "px";
+        item.style.left = Math.random() * 80 + 10 + "vw";
+        const peak = 40 + Math.random() * 40 + "vh";
+        item.style.setProperty('--peakHeight', peak);
+        const drift = (Math.random() - 0.5) * 300 + "px";
+        item.style.transform = `translateX(${drift})`;
+        const duration = 2 + Math.random();
+        item.style.animation = `tossUp ${duration}s ease-in-out forwards`;
+
+        // Define behavior
+        item.sliceHandler = function() {
+            if (stopGame) return;
+            if (isBomb) { 
+                letterScore = 0; updateHUD();
+                const bad = document.getElementById("tugayaSound"); bad.currentTime = 0; bad.play(); 
+                const flash = document.getElementById("redFlash"); flash.style.opacity = "0.6"; setTimeout(() => flash.style.opacity = "0", 200); 
+                item.remove(); 
+            } else { 
+                letterScore++; 
+                document.getElementById("scoreCounter").innerText = letterScore;
+                document.getElementById("barFill").style.width = Math.min((letterScore/targetScore)*100, 100) + "%";
+                
+                const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
+
+                // --- CHECK IF 19TH LETTER ---
+                if (letterScore >= targetScore) {
+                    stopGame = true; // Stop spawns
+                    
+                    // 1. Freeze animation
+                    item.style.animation = 'none';
+                    
+                    // 2. Center & Zoom BIG
+                    item.style.transition = "all 2.5s cubic-bezier(0.25, 1, 0.5, 1)";
+                    item.style.position = "fixed";
+                    item.style.left = "50%";
+                    item.style.top = "50%";
+                    item.style.zIndex = "10000";
+                    // Force transform next tick
+                    requestAnimationFrame(() => {
+                        item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)";
+                        item.style.opacity = "0"; // Fade out during zoom
+                    });
+
+                    // 3. Trigger Finale after zoom finishes
+                    setTimeout(() => {
+                        document.querySelectorAll('.toss-item').forEach(el => el.remove());
+                        document.getElementById("gameHUD").style.display = "none"; 
+                        document.getElementById("progressWrapper").style.opacity = "0"; 
+                        document.getElementById("cupid-img").style.display = "none"; 
+                        document.getElementById("cupidFinale").style.display = "flex";
+                    }, 2500);
+                    
+                } else {
+                    // Normal behavior
+                    showFloatingText(item.getBoundingClientRect().left, item.getBoundingClientRect().top, loveWords); 
+                    item.remove(); 
+                }
+            }
         };
-        document.body.appendChild(finalBtn);
-    }
 
-    function closeLetter() { document.getElementById("letterPopup").classList.remove("active"); }
-    function eatSelf() { document.getElementById("guiltPopup").classList.remove("hidden"); }
-    function shareWithAdi() { triggerBlackout(); }
-    function giveToAdi() { triggerBlackout(); }
+        // Mouse interaction
+        item.onmouseover = function() {
+            if(!this.hit) { this.hit = true; this.sliceHandler(); }
+        };
+
+        document.body.appendChild(item);
+        setTimeout(() => { if(item.parentNode) item.remove(); }, duration * 1000 + 100);
+        if (!stopGame) setTimeout(spawnItem, Math.random() * 600 + 300); 
+    };
+    spawnItem();
+}
+
+function showFloatingText(x, y, words) {
+    const txt = document.createElement("div"); txt.className = "love-pop";
+    txt.innerText = words[Math.floor(Math.random() * words.length)];
+    txt.style.left = x + "px"; txt.style.top = y + "px";
+    document.body.appendChild(txt); setTimeout(() => txt.remove(), 3000);
+}
+
+function updateHUD() {
+    document.getElementById("scoreCounter").innerText = letterScore;
+    const pct = (letterScore / targetScore) * 100;
+    document.getElementById("barFill").style.width = Math.min(pct, 100) + "%";
+}
+
+function showFinalWhiteScreen() {
+    const whiteScreen = document.getElementById("whiteScreen");
+    whiteScreen.style.opacity = "1";
+    whiteScreen.style.pointerEvents = "auto";
+    
+    // 1. Fade In Red Text
+    setTimeout(() => {
+        document.getElementById("finalRedText").style.opacity = "1";
+        document.getElementById("finaleLoadingBox").style.opacity = "1";
+        
+        // 2. Start Bar Animation (takes 5s)
+        document.getElementById("finaleBar").style.width = "100%";
+    }, 500);
+
+    // 3. Fade Out Red Text & Bar after 5.5s
+    setTimeout(() => {
+        document.getElementById("finalRedText").style.opacity = "0";
+        document.getElementById("finaleLoadingBox").style.opacity = "0";
+    }, 5500); 
+
+    // 4. Fade In Bye Text after 6.5s
+    setTimeout(() => {
+        document.getElementById("byeText").style.opacity = "1";
+    }, 6500); 
+}
