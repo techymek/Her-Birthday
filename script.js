@@ -1,3 +1,12 @@
+// --- VARIABLES ---
+let mouse = { x:0, y:0, lx:0, ly:0 };
+let slices = 19;
+let letterScore = 0;
+const targetScore = 19;
+let isGameOver = false;
+let stopGame = false;
+let audioUnlocked = false; // New flag for iOS fix
+
 // --- RESPONSIVE TOUCH & CURSOR LOGIC ---
 function updateCupid(x, y) {
     const cupid = document.getElementById("cupid-img");
@@ -6,6 +15,39 @@ function updateCupid(x, y) {
         cupid.style.top = (y + 15) + "px";
     }
 }
+
+// Global Interaction Listener (Fix for iOS Audio)
+function unlockRestOfAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+
+    // We silently play-pause the other SFX on the FIRST touch/interaction
+    // This prevents the "explosion" of sound at the start
+    const sfx = [
+        'sliceSound', 'yaySound', 'sadSound', 'sadIndianSound', 
+        'afterCakeSound', 'heartSound', 'chaloSound', 'tugayaSound', 
+        'letterMusic'
+    ];
+
+    sfx.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.muted = true; // Ensure it's silent
+            el.play().then(() => {
+                el.pause();
+                el.currentTime = 0;
+                el.muted = false; // Ready for real use
+            }).catch(e => { /* Ignore auto-play errors */ });
+        }
+    });
+    
+    // Remove listeners so this only happens once
+    document.removeEventListener("touchstart", unlockRestOfAudio);
+    document.removeEventListener("mousemove", unlockRestOfAudio);
+}
+
+document.addEventListener("touchstart", unlockRestOfAudio);
+document.addEventListener("mousemove", unlockRestOfAudio);
 
 document.addEventListener("touchmove", function(e) {
     e.preventDefault();
@@ -54,42 +96,16 @@ window.onload = function() {
 };
 
 function triggerIntro() {
-    // --- 1. SILENT AUDIO UNLOCK (FIXED) ---
-    // We strictly mute and set volume to 0 BEFORE playing to prevent the "explosion" of sound.
-    const silentUnlockList = [
-        'letterMusic', 'sliceSound', 'yaySound', 'sadSound', 
-        'afterCakeSound', 'heartSound', 'chaloSound', 
-        'tugayaSound', 'bounceSound', 'sadIndianSound'
-    ];
-
-    silentUnlockList.forEach(id => { 
-        const el = document.getElementById(id); 
-        if(el) {
-            el.volume = 0; // Double safety: Volume 0
-            el.muted = true; // Triple safety: Muted
-            
-            // Play briefly to unlock the audio engine on mobile
-            el.play().then(() => { 
-                el.pause(); 
-                el.currentTime = 0; 
-                
-                // Only restore volume after a safe delay
-                setTimeout(() => {
-                    el.volume = 1;
-                    el.muted = false;
-                }, 500); 
-            }).catch(e => console.log("Audio unlock skipped for:", id)); 
-        }
-    });
-
-    // --- 2. PLAY BGM ---
+    // --- 1. PLAY ONLY BGM & BOUNCE (Fix for noise explosion) ---
     const bgm = document.getElementById('cuteMusic');
     if(bgm) {
         bgm.volume = 0.3; 
         bgm.play().catch(e => console.log("BGM play failed"));
     }
 
-    // --- 3. START VISUALS ---
+    const bounce = document.getElementById('bounceSound');
+
+    // --- 2. START VISUALS ---
     document.getElementById('startScreen').style.display = 'none';
     const scene = document.getElementById('introScene');
     scene.style.display = 'flex';
@@ -97,17 +113,14 @@ function triggerIntro() {
     const vText = document.getElementById('valentineText');
     const bText = document.getElementById('birthdayText');
     const flash = document.getElementById('impactFlash');
-    const bounce = document.getElementById('bounceSound');
 
     setTimeout(() => { vText.classList.add('pop-in'); }, 300);
 
     setTimeout(() => {
         bText.classList.add('crash-in');
         setTimeout(() => {
-            // Unmute bounce specifically for this moment
-            bounce.volume = 1; 
-            bounce.muted = false; 
-            bounce.play().catch(e => {}); 
+            // Play bounce sound here
+            if(bounce) bounce.play().catch(e=>{});
             
             scene.classList.add('screen-shake');
             flash.classList.add('flash-now');
@@ -127,13 +140,6 @@ function startMainExperience() {
     document.getElementById('introScene').style.display = 'none';
     document.getElementById('stage1').classList.remove('hidden');
 }
-
-let mouse = { x:0, y:0, lx:0, ly:0 };
-let slices = 19;
-let letterScore = 0;
-const targetScore = 19;
-let isGameOver = false;
-let stopGame = false;
 
 document.addEventListener("mousemove", (e) => {
     mouse.x = e.clientX; mouse.y = e.clientY;
@@ -161,10 +167,19 @@ function createSlash(x, y) {
     setTimeout(() => s.remove(), 400);
 }
 
-function toStage2() { document.getElementById("yaySound").play(); document.getElementById("stage1").classList.add("hidden"); document.getElementById("noBtn").style.display = "none"; document.getElementById("stage2").classList.remove("hidden"); }
+function toStage2() { 
+    document.getElementById("yaySound").play().catch(e=>{}); 
+    document.getElementById("stage1").classList.add("hidden"); 
+    document.getElementById("noBtn").style.display = "none"; 
+    document.getElementById("stage2").classList.remove("hidden"); 
+}
 
 document.getElementById("noBtn").addEventListener('mouseover', function() {
-    const btn = this; document.getElementById("sadSound").currentTime = 0; document.getElementById("sadSound").play();
+    const btn = this; 
+    const sad = document.getElementById("sadSound");
+    sad.currentTime = 0; 
+    sad.play().catch(e=>{});
+    
     if (btn.parentNode.id !== 'body') { document.body.appendChild(btn); }
     btn.style.position = "fixed"; btn.style.left = Math.random() * 80 + "vw"; btn.style.top = Math.random() * 80 + "vh";
 });
@@ -177,8 +192,15 @@ function checkHit() {
             slices--; 
             if (slices < 0) slices = 0;
             document.getElementById("counter").innerText = `Slices left: ${slices}`;
-            const s = document.getElementById("sliceSound"); s.currentTime = 0; s.play();
-            if(slices === 0) { document.getElementById("afterCakeSound").play(); document.getElementById("cake").src = "sliced cake.png"; document.getElementById("cakeChoices").classList.remove("hidden"); }
+            
+            const s = document.getElementById("sliceSound"); 
+            s.currentTime = 0; s.play().catch(e=>{});
+            
+            if(slices === 0) { 
+                document.getElementById("afterCakeSound").play().catch(e=>{}); 
+                document.getElementById("cake").src = "sliced cake.png"; 
+                document.getElementById("cakeChoices").classList.remove("hidden"); 
+            }
             window.lh = Date.now();
         }
     }
@@ -187,12 +209,13 @@ function checkHit() {
 function eatSelf() { 
     document.getElementById("guiltPopup").classList.remove("hidden"); 
     document.getElementById("cuteMusic").pause();
-    document.getElementById("sadIndianSound").play();
+    document.getElementById("sadIndianSound").play().catch(e=>{});
 }
 
 function showDimpu() { 
-    document.getElementById("sadIndianSound").pause();
-    document.getElementById("sadIndianSound").currentTime = 0;
+    const sad = document.getElementById("sadIndianSound");
+    sad.pause(); sad.currentTime = 0;
+    
     document.getElementById("cuteMusic").play();
     document.getElementById("stage2").classList.add("hidden"); 
     document.getElementById("guiltPopup").classList.add("hidden"); 
@@ -203,13 +226,38 @@ function checkYear() {
     const val = document.getElementById("adiYear").value;
     const img = document.getElementById("dimpuImg");
     const tugaya = document.getElementById("tugayaSound");
-    if(val === "2004") { tugaya.pause(); tugaya.currentTime = 0; document.getElementById("chaloSound").play(); img.src = "dimpu2.png"; setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); setTimeout(() => { triggerRealBlackout(); }, 3000); }
-    else { tugaya.currentTime = 0; tugaya.play(); img.src = "dimpuangry.png"; alert("Wrong year! Try again 😼"); }
+    
+    if(val === "2004") { 
+        tugaya.pause(); tugaya.currentTime = 0; 
+        document.getElementById("chaloSound").play().catch(e=>{}); 
+        img.src = "dimpu2.png"; 
+        setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); 
+        setTimeout(() => { triggerRealBlackout(); }, 3000); 
+    } else { 
+        tugaya.currentTime = 0; tugaya.play().catch(e=>{}); 
+        img.src = "dimpuangry.png"; 
+        alert("Wrong year! Try again 😼"); 
+    }
 }
 
-function triggerRealBlackout() { isGameOver = true; document.getElementById("dimpuStage").classList.add("hidden"); document.getElementById("blackout").style.display = "block"; setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); setTimeout(() => { document.getElementById("beatingHeart").style.display = "block"; document.getElementById("heartSound").play(); }, 3000); }
+function triggerRealBlackout() { 
+    isGameOver = true; 
+    document.getElementById("dimpuStage").classList.add("hidden"); 
+    document.getElementById("blackout").style.display = "block"; 
+    setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); 
+    setTimeout(() => { 
+        document.getElementById("beatingHeart").style.display = "block"; 
+        document.getElementById("heartSound").play().catch(e=>{}); 
+    }, 3000); 
+}
 
-document.getElementById("beatingHeart").onclick = function() { document.getElementById("heartSound").pause(); this.style.display = "none"; document.getElementById("blackout").style.display = "none"; document.getElementById("glassOverlay").style.display = "block"; document.getElementById("rulesPopup").classList.remove("hidden"); };
+document.getElementById("beatingHeart").onclick = function() { 
+    document.getElementById("heartSound").pause(); 
+    this.style.display = "none"; 
+    document.getElementById("blackout").style.display = "none"; 
+    document.getElementById("glassOverlay").style.display = "block"; 
+    document.getElementById("rulesPopup").classList.remove("hidden"); 
+};
 
 function startFinalGame() {
     document.getElementById("rulesPopup").classList.add("hidden");
@@ -218,11 +266,10 @@ function startFinalGame() {
     document.getElementById("gameHUD").style.display = "flex";
     
     const bgm = document.getElementById("cuteMusic"); bgm.pause();
-    document.getElementById("letterMusic").play();
+    document.getElementById("letterMusic").play().catch(e=>{});
     startFruitNinja();
 }
 
-// --- ZOOM LOGIC ---
 function startFruitNinja() {
     const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
     const spawnItem = () => {
@@ -246,7 +293,9 @@ function startFruitNinja() {
             if (stopGame) return;
             if (isBomb) { 
                 letterScore = 0; updateHUD();
-                const bad = document.getElementById("tugayaSound"); bad.currentTime = 0; bad.play(); 
+                const bad = document.getElementById("tugayaSound"); 
+                bad.currentTime = 0; bad.play().catch(e=>{});
+                
                 const flash = document.getElementById("redFlash"); flash.style.opacity = "0.6"; setTimeout(() => flash.style.opacity = "0", 200); 
                 item.remove(); 
             } else { 
@@ -254,7 +303,8 @@ function startFruitNinja() {
                 document.getElementById("scoreCounter").innerText = letterScore;
                 document.getElementById("barFill").style.width = Math.min((letterScore/targetScore)*100, 100) + "%";
                 
-                const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
+                const good = document.getElementById("sliceSound"); 
+                good.currentTime = 0; good.play().catch(e=>{});
 
                 // --- CHECK IF 19TH LETTER ---
                 if (letterScore >= targetScore) {
@@ -342,3 +392,4 @@ function showFinalWhiteScreen() {
         document.getElementById("byeText").style.opacity = "1";
     }, 6500); 
 }
+
