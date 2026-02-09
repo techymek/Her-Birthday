@@ -1,173 +1,151 @@
-/* ===============================
-   GLOBAL
-================================ */
+/* --- GLOBAL VARIABLES --- */
+:root { --pink: #ff4d6d; --deep-rose: #8d0033; --glow: #ff0000; }
+* { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* FIX FOR BUTTONS ON MOBILE */
+button { touch-action: manipulation; pointer-events: auto; cursor: pointer; }
+
+body { background: #ffc0cb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; cursor: none; height: 100vh; width: 100vw; transition: background 1s ease; }
+
+/* --- BLADE & CURSOR --- */
+#sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); }
+.slash { position: fixed; width: 100px; height: 8px; background: white; border-radius: 10px; pointer-events: none; z-index: 9999; box-shadow: 0 0 10px #fff, 0 0 20px var(--pink); animation: slashFade 0.3s ease-out forwards; transform-origin: center; }
+@keyframes slashFade { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.2); } }
+
+/* --- FLOATING CURSOR CUPID --- */
+#cupid-img { position: fixed; width: 100px; pointer-events: none; z-index: 9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s; }
+
+/* --- LOADING & INTRO --- */
+#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; overflow: hidden; padding: 20px; }
+@keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+.rain-text { position: absolute; top: -50px; color: #fff; opacity: 0.25; font-weight: bold; font-family: 'Arial', sans-serif; animation: fallDown linear infinite; }
+@keyframes fallDown { to { transform: translateY(110vh); } }
+.start-card { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 2; width: 100%; max-width: 420px; color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
+.start-card h1 { font-size: clamp(28px, 5vw, 36px); margin-bottom: 10px; font-weight: 800; }
+.start-card p { font-size: 16px; margin-bottom: 20px; opacity: 0.9; font-weight: 600; }
+.loader-heart { font-size: 45px; animation: bounceHeart 0.8s infinite alternate; margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5)); }
+@keyframes bounceHeart { from { transform: scale(1); } to { transform: scale(1.15); } }
+.loader-container { width: 100%; background: rgba(255,255,255,0.4); height: 10px; border-radius: 20px; overflow: hidden; margin-bottom: 15px; position: relative; }
+.loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff758f, #ff4d6d); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); transition: width 0.1s linear; }
+#loadingText { font-size: 14px; font-weight: 700; min-height: 25px; color: var(--deep-rose); letter-spacing: 0.5px; }
+#startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; transition: 0.3s; }
+@keyframes popBtn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* --- INTRO SCENE --- */
+#introScene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffc0cb; z-index: 8500; display: none; justify-content: center; align-items: center; overflow: hidden; padding: 20px; }
+#valentineText { position: absolute; width: 100%; text-align: center; font-size: clamp(28px, 5vw, 48px); color: #ff0055; font-weight: bold; opacity: 0; transform: scale(0.5); text-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+#birthdayText { position: absolute; width: 100%; text-align: center; font-size: clamp(32px, 6vw, 60px); color: #d00000; font-weight: 900; opacity: 0; text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); font-family: 'Arial Black', sans-serif; white-space: normal; line-height: 1.2; }
+.pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes popIn { 0% { opacity:0; transform: scale(0.5); } 100% { opacity:1; transform: scale(1); } }
+.crash-in { animation: crashIn 0.4s ease-in forwards; }
+@keyframes crashIn { 0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } }
+.knockout { animation: flyOut 0.8s ease-out forwards; }
+@keyframes flyOut { 0% { transform: translate(0,0) rotate(0deg); } 20% { transform: translate(-20px, 20px) rotate(-10deg); } 100% { transform: translate(-150vw, -50vh) rotate(-120deg); opacity: 0; } }
+.screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake { 10%, 90% { transform: translate3d(-5px, 0, 0); } 20%, 80% { transform: translate3d(10px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-10px, 0, 0); } 40%, 60% { transform: translate3d(10px, 0, 0); } }
+#impactFlash { position: fixed; top:0; left:0; width:100%; height:100%; background: white; opacity: 0; pointer-events: none; z-index: 8600; }
+.flash-now { animation: flashAnim 0.3s ease-out forwards; }
+@keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
+#letsGoBtn { position: absolute; bottom: 15%; font-size: 20px; padding: 15px 40px; z-index: 9999; display: none; animation: fadeInBtn 1s; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; }
+@keyframes fadeInBtn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- GAME HUD & UI --- */
+#gameHUD { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; z-index: 7000; background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink); width: auto; min-width: 280px; justify-content: space-around; }
+.hud-item { display: flex; flex-direction: column; align-items: center; }
+.hud-label { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
+.hud-icon { width: 28px; height: 28px; object-fit: contain; }
+#scoreCounter { font-size: 24px; font-weight: 900; color: var(--pink); line-height: 1; }
+#scoreTotal { font-size: 12px; font-weight: bold; color: #aaa; }
+#progressWrapper { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 7000; display: none; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px); }
+#barBase { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; }
+#barFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff758f, #ff4d6d); transition: 0.2s; }
+#barText { color: var(--pink); font-weight: bold; margin-top: 3px; font-size: 12px; }
+.centerBox { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 30px; z-index: 100; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+button.actionBtn { padding: 12px 25px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; margin: 8px; background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+#noBtn { background: #adb5bd; position: relative; z-index: 200; border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin: 8px; }
+.hidden { display: none !important; }
+
+/* FINAL STAGES */
+#blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
+#beatingHeart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 600; cursor: pointer; text-align: center; }
+#heartEmoji { font-size: 100px; animation: pBeat 0.8s infinite; }
+#heartText { color: #ff4d6d; font-size: 24px; font-weight: bold; margin-top: 20px; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 15px rgba(255, 77, 109, 0.6); white-space: nowrap; animation: fadeText 1.5s infinite alternate; }
+@keyframes pBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
+#glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
+
+/* FRUIT NINJA ITEMS */
+.toss-item { position: fixed; cursor: crosshair; z-index: 9000; bottom: -300px; user-select: none; pointer-events: auto; padding: 15px; }
+@keyframes tossUp { 0% { bottom: -300px; transform: rotate(0deg); } 50% { bottom: var(--peakHeight); } 100% { bottom: -300px; transform: rotate(720deg); } }
+
+/* --- CUPID FINALE CSS --- */
+#cupidFinale { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8000; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
+#finaleCupid { width: 50vw; max-width: 250px; animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; margin-bottom: 20px; }
+@keyframes flyInCupid { from { transform: translate(-100vw, -20vh) rotate(-20deg); opacity: 0; } to { transform: translate(0, 0) rotate(0deg); opacity: 1; } }
+.final-letter-card { background: #fff; padding: 30px 20px; border-radius: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink); animation: popUp 0.5s 1s backwards; display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
+@keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* --- WHITE SCREEN FINALE CSS --- */
+#whiteScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px; }
+#finalRedText { color: #d00000; font-size: clamp(20px, 5vw, 36px); text-align: center; font-weight: bold; opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px; text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5; }
+#finaleLoadingBox { width: 80%; max-width: 250px; height: 10px; background: #f0f0f0; border-radius: 20px; margin-top: 30px; overflow: hidden; opacity: 0; transition: opacity 1s; border: 1px solid #ff4d6d; }
+#finaleBar { height: 100%; width: 0%; background: #ff4d6d; transition: width 5s linear; }
+#byeText { color: #ff4d6d; font-size: clamp(28px, 6vw, 50px); text-align: center; font-weight: bold; opacity: 0; position: absolute; transition: opacity 1s; width: 100%; }
+
+/* --- FLASHBACK & THEME STYLES (NEW) --- */
+#flashbackContainer { position: absolute; width: 100%; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; z-index: 10001; }
+
+.flashback-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px; border-radius: 20px;
+    width: 90%; max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: popUpCard 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex; flex-direction: column; align-items: center;
 }
+.fb-image { width: 100%; max-height: 300px; object-fit: contain; border-radius: 15px; margin-bottom: 15px; }
+.fb-title { color: var(--pink); font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+.fb-msg { color: #444; font-size: 16px; margin-bottom: 20px; line-height: 1.5; font-weight: 500; }
+.fb-btn { padding: 12px 30px; font-size: 18px; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
+.fb-btn:active { transform: scale(0.95); }
 
-body {
-    background: #ffc0cb;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    cursor: none;
+/* Day Themes */
+.theme-rose { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); }
+.theme-propose { background: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%); }
+.theme-chocolate { background: #5d4037; } /* Chocolate brown */
+.theme-teddy { background: #e0f7fa; } /* Soft blue */
+.theme-promise { background: #2962ff; } /* Royal Blue */
+.theme-hug { background: #ffcc80; } /* Warm orange */
+.theme-kiss { background: #d50000; } /* Lipstick red */
+.theme-valentine { background: radial-gradient(circle, #ff5252, #b71c1c); }
+
+/* Decoration Layers (Pseudo elements for simplicity) */
+.theme-rose::before { content: '🌹'; position: absolute; font-size: 50px; animation: rain 4s infinite; left: 10%; top: -10%; }
+.theme-rose::after { content: '🌹'; position: absolute; font-size: 40px; animation: rain 5s infinite 1s; right: 10%; top: -10%; }
+
+.theme-chocolate::before { content: ''; position: absolute; top:0; left:0; width:100%; height:50px; background: linear-gradient(180deg, #3e2723, transparent); }
+
+/* Chocolate Prank Styles */
+#prankContainer { position: relative; width: 100%; height: 250px; margin-bottom: 15px; border: 2px dashed #aaa; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.5); }
+.choco-item { position: absolute; width: 100px; transition: top 0.2s, left 0.2s; cursor: pointer; }
+
+/* Glass Crack */
+#glassCrack {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Broken_glass.svg/1200px-Broken_glass.svg.png') no-repeat center center;
+    background-size: cover;
+    z-index: 10005; pointer-events: none; opacity: 0;
+    mix-blend-mode: multiply;
 }
+.cracked { opacity: 0.8 !important; animation: shake 0.5s; }
 
+/* Special Popup */
+.special-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 20px; border: 4px solid var(--pink); z-index: 10010; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: popUp 0.3s; }
 
+@keyframes rain { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(110vh); opacity:0; } }
 
-/* ===============================
-   CENTER BOX
-================================ */
-
-.centerBox {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-
-
-
-/* ===============================
-   BUTTONS
-================================ */
-
-button {
-    padding: 14px 28px;
-    font-size: 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    margin: 15px;
-}
-
-#yesBtn {
-    background: #ff4d6d;
-    color: white;
-}
-
-#noBtn {
-    position: absolute;
-}
-
-
-
-/* ===============================
-   GIFS
-================================ */
-
-.gif {
-    width: 300px;
-    margin-top: 20px;
-    display: none;
-}
-
-
-
-/* ===============================
-   CAKE
-================================ */
-
-#cake {
-    width: 360px;
-    margin-top: 20px;
-    position: relative;
-    z-index: 5;
-}
-
-
-
-/* ===============================
-   HEARTS
-================================ */
-
-.heart {
-    position: fixed;
-    top: -10px;
-    font-size: 26px;
-    animation: fall 4s linear;
-    z-index: 3;
-}
-
-@keyframes fall {
-    from {
-        top: -10px;
-        opacity: 1;
-    }
-    to {
-        top: 100vh;
-        opacity: 0;
-    }
-}
-
-
-
-/* ===============================
-   SWORD CURSOR
-================================ */
-
-#sword {
-    position: fixed;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    pointer-events: none;
-
-    background: radial-gradient(circle, white, hotpink);
-    box-shadow:
-        0 0 15px hotpink,
-        0 0 30px deeppink,
-        0 0 60px hotpink;
-
-    z-index: 999999;
-}
-
-
-
-/* ===============================
-   SLASH EFFECT
-================================ */
-
-.slash {
-    position: fixed;
-    width: 90px;
-    height: 8px;
-
-    background: linear-gradient(
-        90deg,
-        transparent,
-        white,
-        hotpink,
-        transparent
-    );
-
-    transform: rotate(45deg);
-    pointer-events: none;
-
-    animation: slashFade 0.25s linear;
-    z-index: 999998;
-}
-
-@keyframes slashFade {
-    from {
-        opacity: 1;
-        transform: scale(1) rotate(45deg);
-    }
-    to {
-        opacity: 0;
-        transform: scale(2) rotate(45deg);
-    }
-}
-
-
-
-/* ===============================
-   HIDDEN
-================================ */
-
-.hidden {
-    display: none;
-}
+#rulesPopup { z-index: 7500; }
+#dimpuImg { transition: transform 1s ease-in; max-width: 100%; border-radius: 20px; width: 100%; }
+input[type="number"] { padding: 12px; font-size: 18px; border-radius: 15px; border: 2px solid var(--pink); outline: none; width: 100%; text-align: center; margin-bottom: 15px; }
+#redFlash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 9500; transition: opacity 0.2s; }
