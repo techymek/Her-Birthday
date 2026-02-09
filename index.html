@@ -8,33 +8,44 @@
         /* --- GLOBAL VARIABLES --- */
         :root { --pink: #ff4d6d; --deep-rose: #8d0033; --glow: #ff0000; }
         * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
-        body { background: #ffc0cb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; cursor: none; height: 100vh; width: 100vw; }
+        
+        /* BODY SETTINGS */
+        body { 
+            background: #ffc0cb; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; 
+            cursor: default; /* Visible cursor for PC */
+            height: 100vh; 
+            width: 100vw; 
+            transition: background 1s ease; /* For Theme Changes */
+        }
 
-        /* --- BLADE & CURSOR --- */
-        #sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); }
-        .slash { position: fixed; width: 150px; height: 5px; background: linear-gradient(90deg, transparent, white, white, transparent); pointer-events: none; z-index: 9999; animation: slashFade 0.4s forwards; }
-        @keyframes slashFade { 0% { opacity: 1; transform: scaleX(0.2); } 100% { opacity: 0; transform: scaleX(1.6); } }
+        /* --- CRITICAL FIX: FORCE BUTTONS TO WORK --- */
+        button { 
+            cursor: pointer !important; 
+            pointer-events: auto !important;
+            touch-action: manipulation !important;
+            position: relative;
+            z-index: 2147483647; /* Maximum Z-Index */
+        }
+
+        /* BLADE & CURSOR */
+        #sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); display: none; }
+        .slash { position: fixed; width: 100px; height: 8px; background: white; border-radius: 10px; pointer-events: none; z-index: 9999; box-shadow: 0 0 10px #fff, 0 0 20px var(--pink); animation: slashFade 0.3s ease-out forwards; transform-origin: center; }
+        @keyframes slashFade { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.2); } }
+
+        /* FLOATING CURSOR CUPID */
+        #cupid-img { position: fixed; width: 100px; pointer-events: none; z-index: 9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s; display: none; }
 
         /* --- 1. LOADING SCREEN --- */
-        #startScreen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
-            z-index: 9000; display: flex; justify-content: center; align-items: center; 
-            flex-direction: column; text-align: center; overflow: hidden; padding: 20px;
-        }
+        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; overflow: hidden; padding: 20px; }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+        
+        .rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
         .rain-text { position: absolute; top: -50px; color: #fff; opacity: 0.25; font-weight: bold; font-family: 'Arial', sans-serif; animation: fallDown linear infinite; }
         @keyframes fallDown { to { transform: translateY(110vh); } }
-
-        .start-card {
-            background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 2; width: 100%; max-width: 420px;
-            color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6);
-        }
+        
+        .start-card { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 10; width: 100%; max-width: 420px; color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6); position: relative; }
         .start-card h1 { font-size: clamp(28px, 5vw, 36px); margin-bottom: 10px; font-weight: 800; }
         .start-card p { font-size: 16px; margin-bottom: 20px; opacity: 0.9; font-weight: 600; }
         
@@ -45,191 +56,69 @@
         .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff758f, #ff4d6d); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); transition: width 0.1s linear; }
         #loadingText { font-size: 14px; font-weight: 700; min-height: 25px; color: var(--deep-rose); letter-spacing: 0.5px; }
         
-        #startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; transition: 0.3s; }
+        #startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; }
         @keyframes popBtn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- 2. INTRO SCENE --- */
-        #introScene { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #ffc0cb; z-index: 8500; display: none; 
-            justify-content: center; align-items: center; overflow: hidden; 
-            padding: 20px;
-        }
-        
-        #valentineText { 
-            position: absolute; width: 100%; text-align: center;
-            font-size: clamp(28px, 5vw, 48px); 
-            color: #ff0055; font-weight: bold; 
-            opacity: 0; transform: scale(0.5); 
-            text-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-        }
-        
-        #birthdayText { 
-            position: absolute; width: 100%; text-align: center;
-            font-size: clamp(32px, 6vw, 60px);
-            color: #d00000; font-weight: 900; 
-            opacity: 0; 
-            text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); 
-            font-family: 'Arial Black', sans-serif;
-            white-space: normal; line-height: 1.2;
-        }
-        
+        #introScene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffc0cb; z-index: 8500; display: none; justify-content: center; align-items: center; overflow: hidden; padding: 20px; }
+        #valentineText { position: absolute; width: 100%; text-align: center; font-size: clamp(28px, 5vw, 48px); color: #ff0055; font-weight: bold; opacity: 0; transform: scale(0.5); text-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #birthdayText { position: absolute; width: 100%; text-align: center; font-size: clamp(32px, 6vw, 60px); color: #d00000; font-weight: 900; opacity: 0; text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); font-family: 'Arial Black', sans-serif; white-space: normal; line-height: 1.2; }
         .pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes popIn { 0% { opacity:0; transform: scale(0.5); } 100% { opacity:1; transform: scale(1); } }
-        
         .crash-in { animation: crashIn 0.4s ease-in forwards; }
-        @keyframes crashIn { 
-            0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 
-            100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } 
-        }
-        
+        @keyframes crashIn { 0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } }
         .knockout { animation: flyOut 0.8s ease-out forwards; }
         @keyframes flyOut { 0% { transform: translate(0,0) rotate(0deg); } 20% { transform: translate(-20px, 20px) rotate(-10deg); } 100% { transform: translate(-150vw, -50vh) rotate(-120deg); opacity: 0; } }
-        
         .screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-5px, 0, 0); } 20%, 80% { transform: translate3d(10px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-10px, 0, 0); } 40%, 60% { transform: translate3d(10px, 0, 0); } }
-        
         #impactFlash { position: fixed; top:0; left:0; width:100%; height:100%; background: white; opacity: 0; pointer-events: none; z-index: 8600; }
         .flash-now { animation: flashAnim 0.3s ease-out forwards; }
         @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
-        
-        #letsGoBtn { 
-            position: absolute; bottom: 15%; 
-            font-size: 20px; padding: 15px 40px; 
-            z-index: 9999; display: none; 
-            animation: fadeInBtn 1s; border-radius: 50px; border: none; 
-            background: var(--pink); color: white; cursor: pointer; font-weight: bold; 
-        }
+        #letsGoBtn { position: absolute; bottom: 15%; font-size: 20px; padding: 15px 40px; z-index: 9999; display: none; animation: fadeInBtn 1s; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; }
         @keyframes fadeInBtn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- 3. GAME HUD & UI --- */
-        #gameHUD {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; align-items: center; z-index: 7000;
-            background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink);
-            width: auto; min-width: 280px; justify-content: space-around;
-        }
+        #gameHUD { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; z-index: 7000; background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink); width: auto; min-width: 280px; justify-content: space-around; }
         .hud-item { display: flex; flex-direction: column; align-items: center; }
         .hud-label { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
         .hud-icon { width: 28px; height: 28px; object-fit: contain; }
         #scoreCounter { font-size: 24px; font-weight: 900; color: var(--pink); line-height: 1; }
         #scoreTotal { font-size: 12px; font-weight: bold; color: #aaa; }
-
-        #progressWrapper { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            width: 85%; z-index: 7000; display: none; text-align: center; 
-            background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
-        }
+        #progressWrapper { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 7000; display: none; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px); }
         #barBase { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; }
         #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff758f, #ff4d6d); transition: 0.2s; }
         #barText { color: var(--pink); font-weight: bold; margin-top: 3px; font-size: 12px; }
-
-        .centerBox { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; 
-            border-radius: 30px; z-index: 100; width: 90%; max-width: 400px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
-        }
+        .centerBox { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 30px; z-index: 100; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
         button.actionBtn { padding: 12px 25px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; margin: 8px; background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
-        
         #noBtn { background: #adb5bd; position: relative; z-index: 200; border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin: 8px; }
         .hidden { display: none !important; }
-        
+
         /* FINAL STAGES */
         #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
-        
-        /* Updated Beating Heart & Text */
-        #beatingHeart { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            display: none; z-index: 600; cursor: pointer; text-align: center;
-        }
-        #heartEmoji {
-            font-size: 100px;
-            animation: pBeat 0.8s infinite;
-        }
-        #heartText {
-            color: #ff4d6d;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-            font-family: 'Segoe UI', sans-serif;
-            text-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
-            white-space: nowrap;
-            animation: fadeText 1.5s infinite alternate;
-        }
-        @keyframes pBeat { 
-            0% { transform: scale(1); } 
-            50% { transform: scale(1.3); } 
-            100% { transform: scale(1); } 
-        }
+        #beatingHeart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 600; cursor: pointer; text-align: center; }
+        #heartEmoji { font-size: 100px; animation: pBeat 0.8s infinite; }
+        #heartText { color: #ff4d6d; font-size: 24px; font-weight: bold; margin-top: 20px; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 15px rgba(255, 77, 109, 0.6); white-space: nowrap; animation: fadeText 1.5s infinite alternate; }
+        @keyframes pBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         @keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
-
         #glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
-        
+
         /* FRUIT NINJA ITEMS */
         .toss-item { position: fixed; cursor: crosshair; z-index: 9000; bottom: -300px; user-select: none; pointer-events: auto; padding: 15px; }
         @keyframes tossUp { 0% { bottom: -300px; transform: rotate(0deg); } 50% { bottom: var(--peakHeight); } 100% { bottom: -300px; transform: rotate(720deg); } }
 
         /* --- 4. CUPID FINALE CSS --- */
-        #cupidFinale {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 8000; display: none;
-            flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.7);
-        }
-        #finaleCupid { 
-            width: 50vw; max-width: 250px; 
-            animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
-            margin-bottom: 20px;
-        }
+        #cupidFinale { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8000; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
+        #finaleCupid { width: 50vw; max-width: 250px; animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; margin-bottom: 20px; }
         @keyframes flyInCupid { from { transform: translate(-100vw, -20vh) rotate(-20deg); opacity: 0; } to { transform: translate(0, 0) rotate(0deg); opacity: 1; } }
-        
-        .final-letter-card {
-            background: #fff; padding: 30px 20px; border-radius: 30px;
-            max-width: 500px; width: 90%; text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink);
-            animation: popUp 0.5s 1s backwards;
-            display: flex; flex-direction: column; align-items: center; 
-            pointer-events: auto;
-        }
+        .final-letter-card { background: #fff; padding: 30px 20px; border-radius: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink); animation: popUp 0.5s 1s backwards; display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
         @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- 5. WHITE SCREEN FINALE CSS --- */
-        #whiteScreen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: white; z-index: 10000; display: flex; 
-            flex-direction: column; justify-content: center; align-items: center; 
-            opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px;
-        }
-        #finalRedText { 
-            color: #d00000; 
-            font-size: clamp(20px, 5vw, 36px); 
-            text-align: center; font-weight: bold; 
-            opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px;
-            text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5;
-        }
-        
-        #finaleLoadingBox {
-            width: 80%; max-width: 250px; height: 10px;
-            background: #f0f0f0; border-radius: 20px;
-            margin-top: 30px; overflow: hidden;
-            opacity: 0; transition: opacity 1s;
-            border: 1px solid #ff4d6d;
-        }
-        #finaleBar {
-            height: 100%; width: 0%; 
-            background: #ff4d6d; 
-            transition: width 5s linear;
-        }
-
-        #byeText { 
-            color: #ff4d6d; 
-            font-size: clamp(28px, 6vw, 50px); 
-            text-align: center; font-weight: bold; 
-            opacity: 0; position: absolute; transition: opacity 1s; width: 100%;
-        }
+        #whiteScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px; }
+        #finalRedText { color: #d00000; font-size: clamp(20px, 5vw, 36px); text-align: center; font-weight: bold; opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px; text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5; }
+        #finaleLoadingBox { width: 80%; max-width: 250px; height: 10px; background: #f0f0f0; border-radius: 20px; margin-top: 30px; overflow: hidden; opacity: 0; transition: opacity 1s; border: 1px solid #ff4d6d; }
+        #finaleBar { height: 100%; width: 0%; background: #ff4d6d; transition: width 5s linear; }
+        #byeText { color: #ff4d6d; font-size: clamp(28px, 6vw, 50px); text-align: center; font-weight: bold; opacity: 0; position: absolute; transition: opacity 1s; width: 100%; }
 
         .love-pop { position: fixed; color: #ff0055; font-weight: bold; font-size: 24px; pointer-events: none; z-index: 9500; text-shadow: 0 0 5px white; animation: floatUp 3s ease-out forwards; }
         @keyframes floatUp { 0% { opacity:1; transform: translateY(0) scale(1); } 100% { opacity:0; transform: translateY(-80px) scale(1.5); } }
@@ -238,12 +127,43 @@
         #dimpuImg { transition: transform 1s ease-in; max-width: 100%; border-radius: 20px; width: 100%; }
         input[type="number"] { padding: 12px; font-size: 18px; border-radius: 15px; border: 2px solid var(--pink); outline: none; width: 100%; text-align: center; margin-bottom: 15px; }
         #redFlash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 9500; transition: opacity 0.2s; }
+
+        /* --- THEMES & PRANK CSS --- */
+        #flashbackContainer { position: absolute; width: 100%; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; z-index: 10001; }
+        .flashback-card { background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: popUpCard 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; }
+        @keyframes popUpCard { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
+        .fb-image { width: 100%; max-height: 300px; object-fit: contain; border-radius: 15px; margin-bottom: 15px; }
+        .fb-title { color: var(--pink); font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+        .fb-msg { color: #444; font-size: 16px; margin-bottom: 20px; line-height: 1.5; font-weight: 500; }
+        .fb-btn { padding: 12px 30px; font-size: 18px; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
+        .fb-btn:active { transform: scale(0.95); }
+
+        /* THEMES */
+        .theme-rose { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); }
+        .theme-propose { background: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%); }
+        .theme-chocolate { background: #5d4037; }
+        .theme-teddy { background: #e0f7fa; }
+        .theme-promise { background: #2962ff; }
+        .theme-hug { background: #ffcc80; }
+        .theme-kiss { background: #d50000; }
+        .theme-valentine { background: radial-gradient(circle, #ff5252, #b71c1c); }
+
+        .theme-rose::before { content: '🌹'; position: absolute; font-size: 50px; animation: rain 4s infinite; left: 10%; top: -10%; }
+        .theme-rose::after { content: '🌹'; position: absolute; font-size: 40px; animation: rain 5s infinite 1s; right: 10%; top: -10%; }
+        .theme-chocolate::before { content: ''; position: absolute; top:0; left:0; width:100%; height:50px; background: linear-gradient(180deg, #3e2723, transparent); }
+
+        #prankContainer { position: relative; width: 100%; height: 250px; margin-bottom: 15px; border: 2px dashed #aaa; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.5); }
+        .choco-item { position: absolute; width: 100px; transition: top 0.2s, left 0.2s; cursor: pointer; }
+        #glassCrack { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Broken_glass.svg/1200px-Broken_glass.svg.png') no-repeat center center; background-size: cover; z-index: 10005; pointer-events: none; opacity: 0; mix-blend-mode: multiply; }
+        .cracked { opacity: 0.8 !important; animation: shake 0.5s; }
+        .special-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 20px; border: 4px solid var(--pink); z-index: 10010; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: popUp 0.3s; }
+        @keyframes rain { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(110vh); opacity:0; } }
     </style>
 </head>
 <body>
 
 <div id="sword"></div>
-<img id="cupid-img" src="cupid.png" style="position:fixed; width:100px; pointer-events:none; z-index:9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s;">
+<img id="cupid-img" src="cupid.png">
 
 <audio id="cuteMusic" loop src="cute-bgm.mp3" preload="auto"></audio>
 <audio id="letterMusic" src="lettersong.mp3" preload="auto"></audio>
@@ -256,6 +176,7 @@
 <audio id="tugayaSound" src="tugaya.mp3" preload="auto"></audio>
 <audio id="bounceSound" src="bounce.mp3" preload="auto"></audio>
 <audio id="sadIndianSound" src="sadindian.mp3" preload="auto"></audio>
+<audio id="glassSound" src="glass.mp3" preload="auto"></audio> 
 
 <div id="startScreen">
     <div class="rain-container" id="rainBox"></div>
@@ -279,21 +200,9 @@
 </div>
 
 <div id="gameHUD" class="hidden">
-    <div class="hud-item">
-        <span class="hud-label">Slice:</span>
-        <img src="letter.png" class="hud-icon">
-    </div>
-    <div class="hud-score-box">
-        <div id="scoreCounter">0</div>
-        <div id="scoreTotal">/ 19</div>
-    </div>
-    <div class="hud-item">
-        <span class="hud-label">Avoid:</span>
-        <div style="display:flex; gap:5px;">
-            <img src="dal.png" class="hud-icon">
-            <img src="roti.png" class="hud-icon">
-        </div>
-    </div>
+    <div class="hud-item"><span class="hud-label">Slice:</span><img src="letter.png" class="hud-icon"></div>
+    <div class="hud-score-box"><div id="scoreCounter">0</div><div id="scoreTotal">/ 19</div></div>
+    <div class="hud-item"><span class="hud-label">Avoid:</span><div style="display:flex; gap:5px;"><img src="dal.png" class="hud-icon"><img src="roti.png" class="hud-icon"></div></div>
 </div>
 
 <div id="progressWrapper">
@@ -337,13 +246,8 @@
 
 <div id="rulesPopup" class="centerBox hidden">
     <h2 style="color: var(--pink); margin-bottom: 15px;">Putku Suno Meri Baat... 🤫</h2>
-    <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.6;">
-        Baby suno tumko na ye <b>Letters</b> slice krne hai cursor move karke 💌
-    </p>
-    <p style="font-size: 16px; margin-bottom: 20px; color: #d00000; font-weight: bold;">
-        Par wo <b>Dal aur Rota</b> ko maat slice karna putku! ⚠️<br>
-        Warna zero ho jayega score apka... 💣
-    </p>
+    <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.6;">Baby suno tumko na ye <b>Letters</b> slice krne hai cursor move karke 💌</p>
+    <p style="font-size: 16px; margin-bottom: 20px; color: #d00000; font-weight: bold;">Par wo <b>Dal aur Rota</b> ko maat slice karna putku! ⚠️<br>Warna zero ho jayega score apka... 💣</p>
     <button class="actionBtn" onclick="startFinalGame()">I am Ready! 🥷❤️</button>
 </div>
 
@@ -359,8 +263,7 @@
     <div class="final-letter-card">
         <h1 style="color: #ff4d6d; margin-bottom: 15px; font-size:24px;">My Dearest Mannu ❤️</h1>
         <p style="font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 20px;">
-            Tum ek akeli aisi insaan ho jisse baat karna mujhe sabse jadha accha lagta hai, aur mai papa mummy ko thanks bolna chahunga ki unhone mujhe itni pyari pyari mannu di, aaj ke din, you are the best baby!! Sabse best hai meri mannu! Happy Birthday to you babyjaan <br><br>
-            <b>I Love You Forever!</b>
+            Tum ek akeli aisi insaan ho jisse baat karna mujhe sabse jadha accha lagta hai, aur mai papa mummy ko thanks bolna chahunga ki unhone mujhe itni pyari pyari mannu di, aaj ke din, you are the best baby!! Sabse best hai meri mannu! Happy Birthday to you babyjaan <br><br><b>I Love You Forever!</b>
         </p>
         <button class="actionBtn" style="font-size: 20px; padding: 15px 30px; margin-top: 10px;" onclick="showFinalWhiteScreen()">Click Here ❤️</button>
     </div>
@@ -368,15 +271,35 @@
 
 <div id="whiteScreen">
     <h1 id="finalRedText">Mannu, tum ho meri best friend, meri darling, meri jaaneman, hehe! I love you sooooooo much! ❤️</h1>
+    <div id="finaleLoadingBox"><div id="finaleBar"></div></div>
     
-    <div id="finaleLoadingBox">
-        <div id="finaleBar"></div>
-    </div>
-
+    <div id="flashbackContainer"></div>
+    <div id="glassCrack"></div>
+    
     <h1 id="byeText">biee biee cutie 🎀</h1>
 </div>
 
 <script>
+    // --- VARIABLES ---
+    let mouse = { x: 0, y: 0, lx: 0, ly: 0 };
+    let slices = 19;
+    let letterScore = 0;
+    const targetScore = 19;
+    let isGameOver = false;
+    let stopGame = false;
+    let currentDayIndex = 0;
+
+    const flashbackData = [
+        { date: "7 Feb", title: "Rose Day 🌹", image: "rose.png", theme: "theme-rose", msg: "Mujhe pata hai pehle wala rose tumse kahi kho gaya… chalo koi baat nahi ye lo cutie kya tumko mera rose pasand aaya?", btn: "Accept karogi? 🌹" },
+        { date: "8 Feb", title: "Propose Day 💍", image: "propose.png", theme: "theme-propose", msg: "MAññU, sirf iss janam me nahi kya har janam me tum meri bano gi? I love you sooo much ❤️", btn: "Yes, I Accept! 💍" },
+        { date: "9 Feb", title: "Chocolate Day 🍫", image: "kitkat.png", theme: "theme-chocolate", msg: "Babyjaan, Isme se na aap ek chocolate lelo… Jo bhi apko chahiye. Fir dono khayenge sath me", btn: "", special: "chocolate" },
+        { date: "10 Feb", title: "Teddy Day 🧸", image: "teddy.png", theme: "theme-teddy", msg: "Baby Jaldi se apna bada sa teddy bear pakdo… isko bohot mehnat se laya hi apke liye abhi abhi abhi chahiye tha na apko.. ye lo", btn: "Teddy Lelo! 🧸" },
+        { date: "11 Feb", title: "Promise Day 🤞", image: "promise.png", theme: "theme-promise", msg: "MAññU cutie kya aap mere hamesa sath rehne wale promise ko accept karogi?", btn: "Pinky Promise! 🤞" },
+        { date: "12 Feb", title: "Hug Day 🫂", image: "hug.png", theme: "theme-hug", msg: "Babe kya aap mera pyara sa side hug accept karoge? Ya fir tight wala hug", btn: "", special: "hug" },
+        { date: "13 Feb", title: "Kiss Day 💋", image: "kiss.png", theme: "theme-kiss", msg: "Kya abhi abhi abhi hum ek aise kissi kar sakte hai?", btn: "Muah! 💋" },
+        { date: "14 Feb", title: "Valentine's Day ❤️", image: "valentine.png", theme: "theme-valentine", msg: "Mannu, sirf 2026 me nahi.. kya tum har saal aur saalon saal.. meri valentine banogi? For ever and forever ♾️", btn: "Yes Forever! ❤️" }
+    ];
+
     // --- RESPONSIVE TOUCH & CURSOR LOGIC ---
     function updateCupid(x, y) {
         const cupid = document.getElementById("cupid-img");
@@ -408,7 +331,7 @@
         }
     }, { passive: false });
 
-    // --- MAIN LOGIC ---
+    // --- MAIN LOGIC (YOUR WORKING START CODE) ---
     window.onload = function() {
         const rainContainer = document.getElementById('rainBox');
         for(let i=0; i<45; i++) {
@@ -433,8 +356,12 @@
     };
 
     function triggerIntro() {
+        // Reveal assets immediately
+        document.getElementById('cupid-img').style.display = 'block';
+        document.getElementById('sword').style.display = 'block';
+
         const sfx = ['yaySound', 'sadSound', 'sliceSound', 'afterCakeSound', 'heartSound', 'letterMusic', 'chaloSound', 'tugayaSound', 'bounceSound', 'sadIndianSound'];
-        sfx.forEach(id => { const el = document.getElementById(id); el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(e => console.log(id)); });
+        sfx.forEach(id => { const el = document.getElementById(id); if(el) el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(e => console.log(id)); });
 
         document.getElementById('startScreen').style.display = 'none';
         const scene = document.getElementById('introScene');
@@ -450,7 +377,7 @@
         setTimeout(() => {
             bText.classList.add('crash-in');
             setTimeout(() => {
-                bounce.play();
+                if(bounce) bounce.play();
                 scene.classList.add('screen-shake');
                 flash.classList.add('flash-now');
                 vText.classList.add('knockout');
@@ -462,25 +389,19 @@
 
     function startMainExperience() {
         const bounce = document.getElementById('bounceSound');
-        bounce.pause(); bounce.currentTime = 0;
+        if(bounce) { bounce.pause(); bounce.currentTime = 0; }
 
         const bgm = document.getElementById('cuteMusic');
-        bgm.volume = 0.2; bgm.play();
+        if(bgm) { bgm.volume = 0.2; bgm.play(); }
+        
         document.getElementById('introScene').style.display = 'none';
         document.getElementById('stage1').classList.remove('hidden');
     }
 
-    let mouse = { x:0, y:0, lx:0, ly:0 };
-    let slices = 19;
-    let letterScore = 0;
-    const targetScore = 19;
-    let isGameOver = false;
-    let stopGame = false;
-
     document.addEventListener("mousemove", (e) => {
         mouse.x = e.clientX; mouse.y = e.clientY;
         updateSword();
-        updateCupid(mouse.x, mouse.y); // Update cupid position
+        updateCupid(mouse.x, mouse.y); 
 
         let speed = Math.sqrt(Math.pow(mouse.x - mouse.lx, 2) + Math.pow(mouse.y - mouse.ly, 2));
         if (speed > 15) {
@@ -564,7 +485,7 @@
         startFruitNinja();
     }
 
-    // --- ZOOM LOGIC ---
+    // --- FRUIT NINJA GAME ---
     function startFruitNinja() {
         const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
         const spawnItem = () => {
@@ -598,26 +519,20 @@
                     
                     const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
 
-                    // --- CHECK IF 19TH LETTER ---
+                    // --- CHECK FOR FINALE ---
                     if (letterScore >= targetScore) {
                         stopGame = true; // Stop spawns
                         
-                        // 1. Freeze animation
+                        // Freeze animation & Zoom
                         item.style.animation = 'none';
-                        
-                        // 2. Center & Zoom BIG
                         item.style.transition = "all 2.5s cubic-bezier(0.25, 1, 0.5, 1)";
-                        item.style.position = "fixed";
-                        item.style.left = "50%";
-                        item.style.top = "50%";
-                        item.style.zIndex = "10000";
-                        // Force transform next tick
+                        item.style.position = "fixed"; item.style.left = "50%"; item.style.top = "50%"; item.style.zIndex = "10000";
                         requestAnimationFrame(() => {
                             item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)";
                             item.style.opacity = "0"; // Fade out during zoom
                         });
 
-                        // 3. Trigger Finale after zoom finishes
+                        // Trigger Finale
                         setTimeout(() => {
                             document.querySelectorAll('.toss-item').forEach(el => el.remove());
                             document.getElementById("gameHUD").style.display = "none"; 
@@ -625,9 +540,7 @@
                             document.getElementById("cupid-img").style.display = "none"; 
                             document.getElementById("cupidFinale").style.display = "flex";
                         }, 2500);
-                        
                     } else {
-                        // Normal behavior
                         showFloatingText(item.getBoundingClientRect().left, item.getBoundingClientRect().top, loveWords); 
                         item.remove(); 
                     }
@@ -659,6 +572,7 @@
         document.getElementById("barFill").style.width = Math.min(pct, 100) + "%";
     }
 
+    // --- MODIFIED FINAL SCREEN LOGIC (FLASHBACK) ---
     function showFinalWhiteScreen() {
         const whiteScreen = document.getElementById("whiteScreen");
         whiteScreen.style.opacity = "1";
@@ -668,21 +582,75 @@
         setTimeout(() => {
             document.getElementById("finalRedText").style.opacity = "1";
             document.getElementById("finaleLoadingBox").style.opacity = "1";
-            
-            // 2. Start Bar Animation (takes 5s)
             document.getElementById("finaleBar").style.width = "100%";
         }, 500);
 
-        // 3. Fade Out Red Text & Bar after 5.5s
+        // 2. Fade Out Red Text & Bar after 5.5s
         setTimeout(() => {
             document.getElementById("finalRedText").style.opacity = "0";
             document.getElementById("finaleLoadingBox").style.opacity = "0";
         }, 5500); 
 
-        // 4. Fade In Bye Text after 6.5s
+        // 3. START FLASHBACK SEQUENCE (Replacing Bye Text)
         setTimeout(() => {
-            document.getElementById("byeText").style.opacity = "1";
-        }, 6500); 
+            startFlashbackSequence();
+        }, 6000);
+    }
+
+    // --- FLASHBACK & THEME LOGIC ---
+    function startFlashbackSequence() {
+        const container = document.getElementById("flashbackContainer"); 
+        const intro = document.createElement("div"); 
+        intro.className = "flashback-text"; 
+        intro.innerText = "Chalo thoda piche chalte hai...";
+        intro.style.fontSize = "30px"; intro.style.fontWeight = "bold"; intro.style.opacity = "0"; intro.style.animation = "fadeInOut 3s forwards"; 
+        container.appendChild(intro);
+        setTimeout(() => { intro.remove(); renderDay(0); }, 3500);
+    }
+
+    function renderDay(index) {
+        if (index >= flashbackData.length) { 
+            document.getElementById("flashbackContainer").innerHTML = ""; 
+            document.body.className = ""; 
+            document.getElementById("byeText").style.opacity = "1"; 
+            return; 
+        }
+        const data = flashbackData[index]; 
+        const container = document.getElementById("flashbackContainer"); 
+        container.innerHTML = ""; 
+        document.body.className = data.theme;
+        
+        const card = document.createElement("div"); card.className = "flashback-card";
+        let htmlContent = `<div class="fb-title">${data.title}</div><div class="fb-msg">${data.msg}</div>`;
+        
+        if (data.special === "chocolate") { 
+            htmlContent += `<div id="prankContainer"><img src="kitkat.png" class="choco-item" id="kitkatBtn" style="left:20%; top:30%;"><img src="dairymilk.png" class="choco-item" id="dairyBtn" style="left:60%; top:30%;"></div><div style="font-size:12px; color:#888;">Pick one!</div>`; 
+        } else if (data.special === "hug") { 
+            htmlContent += `<img src="${data.image}" class="fb-image"><div style="display:flex; gap:10px; width:100%; justify-content:center;"><button class="fb-btn" id="sideHugBtn" style="background:#aaa;">Side Hug 😒</button><button class="fb-btn" id="tightHugBtn">Tight Hug 🤗</button></div>`; 
+        } else { 
+            htmlContent += `<img src="${data.image}" class="fb-image"><button class="fb-btn" onclick="nextDay()">${data.btn}</button>`; 
+        }
+        
+        card.innerHTML = htmlContent; container.appendChild(card);
+        if (data.special === "chocolate") { initChocolatePrank(); } else if (data.special === "hug") { initHugMechanic(); }
+    }
+
+    function nextDay() { 
+        document.getElementById("yaySound").currentTime = 0; document.getElementById("yaySound").play().catch(e=>{}); 
+        currentDayIndex++; renderDay(currentDayIndex); 
+    }
+    
+    function initChocolatePrank() {
+        const dairy = document.getElementById("dairyBtn"); const kitkat = document.getElementById("kitkatBtn");
+        function moveDairy() { const container = document.getElementById("prankContainer"); const maxX = container.clientWidth - 100; const maxY = container.clientHeight - 100; dairy.style.left = Math.random() * maxX + "px"; dairy.style.top = Math.random() * maxY + "px"; }
+        dairy.addEventListener("mouseover", moveDairy); dairy.addEventListener("touchstart", (e) => { e.preventDefault(); moveDairy(); });
+        kitkat.addEventListener("click", nextDay); kitkat.addEventListener("touchstart", nextDay);
+    }
+
+    function initHugMechanic() {
+        const side = document.getElementById("sideHugBtn"); const tight = document.getElementById("tightHugBtn"); const glassCrack = document.getElementById("glassCrack"); const glassSound = document.getElementById("glassSound") || document.getElementById("tugayaSound");
+        side.addEventListener("click", () => { glassCrack.classList.add("cracked"); if(glassSound) { glassSound.currentTime = 0; glassSound.play().catch(e => { }); } alert("Ouch! Dil toot gaya 💔 Try again!"); });
+        tight.addEventListener("click", () => { glassCrack.classList.remove("cracked"); const popup = document.createElement("div"); popup.className = "special-popup"; popup.innerHTML = "<h1>Love you sooo much babyyyyy maja aagya wow wow hug ❤️❤️❤️</h1>"; document.body.appendChild(popup); document.getElementById("yaySound").play().catch(e => { }); setTimeout(() => { popup.remove(); nextDay(); }, 3000); });
     }
 </script>
 </body>
