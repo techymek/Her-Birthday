@@ -1,200 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>11:11 PM Reflection</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0a0a0a;
-            color: #eaeaea;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title> The Boundations</title>
+<style>
+    /* Base styling for the initial white screen */
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        transition: background-color 0.1s, color 0.1s;
+    }
 
-        #quote-container {
-            font-size: 1.5rem;
-            max-width: 800px;
-            padding: 20px;
-            line-height: 1.6;
-            min-height: 100px;
-        }
+    /* Terminal styling for the black & white sequence */
+    body.terminal-mode {
+        background-color: #000;
+        color: #fff;
+        font-family: 'Courier New', Courier, monospace;
+    }
 
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2rem;
-            background-color: #eaeaea;
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
-            margin-left: 5px;
-        }
+    #expired-screen {
+        text-align: center;
+        padding: 20px;
+    }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+    #expired-screen p {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.8;
+        margin: 0;
+    }
 
-        #bottom-section {
-            margin-top: 40px;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-            color: #888;
-        }
+    #container {
+        width: 90%;
+        max-width: 600px;
+        text-align: left;
+        min-height: 200px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
 
-        #countdown {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            color: #bbb;
-        }
+    .hidden {
+        display: none !important;
+    }
 
-        #come-again {
-            font-size: 1rem;
-            font-style: italic;
-        }
-    </style>
+    .btn-group {
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Button Fade-in Styling */
+    button {
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #fff;
+        padding: 12px 20px;
+        font-family: 'Courier New', Courier, monospace;
+        cursor: pointer;
+        font-size: 14px;
+        touch-action: manipulation;
+        opacity: 0; 
+        transition: opacity 2s ease-in-out, background-color 0.3s, color 0.3s;
+    }
+
+    button.fade-in-visible {
+        opacity: 1; 
+    }
+
+    button:hover, button:active {
+        background-color: #fff;
+        color: #000;
+    }
+
+    .typing-cursor::after {
+        content: '|';
+        animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+
+    .quote-text {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 15px;
+    }
+
+    #delete-log {
+        color: #aaa;
+        font-size: 14px;
+        margin-top: 15px;
+        word-break: break-all;
+    }
+
+    .final-message {
+        white-space: pre-wrap;
+        line-height: 1.8;
+        font-size: 16px;
+        color: #ccc;
+    }
+
+    /* Adi is typing indicator */
+    #typing-indicator {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #666;
+        font-size: 13px;
+        font-style: italic;
+        font-family: 'Courier New', Courier, monospace;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+    }
+
+    #typing-indicator.visible {
+        opacity: 1;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+    }
+</style>
 </head>
 <body>
 
-    <div id="quote-container">
-        <span id="quote-text"></span><span class="cursor" id="cursor"></span>
-    </div>
+<div id="expired-screen">
+    <p>Tumare bolne pe delete kardi site,<br>mehnat bohot ki thi banane me</p>
+</div>
 
-    <div id="bottom-section">
-        <div id="countdown">00:00:00</div>
-        <div id="come-again">come again tomorrow at 11:11 PM</div>
-    </div>
+<div id="container" class="hidden">
+    <div id="output"></div>
+    <div id="delete-log"></div>
+    <div id="controls" class="btn-group hidden"></div>
+</div>
 
-    <script>
-        const quotes = [
-            // The Forgotten Good
-            "100 days of sunlight, forgotten for one drop of rain.",
-            "They drank the ocean you poured, but complained about the glass.",
-            "You gave them the world, and they left because you forgot the moon.",
-            "A hundred 'yeses' erased by a single 'no'.",
-            "They only remember your hands when they are empty.",
-            "Give them 99%, and they will hate you for the missing one.",
-            "Your thousand acts of care, buried by one mistake.",
-            "Perfection is expected; one flaw is condemned.",
-            "You can build a hundred bridges, but they'll only talk about the one you didn't.",
-            "Countless sacrifices remain invisible until the day you finally stop.",
-            
-            // The Prettiest Blue
-            "You are the perfect sky, but she only watches the fire.",
-            "It is not that you aren't enough; you just aren't her color.",
-            "A masterpiece in blue means nothing to a lover of red.",
-            "Don't curse your blue just because she craves the crimson.",
-            "Even the deepest ocean cannot satisfy a heart that wants to burn.",
-            "You were a beautiful wave, but she was looking for a flame.",
-            "Being the absolute best blue will never win a heart set on red.",
-            "A diamond is useless to someone shopping for rubies.",
-            "Perfectly blue, yet completely unseen.",
-            "You can't paint her a warm sunset when all you have is a cool sky.",
-            
-            // Deserving to be Cared For
-            "They handed you their coldness, and you blamed your own warmth.",
-            "Their inability to care is their limitation, not a measure of your worth.",
-            "You deserve the exact same love you keep trying to give away.",
-            "They treat you like an option, while you make them a priority.",
-            "Don't let their empty hands convince you that you don't deserve to be held.",
-            "You are not asking for too much; you are just asking the wrong person.",
-            "Stop shrinking to fit in places that don't appreciate your presence.",
-            "You gave them your heart, and they treated it like a heavy burden.",
-            "You are worth far more than the afterthought they turned you into.",
-            "If they make you feel unlovable, they are simply looking through the wrong mirror."
-        ];
+<div id="typing-indicator">Adi is typing...</div>
 
-        // --- Time Sync Logic ---
-        function getNextTargetTime() {
-            const now = new Date();
-            let target = new Date(now);
-            target.setHours(23, 11, 0, 0); // 11:11:00 PM local time
+<script>
+    const expiredScreen = document.getElementById('expired-screen');
+    const containerDiv = document.getElementById('container');
+    const outputDiv = document.getElementById('output');
+    const deleteLogDiv = document.getElementById('delete-log');
+    const controlsDiv = document.getElementById('controls');
+    const typingIndicator = document.getElementById('typing-indicator');
 
-            // If it's already past 11:11 PM, set target to tomorrow's 11:11 PM
-            if (now.getTime() >= target.getTime()) {
-                target.setDate(target.getDate() + 1);
-            }
-            return target.getTime();
-        }
+    // All quotes combined into one pool
+    const allQuotes = [
+        "You can leave me if you must,\njust leave your memories behind…\nthey were never yours alone,\nthey grew inside me.",
+        "Go, I won’t stop you now…\nlove should never feel like a cage.\nBut the moments we made,\nthey belong to me as much as they ever did to you.",
+        "Take your goodbye with you,\nbut leave the nights we stayed awake…\nthey still breathe somewhere inside me.",
+        "You can forget me if it’s easy for you,\nbut I’ll keep every little piece of us…\nlike a forever you never stayed for.",
+        "I won’t ask you to come back,\nI’ve learned how silence answers everything.\nJust don’t take the memories…\nthey are all my love has left to hold.",
+        "You left like it was nothing,\nbut I’m still here holding onto everything…\every word, every moment, every almost.",
+        "You didn’t break my heart…\nyou just showed me how easily I could be forgotten.",
+        "I wasn’t hard to love,\nyou just didn’t care enough to try.",
+        "Funny how I was always there for you,\nand you were never really there for me.",
+        "I kept choosing you,\neven when you made it clear I was never your choice.",
+        "You didn’t lose me…\nyou just let go of someone who would’ve never left you.",
+        "I gave you something real,\nand you treated it like it was replaceable.",
+        "I stayed loyal to a version of you\nthat never really existed."
+    ];
 
-        // --- Random Quote Storage Logic ---
-        function getDailyRandomQuoteIndex() {
-            const now = new Date().getTime();
-            let expireTime = localStorage.getItem('quoteExpire1111');
-            let quoteIndex = localStorage.getItem('quoteIndex1111');
+    let availableQuotes = [...allQuotes];
+    
+    // Updated File Names with real memories
+    const fileBases = [
+        "snapchat_megha.jpg", 
+        "meghapics.jpg", 
+        "mannu.mp4", 
+        "img_backup.png", 
+        "vid_memory.mp4", 
+        "voice_note.m4a",
+        "our_first_bgmi_game.mp4",
+        "first_time_i_saw_your_pic.jpg",
+        "screenshot_of_bgmi.png",
+        "mehndi.jpg",
+        "photo_of_ur_birthday.jpg",
+        "our_ai_generated_photo.png"
+    ];
+    
+    let isQuotesRunning = false;
+    let typeId = 0; 
+    const keyboardLetters = "abcdefghijklmnopqrstuvwxyz";
 
-            // If no data exists, OR if the current time has passed the expiration time (11:11 PM)
-            if (!expireTime || !quoteIndex || now >= parseInt(expireTime)) {
-                quoteIndex = Math.floor(Math.random() * quotes.length); // Totally random
-                expireTime = getNextTargetTime(); 
-                
-                // Save the new random quote and its expiration time in the browser
-                localStorage.setItem('quoteIndex1111', quoteIndex);
-                localStorage.setItem('quoteExpire1111', expireTime);
-            }
-            return parseInt(quoteIndex);
-        }
-
-        // --- Typewriter Effect ---
-        const quoteTextElement = document.getElementById("quote-text");
-        const bottomSection = document.getElementById("bottom-section");
-        const cursor = document.getElementById("cursor");
+    // Utility: Type text effect with natural typos and variable speeds
+    async function typeText(text, baseSpeed = 40, clearFirst = true, simulateTypos = false) {
+        typeId++;
+        let currentTypeId = typeId; 
         
-        const targetQuote = quotes[getDailyRandomQuoteIndex()];
-        let charIndex = 0;
-        const typingSpeed = 60; 
+        if (clearFirst) outputDiv.innerHTML = '';
+        outputDiv.classList.add('typing-cursor');
+        
+        for (let i = 0; i < text.length; i++) {
+            if (currentTypeId !== typeId) return; 
+            
+            let char = text.charAt(i);
 
-        function typeWriter() {
-            if (charIndex < targetQuote.length) {
-                quoteTextElement.innerHTML += targetQuote.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeWriter, typingSpeed);
-            } else {
-                setTimeout(() => {
-                    bottomSection.style.opacity = 1;
-                    cursor.style.display = "none";
-                }, 1000);
+            // 5% chance to make a typo on regular letters
+            if (simulateTypos && /[a-zA-Z]/.test(char) && Math.random() < 0.05) {
+                let wrongChar = keyboardLetters.charAt(Math.floor(Math.random() * keyboardLetters.length));
+                
+                outputDiv.innerHTML += wrongChar;
+                await delay(baseSpeed + 50);
+                
+                if (currentTypeId !== typeId) return;
+                
+                await delay(150);
+                
+                outputDiv.innerHTML = outputDiv.innerHTML.slice(0, -1);
+                await delay(baseSpeed + 50);
+            }
+
+            outputDiv.innerHTML += char;
+            
+            let currentSpeed = baseSpeed + (Math.random() * 30 - 15);
+            if (char === '.' || char === ',' || char === '\n') {
+                currentSpeed += 250; 
+            }
+            
+            await delay(Math.max(10, currentSpeed));
+        }
+    }
+
+    // Utility: Delay
+    function delay(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+
+    // Utility: Get a unique quote
+    function getUniqueQuote(arr) {
+        if (arr.length === 0) return null;
+        const index = Math.floor(Math.random() * arr.length);
+        const quote = arr[index];
+        arr.splice(index, 1);
+        return quote;
+    }
+
+    // Utility: Update button options with a slow fade-in
+    function setButtons(buttons) {
+        controlsDiv.innerHTML = '';
+        if (buttons.length === 0) {
+            controlsDiv.classList.add('hidden');
+            return;
+        }
+        controlsDiv.classList.remove('hidden');
+        
+        buttons.forEach(btn => {
+            const buttonEl = document.createElement('button');
+            buttonEl.innerText = btn.text;
+            buttonEl.onclick = () => {
+                controlsDiv.classList.add('hidden'); 
+                btn.action();
+            };
+            controlsDiv.appendChild(buttonEl);
+            
+            setTimeout(() => {
+                buttonEl.classList.add('fade-in-visible');
+            }, 50);
+        });
+    }
+
+    // Phase 1: The initial message
+    window.onload = async () => {
+        await delay(3000); 
+        
+        expiredScreen.classList.add('hidden');
+        document.body.classList.add('terminal-mode');
+        containerDiv.classList.remove('hidden');
+        
+        startSystemSequence();
+    };
+
+    // Phase 2: System Boot Sequence
+    async function startSystemSequence() {
+        await delay(500);
+        await typeText("Initialization...\n", 50, false, false);
+        await delay(800);
+        await typeText("Scanning...\n", 50, false, false);
+        await delay(1200);
+        await typeText("\nData from Adarsh’s iPhone -\n213 Photos\n107 Videos\n1430 Screenshots\n", 40, false, false);
+        
+        outputDiv.classList.remove('typing-cursor');
+        
+        setButtons([
+            { text: "Delete the files to continue", action: deleteSequence }
+        ]);
+    }
+
+    // Phase 3: Deletion Sequence
+    async function deleteSequence() {
+        outputDiv.innerHTML = "Initiating deletion protocol...";
+        
+        await delay(500);
+        for (let i = 1; i <= 143; i++) {
+            let prefix = i.toString().padStart(3, '0');
+            let fileName = fileBases[Math.floor(Math.random() * fileBases.length)];
+            deleteLogDiv.innerHTML = `Deleting file [${i}/143]: ${prefix}_${fileName}`;
+            
+            let speed = 30; 
+            if (i > 50 && i < 110) speed = 120; 
+            await delay(speed);
+        }
+        
+        deleteLogDiv.innerHTML = "";
+        
+        await typeText("ERROR: Deleting failed.\nNo files were deleted.\nSome things cannot be erased.", 50, true, false);
+        outputDiv.classList.remove('typing-cursor');
+        
+        await delay(1500);
+        setButtons([
+            { text: "Keep them", action: startAutoQuotes }
+        ]);
+    }
+
+    // Phase 4: Auto-looping Quotes Sequence
+    async function startAutoQuotes() {
+        isQuotesRunning = true;
+        outputDiv.classList.add('quote-text');
+        
+        let quoteCount = 0;
+        let quote = getUniqueQuote(availableQuotes);
+        
+        while (quote !== null && isQuotesRunning) {
+            typingIndicator.classList.add('visible'); 
+            
+            await typeText(quote, 55, true, true); 
+            
+            typingIndicator.classList.remove('visible'); 
+            outputDiv.classList.remove('typing-cursor'); 
+            
+            quoteCount++;
+            
+            // Pop out "Save Memories" button after 2nd quote
+            if (quoteCount === 3 && isQuotesRunning) {
+                setButtons([{ text: "Save Memories", action: triggerSavedEnding }]);
+            }
+            
+            // Wait before next quote, checking for button clicks
+            for (let w = 0; w < 35; w++) {
+                if (!isQuotesRunning) break; 
+                await delay(100);
+            }
+            
+            if (isQuotesRunning) {
+                quote = getUniqueQuote(availableQuotes); 
             }
         }
-
-        // --- Countdown Logic ---
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const targetTime = getNextTargetTime();
-            const diff = targetTime - now;
-
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / 1000 / 60) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-
-            const formattedTime = 
-                String(hours).padStart(2, '0') + ":" + 
-                String(minutes).padStart(2, '0') + ":" + 
-                String(seconds).padStart(2, '0');
-
-            document.getElementById("countdown").innerText = formattedTime;
-
-            // Auto-refresh the page exactly when it hits 11:11 PM to load the new quote
-            if (diff <= 1000 && diff > 0) {
-                setTimeout(() => location.reload(), 1000);
-            }
+        
+        // If the loop finished naturally without her clicking the button
+        if (quote === null && isQuotesRunning) {
+            triggerOriginalEnding();
         }
+    }
 
-        // Initialize
-        window.onload = () => {
-            setTimeout(typeWriter, 1500); 
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-        };
-    </script>
+    // Ending A: She clicked "Save Memories"
+    async function triggerSavedEnding() {
+        isQuotesRunning = false; 
+        setButtons([]); 
+        
+        outputDiv.classList.remove('quote-text');
+        outputDiv.classList.add('final-message');
+        
+        const savedMsg = "You saved them.\nEven now, you couldn't let them go either.\nI'll keep them safe for us.\n\nGoodbye, Megha.";
+        
+        typingIndicator.classList.add('visible'); 
+        await typeText(savedMsg, 65, true, true); 
+        
+        // Pause to let her read the first part
+        typingIndicator.classList.remove('visible');
+        outputDiv.classList.remove('typing-cursor');
+        await delay(4000); 
+
+        // Type the final heartbreaking message
+        const finalMsg = "You deserve someone way better than me.\nSomeone who you can call anytime you want,\nand someone who is not like me.\nSomeone you can actually call on the phone.\n\nI hope you find someone who you can genuinely love.\n\nNot like me.";
+        
+        typingIndicator.classList.add('visible'); 
+        await typeText(finalMsg, 65, true, true); 
+        typingIndicator.classList.remove('visible');
+        outputDiv.classList.remove('typing-cursor');
+    }
+
+    // Ending B: She let the quotes run out without clicking
+    async function triggerOriginalEnding() {
+        isQuotesRunning = false; 
+        setButtons([]); 
+        
+        outputDiv.classList.remove('quote-text');
+        outputDiv.classList.add('final-message');
+        
+        const finalMsg = "You deserve someone way better than me.\nSomeone who you can call anytime you want,\nand someone who is not like me.\nSomeone you can actually call on the phone.\n\nI hope you find someone who you can genuinely love.\n\nNot like me.";
+        
+        typingIndicator.classList.add('visible'); 
+        await typeText(finalMsg, 65, true, true); 
+        typingIndicator.classList.remove('visible');
+        outputDiv.classList.remove('typing-cursor');
+    }
+
+</script>
 </body>
 </html>
