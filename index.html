@@ -2,827 +2,199 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Final Chapter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11:11 PM Reflection</title>
     <style>
-        /* =========================================================
-           GLOBAL & THEME VARIABLES
-           ========================================================= */
-        :root { 
-            --pink: #ff4d6d; --deep-rose: #8d0033; --chocolate: #3e2723;
-            /* Book Variables */
-            --bg-color: #0a0a0c; --page-bg: #f4f3ed; --text-color: #1a1a1a;
-            --cover-color: #111; --highlight: #c0392b; --transition-speed: 0.8s;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
-        
-        body { 
-            background-color: var(--bg-color); 
-            background-image: radial-gradient(circle at center, #222 0%, #050505 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            overflow: hidden; 
-            cursor: auto; 
-            height: 100vh; width: 100vw; 
-            transition: background 1.5s ease; 
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            color: #eaeaea;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
         }
 
-        #masterBlackout {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 99999;
-            opacity: 0; pointer-events: none; transition: opacity 1.5s ease;
-        }
-
-
-        /* =========================================================
-           PART 1: THE NEW BOOK EXPERIENCE (SHOWS FIRST)
-           ========================================================= */
-        #newExperience {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Georgia', serif; color: var(--text-color);
-            z-index: 20000;
-        }
-
-        .scene {
-            width: min(94vw, 120vh); 
+        #quote-container {
+            font-size: 1.5rem;
             max-width: 800px;
-            aspect-ratio: 1.4 / 1; 
-            perspective: 2500px; position: relative;
-            transform: translateX(-25%); /* Starts shifted so the cover is centered */
-            transition: transform var(--transition-speed) ease;
-            animation: bookFadeIn 1.5s ease forwards;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100px;
         }
 
-        /* FIX: Removed 'transform' from keyframes so JS can take control of centering */
-        @keyframes bookFadeIn { 
-            from { opacity: 0; top: 40px; } 
-            to { opacity: 1; top: 0; } 
-        }
-
-        .book { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
-
-        .page {
-            width: 50%; height: 100%; position: absolute; top: 0; right: 0; 
-            transform-origin: left center;
-            transition: transform var(--transition-speed) cubic-bezier(0.4, 0.0, 0.2, 1);
-            transform-style: preserve-3d;
-            border-radius: 3px 10px 10px 3px; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-
-        .front, .back {
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-            padding: 5% 7%;
-            display: flex; flex-direction: column; justify-content: center;
-            background-color: var(--page-bg); border-radius: 3px 10px 10px 3px;
-        }
-
-        .front { background-image: linear-gradient(to right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 8%); }
-        .back { transform: rotateY(180deg); background-image: linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 8%); border-radius: 10px 3px 3px 10px; }
-
-        #p1 .front, #p4 .back { background-color: var(--cover-color); color: #ecece7; text-align: center; border-left: 2px solid #333; background-image: linear-gradient(120deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.6) 100%); }
-        
-        .book h1 { font-size: clamp(1.4rem, 4vw, 2.5rem); margin-bottom: 5px; letter-spacing: 2px; font-weight: normal; }
-        .book h2 { font-size: clamp(0.8rem, 2vw, 1.2rem); opacity: 0.5; font-style: italic; font-weight: normal; }
-        .book p { line-height: 1.5; margin-bottom: 12px; font-size: clamp(11px, 2vw, 16px); font-family: 'Georgia', serif;}
-        .highlight { color: var(--highlight); font-weight: bold; }
-
-        .final-content { text-align: center; width: 100%; }
-        .block-btn {
-            background: #000; color: white; border: 1px solid #444; padding: 10px 20px; margin-top: 15px;
-            font-family: sans-serif; font-size: clamp(10px, 1.5vw, 14px); letter-spacing: 3px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,0,0,0.1); display: inline-block;
-        }
-        .block-btn:hover { border-color: var(--highlight); color: var(--highlight); }
-
-        .swipe-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: clamp(8px, 1.5vw, 12px); opacity: 0.4; font-family: sans-serif; letter-spacing: 2px; animation: pulse 2s infinite; width: 100%; text-align:center;}
-        .flipped { transform: rotateY(-180deg); }
-        @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.6; } }
-
-        #goToBirthdayBtn {
-            background: transparent; color: #888; border: 1px solid #444;
-            padding: 8px 15px; margin-top: 25px; font-family: sans-serif; font-size: clamp(9px, 1.2vw, 12px);
-            letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        .cursor {
             display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: #eaeaea;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 5px;
         }
-        #goToBirthdayBtn:hover { border-color: #fff; color: #fff; }
 
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
 
-        /* =========================================================
-           PART 2: THE OLD BIRTHDAY EXPERIENCE (HIDDEN INITIALLY)
-           ========================================================= */
-        #oldExperience { position: relative; width: 100%; height: 100%; z-index: 1; display: none; }
+        #bottom-section {
+            margin-top: 40px;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            color: #888;
+        }
 
-        #sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); }
-        .slash { position: fixed; width: 150px; height: 5px; background: linear-gradient(90deg, transparent, white, white, transparent); pointer-events: none; z-index: 9999; animation: slashFade 0.4s forwards; }
-        @keyframes slashFade { 0% { opacity: 1; transform: scaleX(0.2); } 100% { opacity: 0; transform: scaleX(1.6); } }
+        #countdown {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            color: #bbb;
+        }
 
-        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; overflow: hidden; padding: 20px; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
-        .rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
-        .rain-text { position: absolute; top: -50px; color: rgba(255, 255, 255, 0.6); font-weight: bold; font-family: 'Arial', sans-serif; animation: fallDown linear infinite; white-space: nowrap; }
-        @keyframes fallDown { to { transform: translateY(110vh); } }
-
-        .start-card { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 2; width: 100%; max-width: 420px; color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
-        .start-card h1 { font-size: clamp(28px, 5vw, 36px); margin-bottom: 10px; font-weight: 800; }
-        .start-card p { font-size: 16px; margin-bottom: 20px; opacity: 0.9; font-weight: 600; }
-        .loader-heart { font-size: 45px; animation: bounceHeart 0.8s infinite alternate; margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5)); }
-        @keyframes bounceHeart { from { transform: scale(1); } to { transform: scale(1.15); } }
-        .loader-container { width: 100%; background: rgba(255,255,255,0.4); height: 10px; border-radius: 20px; overflow: hidden; margin-bottom: 15px; position: relative; }
-        .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff758f, #ff4d6d); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); transition: width 0.1s linear; }
-        #loadingText { font-size: 14px; font-weight: 700; min-height: 25px; color: var(--deep-rose); letter-spacing: 0.5px; }
-        #startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; transition: 0.3s; }
-        @keyframes popBtn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        #introScene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffc0cb; z-index: 8500; display: none; justify-content: center; align-items: center; overflow: hidden; padding: 20px; }
-        #valentineText { position: absolute; width: 100%; text-align: center; font-size: clamp(28px, 5vw, 48px); color: #ff0055; font-weight: bold; opacity: 0; transform: scale(0.5); text-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        #birthdayText { position: absolute; width: 100%; text-align: center; font-size: clamp(32px, 6vw, 60px); color: #d00000; font-weight: 900; opacity: 0; text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); font-family: 'Arial Black', sans-serif; white-space: normal; line-height: 1.2; }
-        .pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity:0; transform: scale(0.5); } 100% { opacity:1; transform: scale(1); } }
-        .crash-in { animation: crashIn 0.4s ease-in forwards; }
-        @keyframes crashIn { 0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } }
-        .knockout { animation: flyOut 0.8s ease-out forwards; }
-        @keyframes flyOut { 0% { transform: translate(0,0) rotate(0deg); } 20% { transform: translate(-20px, 20px) rotate(-10deg); } 100% { transform: translate(-150vw, -50vh) rotate(-120deg); opacity: 0; } }
-        .screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-5px, 0, 0); } 20%, 80% { transform: translate3d(10px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-10px, 0, 0); } 40%, 60% { transform: translate3d(10px, 0, 0); } }
-        #impactFlash { position: fixed; top:0; left:0; width:100%; height:100%; background: white; opacity: 0; pointer-events: none; z-index: 8600; }
-        .flash-now { animation: flashAnim 0.3s ease-out forwards; }
-        @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
-        #letsGoBtn { position: absolute; bottom: 15%; font-size: 20px; padding: 15px 40px; z-index: 9999; display: none; animation: fadeInBtn 1s; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; }
-        @keyframes fadeInBtn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        #gameHUD { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; z-index: 7000; background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink); width: auto; min-width: 280px; justify-content: space-around; }
-        .hud-item { display: flex; flex-direction: column; align-items: center; }
-        .hud-label { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
-        .hud-icon { width: 28px; height: 28px; object-fit: contain; }
-        #scoreCounter { font-size: 24px; font-weight: 900; color: var(--pink); line-height: 1; }
-        #scoreTotal { font-size: 12px; font-weight: bold; color: #aaa; }
-        #progressWrapper { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 7000; display: none; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px); }
-        #barBase { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; }
-        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff758f, #ff4d6d); transition: 0.2s; }
-        #barText { color: var(--pink); font-weight: bold; margin-top: 3px; font-size: 12px; }
-
-        .centerBox { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 30px; z-index: 100; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
-        button.actionBtn { padding: 12px 25px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; margin: 8px; background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
-        #noBtn { background: #adb5bd; position: relative; z-index: 200; border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin: 8px; }
-        .hidden { display: none !important; }
-        
-        #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
-        #beatingHeart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 600; cursor: pointer; text-align: center; }
-        #heartEmoji { font-size: 100px; animation: pBeat 0.8s infinite; }
-        #heartText { color: #ff4d6d; font-size: 24px; font-weight: bold; margin-top: 20px; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 15px rgba(255, 77, 109, 0.6); white-space: nowrap; animation: fadeText 1.5s infinite alternate; }
-        @keyframes pBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        @keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
-        #glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
-        
-        .toss-item { position: fixed; cursor: crosshair; z-index: 9000; bottom: -300px; user-select: none; pointer-events: auto; padding: 15px; }
-        @keyframes tossUp { 0% { bottom: -300px; transform: rotate(0deg); } 50% { bottom: var(--peakHeight); } 100% { bottom: -300px; transform: rotate(720deg); } }
-
-        #cupidFinale { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8000; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
-        #finaleCupid { width: 50vw; max-width: 250px; animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; margin-bottom: 20px; }
-        @keyframes flyInCupid { from { transform: translate(-100vw, -20vh) rotate(-20deg); opacity: 0; } to { transform: translate(0, 0) rotate(0deg); opacity: 1; } }
-        .final-letter-card { background: #fff; padding: 30px 20px; border-radius: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink); animation: popUp 0.5s 1s backwards; display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
-        @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        #loveWeekOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8500; display: none; flex-direction: column; justify-content: center; align-items: center; transition: background 1s ease; padding: 20px; overflow: hidden; }
-        .rose-petal { position: absolute; top: -100px; width: 40px; height: auto; user-select: none; pointer-events: none; animation: fall linear forwards; z-index: 8600; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
-        @keyframes fall { to { transform: translateY(120vh) rotate(720deg); } }
-        #chocolateDrip { position: fixed; top: 0; left: 0; width: 100%; height: 0; background: linear-gradient(to bottom, #3e2723 40%, #5d4037 100%); z-index: 8400; transition: height 1.5s cubic-bezier(0.25, 1, 0.5, 1); border-bottom-left-radius: 50% 100px; border-bottom-right-radius: 50% 100px; box-shadow: inset 0 -10px 20px rgba(0,0,0,0.3), 0 15px 30px rgba(0,0,0,0.4); }
-        
-        .week-img.drive-in { height: auto; width: 85%; max-width: 500px; margin-bottom: 10px; animation: vroomRightToLeft 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards, idleBike 2s ease-in-out infinite 0.8s; }
-        @keyframes vroomRightToLeft { 0% { transform: translateX(150vw) skewX(20deg) scale(0.8); opacity: 0; } 70% { transform: translateX(-20px) skewX(-5deg) scale(1.1); opacity: 1; } 100% { transform: translateX(0) skewX(0) scale(1.2); opacity: 1; } }
-        @keyframes idleBike { 0%, 100% { transform: translateX(0) translateY(0); } 50% { transform: translateX(-3px) translateY(-2px); } }
-        .week-img.drive-out { animation: vroomOutLeft 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important; }
-        @keyframes vroomOutLeft { 0% { transform: translateX(0) skewX(0) scale(1.2); opacity: 1; } 100% { transform: translateX(-150vw) skewX(-20deg) scale(1.2); opacity: 1; } }
-        .smoke-particle { position: absolute; bottom: 80px; right: -50px; width: 40px; height: 40px; background: rgba(220,220,220,0.6); border-radius: 50%; animation: smokePuff 1s ease-out forwards; z-index: 8700; pointer-events: none; filter: blur(5px); }
-        @keyframes smokePuff { to { transform: translate(-150px, -50px) scale(4); opacity: 0; } }
-
-        .kiss-mark { position: absolute; font-size: 50px; animation: popKiss 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 8700; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
-        @keyframes popKiss { from { transform: scale(0) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
-
-        .week-card { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: cardSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; z-index: 8800; }
-        @keyframes cardSlideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        #weekTitle { color: #555; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold; }
-        #weekImageContainer { display: flex; justify-content: center; align-items: center; gap: 20px; min-height: 200px; margin-bottom: 20px; position: relative; }
-        .week-img { height: 160px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); transition: transform 0.3s; }
-        .week-img.float { animation: floatImg 3s ease-in-out infinite; }
-        @keyframes floatImg { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        #weekQuestion { font-size: 20px; font-weight: bold; color: var(--pink); margin-bottom: 25px; line-height: 1.4; white-space: pre-wrap; }
-        #hugMessage { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 4px solid var(--pink); z-index: 9000; text-align: center; color: var(--deep-rose); font-weight: bold; font-size: 24px; display: none; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 80%; }
-
-        #whiteScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px; }
-        #finalRedText { color: #d00000; font-size: clamp(20px, 5vw, 36px); text-align: center; font-weight: bold; opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px; text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5; }
-        #finaleLoadingBox { width: 80%; max-width: 250px; height: 10px; background: #f0f0f0; border-radius: 20px; margin-top: 30px; overflow: hidden; opacity: 0; transition: opacity 1s; border: 1px solid #ff4d6d; }
-        #finaleBar { height: 100%; width: 0%; background: #ff4d6d; transition: width 5s linear; }
-        #byeText { color: #ff4d6d; font-size: clamp(28px, 6vw, 50px); text-align: center; font-weight: bold; opacity: 0; position: absolute; transition: opacity 1s; width: 100%; }
-
-        .love-pop { position: fixed; color: #ff0055; font-weight: bold; font-size: 24px; pointer-events: none; z-index: 9500; text-shadow: 0 0 5px white; animation: floatUp 3s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity:1; transform: translateY(0) scale(1); } 100% { opacity:0; transform: translateY(-80px) scale(1.5); } }
-
-        #rulesPopup { z-index: 7500; }
-        #dimpuImg { transition: transform 1s ease-in; max-width: 100%; border-radius: 20px; width: 100%; }
-        input[type="number"] { padding: 12px; font-size: 18px; border-radius: 15px; border: 2px solid var(--pink); outline: none; width: 100%; text-align: center; margin-bottom: 15px; }
-        #redFlash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 9500; transition: opacity 0.2s; }
+        #come-again {
+            font-size: 1rem;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-<div id="masterBlackout"></div>
-
-<div id="newExperience">
-    <div class="scene" id="scene">
-        <div class="book" id="book">
-            <div class="page" id="p1" style="z-index: 4;">
-                <div class="front">
-                    <h1>The Reality</h1>
-                    <h2>Adi & Mannu</h2>
-                    <div class="swipe-hint">TAP RIGHT TO OPEN</div>
-                </div>
-                <div class="back">
-                    <p>It started with a simple instinct. I never liked Jahil from the very beginning. Something felt off.</p>
-                    <p>But you made him your bestie. I tried to be okay with it, but eventually, the truth came out.</p>
-                    <p>You said you were sorry. You said you’d never interact with him again.</p>
-                </div>
-            </div>
-
-            <div class="page" id="p2" style="z-index: 3;">
-                <div class="front">
-                    <p>Months passed. I thought we were healing.</p>
-                    <p>But then I saw it. You still followed him on Instagram. That simple "Followed by" tag broke me. It brought back everything that happened because of that friendship.</p>
-                    <p>I literally <b>begged</b> you to unfollow him. Just for my mental peace.</p>
-                </div>
-                <div class="back">
-                    <p>Eventually, you agreed. You removed him. Months passed and I was finally happy.</p>
-                    <p>But then college started.</p>
-                    <p>As soon as you met him, you followed him again. You didn't tell me. You didn't even ask if I was okay with it.</p>
-                </div>
-            </div>
-
-            <div class="page" id="p3" style="z-index: 2;">
-                <div class="front">
-                    <p>You knew. You knew seeing you follow him made me sad and depressed. Yet, you chose him over me. Again.</p>
-                    <p>When I asked you, you acted like it was casual. Like it wasn't a big thing.</p>
-                    <p>But inside? <span class="highlight">I was broken.</span></p>
-                </div>
-                <div class="back">
-                    <p>I realized something today. You don't care about my emotions. You don't respect the pain I went through.</p>
-                    <p>I decided there is no need to beg anymore.</p>
-                    <p>Because you will always, <i>always</i> choose Jahil over Adi.</p>
-                </div>
-            </div>
-
-            <div class="page" id="p4" style="z-index: 1;">
-                <div class="front">
-                    <p>So, this is me accepting reality.</p>
-                    <p>I am done begging to be prioritized over someone who hurt me.</p>
-                    <p>I am leaving it exactly how it is.</p>
-                </div>
-                <div class="back">
-                    <div class="final-content">
-                        <h2 style="margin-bottom: 5px; font-weight: normal; letter-spacing: 2px;">The End.</h2>
-                        <p style="opacity: 0.7;">This site was built with so much effort for your birthday.</p>
-                        <p style="opacity: 0.7;">Now, it serves a different purpose.</p>
-                        <div class="block-btn" id="blockBtn">BLOCKED</div>
-                        <br>
-                        <button id="goToBirthdayBtn" onclick="switchToBirthday()">[ View Original Birthday Site ]</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="oldExperience">
-    <div id="sword"></div>
-    <img id="cupid-img" src="cupid.png" style="position:fixed; width:100px; pointer-events:none; z-index:9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s;">
-
-    <audio id="cuteMusic" loop src="cute-bgm.mp3" preload="auto"></audio>
-    <audio id="letterMusic" src="lettersong.mp3" preload="auto"></audio>
-    <audio id="sliceSound" src="slice.mp3" preload="auto"></audio>
-    <audio id="yaySound" src="yay.mp3" preload="auto"></audio>
-    <audio id="sadSound" src="sad.mp3" preload="auto"></audio>
-    <audio id="afterCakeSound" src="after cake.mp3" preload="auto"></audio>
-    <audio id="heartSound" loop src="heart.mp3" preload="auto"></audio>
-    <audio id="chaloSound" src="chalo.mp3" preload="auto"></audio>
-    <audio id="tugayaSound" src="tugaya.mp3" preload="auto"></audio>
-    <audio id="bounceSound" src="bounce.mp3" preload="auto"></audio>
-    <audio id="sadIndianSound" src="sadindian.mp3" preload="auto"></audio>
-    <audio id="bikeIdle" src="bike.mp3" loop preload="auto"></audio>
-    <audio id="bikeRev" src="bikerev.mp3" preload="auto"></audio>
-
-    <div id="startScreen">
-        <div class="rain-container" id="rainBox"></div>
-        <div class="start-card">
-            <div class="loader-heart">❤️</div>
-            <h1>Hey Mannu... 👋</h1>
-            <p>Wait karna padega... Special cheez hai! 😉</p>
-            <div id="loaderBox">
-                <div class="loader-container"><div class="loader-bar" id="fillBar"></div></div>
-                <p id="loadingText">Ittu sa pyar...</p>
-            </div>
-            <button id="startBtn" onclick="triggerIntro()">Open Your Gift 🎁</button>
-        </div>
+    <div id="quote-container">
+        <span id="quote-text"></span><span class="cursor" id="cursor"></span>
     </div>
 
-    <div id="introScene">
-        <div id="impactFlash"></div>
-        <div id="valentineText">Valentine's Day? 🌹</div>
-        <div id="birthdayText">Mannu ka Birthday Hai! 🎂</div>
-        <button id="letsGoBtn" onclick="startMainExperience()">Let's Go! ✨</button>
+    <div id="bottom-section">
+        <div id="countdown">00:00:00</div>
+        <div id="come-again">come again tomorrow at 11:11 PM</div>
     </div>
 
-    <div id="gameHUD" class="hidden">
-        <div class="hud-item"><span class="hud-label">Slice:</span><img src="letter.png" class="hud-icon"></div>
-        <div class="hud-score-box"><div id="scoreCounter">0</div><div id="scoreTotal">/ 19</div></div>
-        <div class="hud-item"><span class="hud-label">Avoid:</span><div style="display:flex; gap:5px;"><img src="dal.png" class="hud-icon"><img src="roti.png" class="hud-icon"></div></div>
-    </div>
-    <div id="progressWrapper"><div id="barBase"><div id="barFill"></div></div><div id="barText">Collect Letters: 0/19</div></div>
-    <div id="redFlash"></div>
-
-    <div id="stage1" class="centerBox hidden">
-        <h1>Will you be my Valentine, Mannu? ❤️</h1>
-        <div style="display:flex; justify-content:center; gap:10px; margin-top: 20px; flex-wrap:wrap;">
-            <button class="actionBtn" onclick="toStage2()">Yes 😍</button>
-            <button id="noBtn">Nahi 😒</button>
-        </div>
-    </div>
-
-    <div id="stage2" class="centerBox hidden">
-        <h2 id="counter" style="color:var(--pink)">Slices left: 19</h2>
-        <h1>Mannu, kaato jaldi se! 🎂</h1>
-        <img id="cake" src="cake.png" style="width:80%; margin: 20px 0;">
-        <div id="cakeChoices" class="hidden" style="margin-top: 10px;">
-            <button class="actionBtn" onclick="showDimpu()">Adi ko dedo ek piece 🙋‍♂️</button>
-            <button class="actionBtn" onclick="eatSelf()">Sara Khud Khajao 😋</button>
-        </div>
-    </div>
-
-    <div id="guiltPopup" class="centerBox hidden" style="z-index:2001;">
-        <h2>🤨 Had hai!</h2>
-        <p style="font-size: 18px; margin: 20px 0;">Akele khana gandi baat hai Mannu baby.</p>
-        <button class="actionBtn" onclick="showDimpu()">Mujhe bhi dedo hehe 🍰</button>
-    </div>
-
-    <div id="dimpuStage" class="centerBox hidden" style="z-index: 2005;">
-        <img id="dimpuImg" src="dimpu.png">
-        <h2 style="margin: 15px 0;">Ye Guldasta Logi? 🌷</h2>
-        <p style="margin-bottom: 10px;">To confirm, tell me Adi's birth year:</p>
-        <input type="number" id="adiYear" placeholder="YYYY">
-        <br>
-        <button class="actionBtn" onclick="checkYear()">Confirm ✅</button>
-    </div>
-
-    <div id="rulesPopup" class="centerBox hidden">
-        <h2 style="color: var(--pink); margin-bottom: 15px;">Putku Suno Meri Baat... 🤫</h2>
-        <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.6;">
-            Baby suno tumko na ye <b>Letters</b> slice krne hai cursor move karke 💌
-        </p>
-        <p style="font-size: 16px; margin-bottom: 20px; color: #d00000; font-weight: bold;">
-            Par wo <b>Dal aur Rota</b> ko maat slice karna putku! ⚠️<br>
-            Warna zero ho jayega score apka... 💣
-        </p>
-        <button class="actionBtn" onclick="startFinalGame()">I am Ready! 🥷❤️</button>
-    </div>
-
-    <div id="blackout"></div>
-    <div id="beatingHeart">
-        <div id="heartEmoji">❤️</div>
-        <div id="heartText">Mere dil pe tap karo babe</div>
-    </div>
-    <div id="glassOverlay"></div>
-
-    <div id="cupidFinale">
-        <img src="cupid.png" id="finaleCupid">
-        <div class="final-letter-card">
-            <h1 style="color: #ff4d6d; margin-bottom: 15px; font-size:24px;">My Dearest Mannu ❤️</h1>
-            <p style="font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 20px;">
-                Tum ek akeli aisi insaan ho jisse baat karna mujhe sabse jadha accha lagta hai, aur mai papa mummy ko thanks bolna chahunga ki unhone mujhe itni pyari pyari mannu di, aaj ke din, you are the best baby!! Sabse best hai meri mannu! Happy Birthday to you babyjaan <br><br>
-                <b>I Love You Forever!</b>
-            </p>
-            <button class="actionBtn" style="font-size: 20px; padding: 15px 30px; margin-top: 10px;" onclick="startLoveJourney()">Click Here ❤️</button>
-        </div>
-    </div>
-
-    <div id="loveWeekOverlay">
-        <div id="chocolateDrip"></div>
-        <div class="rain-container" id="valentineRain" style="display:none; z-index:8600;"></div>
-        
-        <div class="week-card">
-            <div id="weekTitle"></div>
-            <div id="weekImageContainer"></div>
-            <div id="weekQuestion"></div>
-            <div id="weekButtons"></div>
-        </div>
-        <div id="hugMessage">Love you sooo much babyyyyy maja aagya wow wow hug 🤗❤️</div>
-    </div>
-
-    <div id="whiteScreen">
-        <h1 id="finalRedText">Mannu, tum ho meri best friend, meri darling, meri jaaneman, hehe! I love you sooooooo much! ❤️</h1>
-        <div id="finaleLoadingBox"><div id="finaleBar"></div></div>
-        <h1 id="byeText">biee biee cutie 🎀</h1>
-    </div>
-</div>
-
-<script>
-    /* =========================================================
-       STATE FLAG
-       ========================================================= */
-    let isBirthdayActive = false; 
-
-    /* =========================================================
-       JAVASCRIPT: NEW BOOK MECHANICS
-       ========================================================= */
-    const pages = document.querySelectorAll('.page');
-    const scene = document.getElementById('scene');
-    const blockBtn = document.getElementById('blockBtn');
-    
-    let currentPage = 1;
-    const totalPages = pages.length;
-    let isAnimating = false;
-
-    function updateBookCenter() {
-        if (currentPage === 1) {
-            scene.style.transform = 'translateX(-25%)'; 
-        } else {
-            scene.style.transform = 'translateX(0)'; 
-        }
-    }
-
-    function updateZIndex() {
-        pages.forEach((page, index) => {
-            const pageNum = index + 1;
-            if (page.classList.contains('flipped')) page.style.zIndex = pageNum;
-            else page.style.zIndex = totalPages - pageNum + 1;
-        });
-    }
-
-    function turnPageForward() {
-        if (currentPage <= totalPages && !isAnimating) {
-            isAnimating = true;
-            const page = document.getElementById(`p${currentPage}`);
-            page.style.zIndex = 100; page.classList.add('flipped');
-            currentPage++; updateBookCenter();
-            setTimeout(() => { updateZIndex(); isAnimating = false; }, 800); 
-        }
-    }
-
-    function turnPageBackward() {
-        if (currentPage > 1 && !isAnimating) {
-            isAnimating = true; currentPage--;
-            const page = document.getElementById(`p${currentPage}`);
-            page.style.zIndex = 100; page.classList.remove('flipped');
-            updateBookCenter();
-            setTimeout(() => { updateZIndex(); isAnimating = false; }, 800);
-        }
-    }
-
-    scene.addEventListener('click', (e) => {
-        if (e.target.id === 'blockBtn' || e.target.id === 'goToBirthdayBtn') return;
-        const rect = scene.getBoundingClientRect();
-        if ((e.clientX - rect.left) > rect.width / 2) turnPageForward();
-        else turnPageBackward();
-    });
-
-    let touchStartX = 0;
-    scene.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-    scene.addEventListener('touchend', e => {
-        let touchEndX = e.changedTouches[0].screenX;
-        if (touchStartX - touchEndX > 40) turnPageForward();
-        if (touchEndX - touchStartX > 40) turnPageBackward();
-    });
-
-    blockBtn.addEventListener('click', () => {
-        blockBtn.style.background = "#c0392b"; blockBtn.style.color = "#fff"; blockBtn.style.borderColor = "#c0392b";
-        blockBtn.innerHTML = "ACCESS DENIED"; blockBtn.style.cursor = "default";
-    });
-
-    /* =========================================================
-       JAVASCRIPT: THE GREAT TRANSITION (BOOK TO BIRTHDAY)
-       ========================================================= */
-    function switchToBirthday() {
-        const blackout = document.getElementById("masterBlackout");
-        blackout.style.opacity = "1";
-        blackout.style.pointerEvents = "auto";
-
-        setTimeout(() => {
-            document.getElementById("newExperience").remove();
-
-            document.body.style.background = "#ffc0cb";
-            document.body.style.backgroundImage = "none";
-            document.body.style.cursor = "none";
-
-            document.getElementById("oldExperience").style.display = "block";
-            isBirthdayActive = true; 
+    <script>
+        const quotes = [
+            // The Forgotten Good
+            "100 days of sunlight, forgotten for one drop of rain.",
+            "They drank the ocean you poured, but complained about the glass.",
+            "You gave them the world, and they left because you forgot the moon.",
+            "A hundred 'yeses' erased by a single 'no'.",
+            "They only remember your hands when they are empty.",
+            "Give them 99%, and they will hate you for the missing one.",
+            "Your thousand acts of care, buried by one mistake.",
+            "Perfection is expected; one flaw is condemned.",
+            "You can build a hundred bridges, but they'll only talk about the one you didn't.",
+            "Countless sacrifices remain invisible until the day you finally stop.",
             
-            startBirthdayLoader();
+            // The Prettiest Blue
+            "You are the perfect sky, but she only watches the fire.",
+            "It is not that you aren't enough; you just aren't her color.",
+            "A masterpiece in blue means nothing to a lover of red.",
+            "Don't curse your blue just because she craves the crimson.",
+            "Even the deepest ocean cannot satisfy a heart that wants to burn.",
+            "You were a beautiful wave, but she was looking for a flame.",
+            "Being the absolute best blue will never win a heart set on red.",
+            "A diamond is useless to someone shopping for rubies.",
+            "Perfectly blue, yet completely unseen.",
+            "You can't paint her a warm sunset when all you have is a cool sky.",
+            
+            // Deserving to be Cared For
+            "They handed you their coldness, and you blamed your own warmth.",
+            "Their inability to care is their limitation, not a measure of your worth.",
+            "You deserve the exact same love you keep trying to give away.",
+            "They treat you like an option, while you make them a priority.",
+            "Don't let their empty hands convince you that you don't deserve to be held.",
+            "You are not asking for too much; you are just asking the wrong person.",
+            "Stop shrinking to fit in places that don't appreciate your presence.",
+            "You gave them your heart, and they treated it like a heavy burden.",
+            "You are worth far more than the afterthought they turned you into.",
+            "If they make you feel unlovable, they are simply looking through the wrong mirror."
+        ];
 
-            setTimeout(() => {
-                blackout.style.opacity = "0";
-                blackout.style.pointerEvents = "none";
-            }, 500);
+        // --- Time Sync Logic ---
+        function getNextTargetTime() {
+            const now = new Date();
+            let target = new Date(now);
+            target.setHours(23, 11, 0, 0); // 11:11:00 PM local time
 
-        }, 1500); 
-    }
-
-    /* =========================================================
-       JAVASCRIPT: OLD BIRTHDAY EXPERIENCE
-       ========================================================= */
-    let mouse = { x:0, y:0, lx:0, ly:0 };
-    function updateCupid(x, y) {
-        const cupid = document.getElementById("cupid-img");
-        if (cupid) { cupid.style.left = (x + 15) + "px"; cupid.style.top = (y + 15) + "px"; }
-    }
-    
-    function handleTouchMove(e) {
-        if (!isBirthdayActive) return; 
-        e.preventDefault();
-        const touch = e.touches[0];
-        mouse.x = touch.clientX; mouse.y = touch.clientY;
-        updateSword(); updateCupid(mouse.x, mouse.y); 
-        const element = document.elementFromPoint(mouse.x, mouse.y);
-        if(element && element.classList.contains('toss-item') && !element.hit) { element.hit = true; element.sliceHandler(); }
-        if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) { checkHit(); }
-    }
-
-    function handleMouseMove(e) {
-        if (!isBirthdayActive) return; 
-        mouse.x = e.clientX; mouse.y = e.clientY;
-        updateSword(); updateCupid(mouse.x, mouse.y);
-        let speed = Math.sqrt(Math.pow(mouse.x - mouse.lx, 2) + Math.pow(mouse.y - mouse.ly, 2));
-        if (speed > 15) { createSlash(mouse.x, mouse.y); if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) checkHit(); }
-        mouse.lx = mouse.x; mouse.ly = mouse.y;
-    }
-
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("mousemove", handleMouseMove);
-
-    function updateSword() { const sword = document.getElementById("sword"); if(sword){ sword.style.left = mouse.x + "px"; sword.style.top = mouse.y + "px"; } }
-    function createSlash(x, y) { const s = document.createElement("div"); s.className = "slash"; s.style.left = x + "px"; s.style.top = y + "px"; s.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(y - mouse.ly, x - mouse.lx) * 180 / Math.PI}deg)`; document.body.appendChild(s); setTimeout(() => s.remove(), 400); }
-
-    function spawnRain(containerId) {
-        const rainContainer = document.getElementById(containerId);
-        if(!rainContainer) return;
-        rainContainer.innerHTML = '';
-        for(let i=0; i<45; i++) {
-            const span = document.createElement('span'); span.innerText = "14 Feb"; span.className = "rain-text";
-            span.style.left = Math.random() * 100 + '%'; 
-            span.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
-            span.style.fontSize = (Math.random() * 12 + 12) + 'px';
-            rainContainer.appendChild(span);
+            // If it's already past 11:11 PM, set target to tomorrow's 11:11 PM
+            if (now.getTime() >= target.getTime()) {
+                target.setDate(target.getDate() + 1);
+            }
+            return target.getTime();
         }
-    }
 
-    function startBirthdayLoader() {
-        spawnRain('rainBox');
-        let load = 0;
-        const txt = document.getElementById('loadingText');
-        const interval = setInterval(() => {
-            load++; document.getElementById('fillBar').style.width = load + "%";
-            if(load < 25) txt.innerText = "Preparing surprise for Mannu... 🎁";
-            else if(load < 50) txt.innerText = "Adding extra love & kisses... 💋";
-            else if(load < 80) txt.innerText = "Bas thoda sa aur baby... 🤏";
-            else txt.innerText = "Ye lo aapka gift! ❤️";
-            if(load >= 100) { clearInterval(interval); document.getElementById('loaderBox').style.display = 'none'; document.getElementById('startBtn').style.display = 'inline-block'; }
-        }, 45);
-    }
+        // --- Random Quote Storage Logic ---
+        function getDailyRandomQuoteIndex() {
+            const now = new Date().getTime();
+            let expireTime = localStorage.getItem('quoteExpire1111');
+            let quoteIndex = localStorage.getItem('quoteIndex1111');
 
-    function triggerIntro() {
-        const sfx = ['yaySound', 'sadSound', 'sliceSound', 'afterCakeSound', 'heartSound', 'letterMusic', 'chaloSound', 'tugayaSound', 'bounceSound', 'sadIndianSound'];
-        sfx.forEach(id => { const el = document.getElementById(id); if(el){ el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(e => console.log(id));} });
-        document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('introScene').style.display = 'flex';
-        const vText = document.getElementById('valentineText'); const bText = document.getElementById('birthdayText'); const flash = document.getElementById('impactFlash'); const bounce = document.getElementById('bounceSound');
-        setTimeout(() => { vText.classList.add('pop-in'); }, 300);
-        setTimeout(() => { bText.classList.add('crash-in'); setTimeout(() => { bounce.play(); document.getElementById('introScene').classList.add('screen-shake'); flash.classList.add('flash-now'); vText.classList.add('knockout'); }, 300); setTimeout(() => { document.getElementById('letsGoBtn').style.display = 'block'; }, 1500); }, 1500);
-    }
+            // If no data exists, OR if the current time has passed the expiration time (11:11 PM)
+            if (!expireTime || !quoteIndex || now >= parseInt(expireTime)) {
+                quoteIndex = Math.floor(Math.random() * quotes.length); // Totally random
+                expireTime = getNextTargetTime(); 
+                
+                // Save the new random quote and its expiration time in the browser
+                localStorage.setItem('quoteIndex1111', quoteIndex);
+                localStorage.setItem('quoteExpire1111', expireTime);
+            }
+            return parseInt(quoteIndex);
+        }
 
-    function startMainExperience() {
-        document.getElementById('bounceSound').pause(); document.getElementById('bounceSound').currentTime = 0;
-        document.getElementById('cuteMusic').volume = 0.2; document.getElementById('cuteMusic').play();
-        document.getElementById('introScene').style.display = 'none'; document.getElementById('stage1').classList.remove('hidden');
-    }
+        // --- Typewriter Effect ---
+        const quoteTextElement = document.getElementById("quote-text");
+        const bottomSection = document.getElementById("bottom-section");
+        const cursor = document.getElementById("cursor");
+        
+        const targetQuote = quotes[getDailyRandomQuoteIndex()];
+        let charIndex = 0;
+        const typingSpeed = 60; 
 
-    let slices = 19; let letterScore = 0; const targetScore = 19; let isGameOver = false; let stopGame = false;
-    let spawnTimeoutId; 
-
-    function toStage2() { document.getElementById("yaySound").play(); document.getElementById("stage1").classList.add("hidden"); document.getElementById("noBtn").style.display = "none"; document.getElementById("stage2").classList.remove("hidden"); }
-    document.getElementById("noBtn").addEventListener('mouseover', function() { const btn = this; document.getElementById("sadSound").currentTime = 0; document.getElementById("sadSound").play(); if (btn.parentNode.id !== 'oldExperience') { document.getElementById("oldExperience").appendChild(btn); } btn.style.position = "fixed"; btn.style.left = Math.random() * 80 + "vw"; btn.style.top = Math.random() * 80 + "vh"; });
-
-    function checkHit() {
-        if(slices <= 0) return; 
-        const rect = document.getElementById("cake").getBoundingClientRect();
-        if(mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) {
-            if(Date.now() - (window.lh || 0) > 150) {
-                slices--; if (slices < 0) slices = 0;
-                document.getElementById("counter").innerText = `Slices left: ${slices}`;
-                const s = document.getElementById("sliceSound"); s.currentTime = 0; s.play();
-                if(slices === 0) { document.getElementById("afterCakeSound").play(); document.getElementById("cake").src = "sliced cake.png"; document.getElementById("cakeChoices").classList.remove("hidden"); }
-                window.lh = Date.now();
+        function typeWriter() {
+            if (charIndex < targetQuote.length) {
+                quoteTextElement.innerHTML += targetQuote.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, typingSpeed);
+            } else {
+                setTimeout(() => {
+                    bottomSection.style.opacity = 1;
+                    cursor.style.display = "none";
+                }, 1000);
             }
         }
-    }
 
-    function eatSelf() { document.getElementById("guiltPopup").classList.remove("hidden"); document.getElementById("cuteMusic").pause(); document.getElementById("sadIndianSound").play(); }
-    function showDimpu() { document.getElementById("sadIndianSound").pause(); document.getElementById("sadIndianSound").currentTime = 0; document.getElementById("cuteMusic").play(); document.getElementById("stage2").classList.add("hidden"); document.getElementById("guiltPopup").classList.add("hidden"); document.getElementById("dimpuStage").classList.remove("hidden"); }
-    function checkYear() {
-        const val = document.getElementById("adiYear").value; const img = document.getElementById("dimpuImg"); const tugaya = document.getElementById("tugayaSound");
-        if(val === "2004") { tugaya.pause(); tugaya.currentTime = 0; document.getElementById("chaloSound").play(); img.src = "dimpu2.png"; setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); setTimeout(() => { triggerRealBlackout(); }, 3000); }
-        else { tugaya.currentTime = 0; tugaya.play(); img.src = "dimpuangry.png"; alert("Wrong year! Try again 😼"); }
-    }
+        // --- Countdown Logic ---
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const targetTime = getNextTargetTime();
+            const diff = targetTime - now;
 
-    function triggerRealBlackout() { isGameOver = true; document.getElementById("dimpuStage").classList.add("hidden"); document.getElementById("blackout").style.display = "block"; setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); setTimeout(() => { document.getElementById("beatingHeart").style.display = "block"; document.getElementById("heartSound").play(); }, 3000); }
-    document.getElementById("beatingHeart").onclick = function() { document.getElementById("heartSound").pause(); this.style.display = "none"; document.getElementById("blackout").style.display = "none"; document.getElementById("glassOverlay").style.display = "block"; document.getElementById("rulesPopup").classList.remove("hidden"); };
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
 
-    function startFinalGame() { document.getElementById("rulesPopup").classList.add("hidden"); document.getElementById("progressWrapper").style.display = "block"; document.getElementById("gameHUD").classList.remove("hidden"); document.getElementById("gameHUD").style.display = "flex"; document.getElementById("cuteMusic").pause(); document.getElementById("letterMusic").play(); startFruitNinja(); }
+            const formattedTime = 
+                String(hours).padStart(2, '0') + ":" + 
+                String(minutes).padStart(2, '0') + ":" + 
+                String(seconds).padStart(2, '0');
 
-    function startFruitNinja() {
-        const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
-        const spawnItem = () => {
-            if (stopGame) return;
-            const item = document.createElement("img");
-            const isBomb = Math.random() > 0.7; 
-            const type = isBomb ? (Math.random() > 0.5 ? "dal.png" : "roti.png") : "letter.png";
-            item.src = type; item.className = "toss-item";
-            const size = isBomb ? (Math.random() * 60 + 80) : (Math.random() * 100 + 150); 
-            item.style.width = size + "px"; item.style.left = Math.random() * 80 + 10 + "vw";
-            const peak = 40 + Math.random() * 40 + "vh"; item.style.setProperty('--peakHeight', peak);
-            const drift = (Math.random() - 0.5) * 300 + "px"; item.style.transform = `translateX(${drift})`;
-            const duration = 2 + Math.random(); item.style.animation = `tossUp ${duration}s ease-in-out forwards`;
-            
-            item.sliceHandler = function() {
-                if (stopGame) return;
-                if (isBomb) { letterScore = 0; updateHUD(); const bad = document.getElementById("tugayaSound"); bad.currentTime = 0; bad.play(); const flash = document.getElementById("redFlash"); flash.style.opacity = "0.6"; setTimeout(() => flash.style.opacity = "0", 200); item.remove(); } 
-                else { 
-                    letterScore++; document.getElementById("scoreCounter").innerText = letterScore; document.getElementById("barFill").style.width = Math.min((letterScore/targetScore)*100, 100) + "%";
-                    const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
-                    if (letterScore >= targetScore) {
-                        stopGame = true; item.style.animation = 'none'; item.style.transition = "all 2.5s cubic-bezier(0.25, 1, 0.5, 1)"; item.style.position = "fixed"; item.style.left = "50%"; item.style.top = "50%"; item.style.zIndex = "10000";
-                        requestAnimationFrame(() => { item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)"; item.style.opacity = "0"; });
-                        setTimeout(() => { document.querySelectorAll('.toss-item').forEach(el => el.remove()); document.getElementById("gameHUD").style.display = "none"; document.getElementById("progressWrapper").style.opacity = "0"; document.getElementById("cupid-img").style.display = "none"; document.getElementById("cupidFinale").style.display = "flex"; }, 2500);
-                    } else { showFloatingText(item.getBoundingClientRect().left, item.getBoundingClientRect().top, loveWords); item.remove(); }
-                }
-            };
-            item.onmouseover = function() { if(!this.hit) { this.hit = true; this.sliceHandler(); } };
-            document.getElementById("oldExperience").appendChild(item); setTimeout(() => { if(item.parentNode) item.remove(); }, duration * 1000 + 100);
-            if (!stopGame) spawnTimeoutId = setTimeout(spawnItem, Math.random() * 600 + 300); 
+            document.getElementById("countdown").innerText = formattedTime;
+
+            // Auto-refresh the page exactly when it hits 11:11 PM to load the new quote
+            if (diff <= 1000 && diff > 0) {
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            setTimeout(typeWriter, 1500); 
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
         };
-        spawnItem();
-    }
-    function showFloatingText(x, y, words) { const txt = document.createElement("div"); txt.className = "love-pop"; txt.innerText = words[Math.floor(Math.random() * words.length)]; txt.style.left = x + "px"; txt.style.top = y + "px"; document.getElementById("oldExperience").appendChild(txt); setTimeout(() => txt.remove(), 3000); }
-    function updateHUD() { document.getElementById("scoreCounter").innerText = letterScore; const pct = (letterScore / targetScore) * 100; document.getElementById("barFill").style.width = Math.min(pct, 100) + "%"; }
-
-    const loveData = [
-        { day: "7 Feb - Rose Day", img: "rose.png", q: "Mujhe pata hai pehle wala rose tumse kahi kho gaya… chalo koi baat nahi ye lo cutie kya tumko mera rose pasand aaya? Accept karogi?", bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)", special: "rose", btnText: "Haan, Rose dedo! 🌹" },
-        { day: "8 Feb - Propose Day", img: "propose.png", q: "MAññU, sirf iss janam me nahi kya har janam me tum meri bano gi? I love you sooo much ❤️", bg: "linear-gradient(135deg, #f6d365 0%, #fda085 100%)", special: false, btnText: "Yes, humesha ke liye! 💍" },
-        { day: "9 Feb - Chocolate Day", img: null, q: "Babyjaan, Isme se na aap ek chocolate lelo… Jo bhi apko chahiye. Fir dono khayenge sath me", bg: "linear-gradient(135deg, #5b3e31 0%, #8d6e63 100%)", special: "chocolate" },
-        { day: "10 Feb - Teddy Day", img: "teddy.png", q: "Baby Jaldi se apna bada sa teddy bear pakdo… isko bohot mehnat se laya hi apke liye abhi abhi abhi chahiye tha na apko.. ye lo", bg: "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)", special: "teddy", btnText: "Le Liya! 🧸" },
-        { day: "11 Feb - Promise Day", img: "promise.png", q: "MAññU cutie kya aap mere hamesa sath rehne wale promise ko accept karogi?", bg: "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)", special: false, btnText: "Pinky Promise! 🤞" },
-        { day: "12 Feb - Hug Day", img: "hug.png", q: "Babe kya aap mera pyara sa side hug accept karoge? Ya fir tight wala hug", bg: "linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%)", special: "hug" },
-        { day: "13 Feb - Kiss Day", img: "kiss.png", q: "Kya abhi abhi abhi hum ek aise kissi kar sakte hai?", bg: "linear-gradient(135deg, #fc00ff 0%, #00dbde 100%)", special: "kiss", btnText: "Haan, ek kissi! 💋" },
-        { day: "14 Feb - Valentine's Day", img: "valentine.png", q: "Mannu, sirf 2026 me nahi.. kya tum har saal aur saalon saal.. meri valentine banogi? For ever and forever ♾️", bg: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", special: "valentine", btnText: "Yes, Forever! ♾️" }
-    ];
-    let currentDayIndex = 0; let petalInterval; let kissInterval; let smokeInterval;
-
-    function startLoveJourney() {
-        document.getElementById("cupidFinale").style.display = "none";
-        document.getElementById("loveWeekOverlay").style.display = "flex";
-        renderDay(); document.getElementById("yaySound").play();
-    }
-
-    function cleanupAnimations() {
-        clearInterval(petalInterval); document.querySelectorAll('.rose-petal').forEach(el => el.remove());
-        document.getElementById("chocolateDrip").style.height = "0";
-        document.getElementById("valentineRain").style.display = "none"; 
-        clearInterval(kissInterval); document.querySelectorAll('.kiss-mark').forEach(el => el.remove());
-        clearInterval(smokeInterval); document.querySelectorAll('.smoke-particle').forEach(el => el.remove());
-        document.getElementById("bikeIdle").pause();
-    }
-
-    function renderDay() {
-        cleanupAnimations();
-        const data = loveData[currentDayIndex];
-        const overlay = document.getElementById("loveWeekOverlay");
-        const title = document.getElementById("weekTitle");
-        const imgContainer = document.getElementById("weekImageContainer");
-        const q = document.getElementById("weekQuestion");
-        const btnContainer = document.getElementById("weekButtons");
-
-        overlay.style.background = data.bg; title.innerText = data.day; q.innerText = data.q;
-        imgContainer.innerHTML = ''; btnContainer.innerHTML = '';
-
-        if (data.special === "rose") {
-            const petalImages = ['petal1.png', 'petal2.png', 'petal3.png'];
-            petalInterval = setInterval(() => {
-                const petalImg = petalImages[Math.floor(Math.random() * petalImages.length)];
-                const petal = document.createElement("img"); petal.src = petalImg; petal.className = "rose-petal";
-                petal.style.left = Math.random() * 95 + "vw"; petal.style.animationDuration = (Math.random() * 3 + 4) + "s";
-                document.getElementById("oldExperience").appendChild(petal); setTimeout(() => petal.remove(), 7000);
-            }, 400);
-            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
-        }
-        else if (data.special === "chocolate") {
-            document.getElementById("chocolateDrip").style.height = "180px"; 
-            const kitkat = document.createElement("img"); kitkat.src = "kitkat.png"; kitkat.className = "week-img float"; kitkat.onclick = nextDay; kitkat.style.cursor = "pointer";
-            const dairy = document.createElement("img"); dairy.src = "dairymilk.png"; dairy.className = "week-img float"; dairy.id = "runawayDairy"; dairy.style.position = "absolute"; dairy.style.zIndex = "9999";
-            
-            const runAway = (e) => {
-                e.preventDefault(); e.stopPropagation();
-                const newX = Math.random() * (window.innerWidth - 100); const newY = Math.random() * (window.innerHeight - 300) + 100;
-                dairy.style.position = "fixed"; dairy.style.left = newX + "px"; dairy.style.top = newY + "px"; dairy.style.transition = "all 0.2s ease";
-            };
-            dairy.addEventListener("mouseover", runAway); dairy.addEventListener("touchstart", runAway); dairy.addEventListener("click", runAway);
-            imgContainer.appendChild(kitkat); imgContainer.appendChild(dairy);
-            const hint = document.createElement("p"); hint.innerText = "(Click the chocolate!)"; hint.style.fontSize = "12px"; hint.style.color = "#fff"; btnContainer.appendChild(hint);
-        }
-        else if (data.special === "teddy") {
-            const img = document.createElement("img"); img.src = data.img; 
-            img.className = "week-img drive-in"; 
-            imgContainer.appendChild(img);
-            
-            const revAudio = document.getElementById("bikeRev");
-            const idleAudio = document.getElementById("bikeIdle");
-
-            revAudio.currentTime = 0; revAudio.play();
-            setTimeout(() => { revAudio.pause(); idleAudio.currentTime = 0; idleAudio.play(); }, 1000);
-
-            smokeInterval = setInterval(() => {
-                const smoke = document.createElement("div"); smoke.className = "smoke-particle";
-                smoke.style.bottom = (80 + Math.random() * 20) + "px";
-                imgContainer.appendChild(smoke); setTimeout(() => smoke.remove(), 1000);
-            }, 150);
-            
-            const btn = document.createElement("button"); 
-            btn.className = "actionBtn"; btn.innerText = data.btnText;
-            
-            btn.onclick = function() {
-                idleAudio.pause(); revAudio.currentTime = 0; revAudio.play();
-                img.classList.remove("drive-in"); void img.offsetWidth; img.classList.add("drive-out");
-                
-                let exitSmoke = setInterval(() => {
-                    const smoke = document.createElement("div"); smoke.className = "smoke-particle";
-                    smoke.style.bottom = (80 + Math.random() * 20) + "px"; smoke.style.left = "50%";
-                    imgContainer.appendChild(smoke); setTimeout(() => smoke.remove(), 1000);
-                }, 100);
-                
-                setTimeout(() => { clearInterval(exitSmoke); nextDay(); }, 1200);
-            };
-            btnContainer.appendChild(btn);
-        }
-        else if (data.special === "hug") {
-            createStandardLayout(data.img, imgContainer, null);
-            const btnTight = document.createElement("button"); btnTight.className = "actionBtn"; btnTight.innerText = "Tight Hug 🤗";
-            btnTight.onclick = function() { 
-                document.getElementById("yaySound").play(); document.getElementById("hugMessage").style.display = "block"; 
-                setTimeout(() => { document.getElementById("hugMessage").style.display = "none"; nextDay(); }, 3000); 
-            };
-            btnContainer.appendChild(btnTight);
-
-            const btnSide = document.createElement("button"); btnSide.className = "actionBtn"; btnSide.innerText = "Side Hug 🫂"; 
-            btnSide.onclick = nextDay; btnContainer.appendChild(btnSide);
-        }
-        else if (data.special === "kiss") {
-            kissInterval = setInterval(() => {
-                const kiss = document.createElement("div"); kiss.innerHTML = "💋"; kiss.className = "kiss-mark";
-                kiss.style.left = Math.random() * 90 + "vw"; kiss.style.top = Math.random() * 90 + "vh"; 
-                kiss.style.transform = `rotate(${Math.random()*360}deg)`;
-                document.getElementById("oldExperience").appendChild(kiss); setTimeout(() => kiss.remove(), 1000);
-            }, 400);
-            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
-        }
-        else if (data.special === "valentine") {
-            const rainDiv = document.getElementById("valentineRain");
-            rainDiv.style.display = "block"; spawnRain('valentineRain');
-            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
-        }
-        else { createStandardLayout(data.img, imgContainer, btnContainer, data.btnText); }
-    }
-
-    function createStandardLayout(imgSrc, imgContainer, btnContainer, btnText) {
-        const img = document.createElement("img"); img.src = imgSrc; img.className = "week-img float";
-        imgContainer.appendChild(img);
-        if(btnContainer) createYesButton(btnContainer, btnText);
-    }
-    function createYesButton(container, text) {
-        const btn = document.createElement("button"); btn.className = "actionBtn"; btn.innerText = text || "Yes, I will! ❤️"; 
-        btn.onclick = nextDay; container.appendChild(btn);
-    }
-
-    function nextDay() {
-        document.getElementById("sliceSound").currentTime = 0; document.getElementById("sliceSound").play();
-        currentDayIndex++;
-        if (currentDayIndex < loveData.length) { renderDay(); } 
-        else { cleanupAnimations(); document.getElementById("loveWeekOverlay").style.display = "none"; showFinalWhiteScreen(); }
-    }
-
-    function showFinalWhiteScreen() {
-        const whiteScreen = document.getElementById("whiteScreen"); whiteScreen.style.opacity = "1"; whiteScreen.style.pointerEvents = "auto";
-        setTimeout(() => { document.getElementById("finalRedText").style.opacity = "1"; document.getElementById("finaleLoadingBox").style.opacity = "1"; document.getElementById("finaleBar").style.width = "100%"; }, 500);
-        setTimeout(() => { document.getElementById("finalRedText").style.opacity = "0"; document.getElementById("finaleLoadingBox").style.opacity = "0"; }, 5500); 
-        setTimeout(() => { document.getElementById("byeText").style.opacity = "1"; }, 6500); 
-    }
-</script>
+    </script>
 </body>
 </html>
