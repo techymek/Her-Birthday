@@ -2,688 +2,425 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For Mannu ❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The New Replaced Old</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <style>
-        /* --- GLOBAL VARIABLES --- */
-        :root { --pink: #ff4d6d; --deep-rose: #8d0033; --glow: #ff0000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
-        body { background: #ffc0cb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; cursor: none; height: 100vh; width: 100vw; }
-
-        /* --- BLADE & CURSOR --- */
-        #sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); }
-        .slash { position: fixed; width: 150px; height: 5px; background: linear-gradient(90deg, transparent, white, white, transparent); pointer-events: none; z-index: 9999; animation: slashFade 0.4s forwards; }
-        @keyframes slashFade { 0% { opacity: 1; transform: scaleX(0.2); } 100% { opacity: 0; transform: scaleX(1.6); } }
-
-        /* --- 1. LOADING SCREEN --- */
-        #startScreen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
-            z-index: 9000; display: flex; justify-content: center; align-items: center; 
-            flex-direction: column; text-align: center; overflow: hidden; padding: 20px;
+        body {
+            background-color: #0f0f0f; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Merriweather', serif;
+            overflow: hidden;
         }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
-        .rain-text { position: absolute; top: -50px; color: #fff; opacity: 0.25; font-weight: bold; font-family: 'Arial', sans-serif; animation: fallDown linear infinite; }
-        @keyframes fallDown { to { transform: translateY(110vh); } }
-
-        .start-card {
-            background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 2; width: 100%; max-width: 420px;
-            color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6);
-        }
-        .start-card h1 { font-size: clamp(28px, 5vw, 36px); margin-bottom: 10px; font-weight: 800; }
-        .start-card p { font-size: 16px; margin-bottom: 20px; opacity: 0.9; font-weight: 600; }
-        
-        .loader-heart { font-size: 45px; animation: bounceHeart 0.8s infinite alternate; margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5)); }
-        @keyframes bounceHeart { from { transform: scale(1); } to { transform: scale(1.15); } }
-        
-        .loader-container { width: 100%; background: rgba(255,255,255,0.4); height: 10px; border-radius: 20px; overflow: hidden; margin-bottom: 15px; position: relative; }
-        .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff758f, #ff4d6d); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); transition: width 0.1s linear; }
-        #loadingText { font-size: 14px; font-weight: 700; min-height: 25px; color: var(--deep-rose); letter-spacing: 0.5px; }
-        
-        #startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; transition: 0.3s; }
-        @keyframes popBtn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* --- 2. INTRO SCENE --- */
-        #introScene { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #ffc0cb; z-index: 8500; display: none; 
-            justify-content: center; align-items: center; overflow: hidden; 
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
+            box-sizing: border-box;
         }
-        
-        #valentineText { 
-            position: absolute; width: 100%; text-align: center;
-            font-size: clamp(28px, 5vw, 48px); 
-            color: #ff0055; font-weight: bold; 
-            opacity: 0; transform: scale(0.5); 
-            text-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-        }
-        
-        #birthdayText { 
-            position: absolute; width: 100%; text-align: center;
-            font-size: clamp(32px, 6vw, 60px);
-            color: #d00000; font-weight: 900; 
-            opacity: 0; 
-            text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); 
-            font-family: 'Arial Black', sans-serif;
-            white-space: normal; line-height: 1.2;
-        }
-        
-        .pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { opacity:0; transform: scale(0.5); } 100% { opacity:1; transform: scale(1); } }
-        
-        .crash-in { animation: crashIn 0.4s ease-in forwards; }
-        @keyframes crashIn { 
-            0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 
-            100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } 
-        }
-        
-        .knockout { animation: flyOut 0.8s ease-out forwards; }
-        @keyframes flyOut { 0% { transform: translate(0,0) rotate(0deg); } 20% { transform: translate(-20px, 20px) rotate(-10deg); } 100% { transform: translate(-150vw, -50vh) rotate(-120deg); opacity: 0; } }
-        
-        .screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-5px, 0, 0); } 20%, 80% { transform: translate3d(10px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-10px, 0, 0); } 40%, 60% { transform: translate3d(10px, 0, 0); } }
-        
-        #impactFlash { position: fixed; top:0; left:0; width:100%; height:100%; background: white; opacity: 0; pointer-events: none; z-index: 8600; }
-        .flash-now { animation: flashAnim 0.3s ease-out forwards; }
-        @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
-        
-        #letsGoBtn { 
-            position: absolute; bottom: 15%; 
-            font-size: 20px; padding: 15px 40px; 
-            z-index: 9999; display: none; 
-            animation: fadeInBtn 1s; border-radius: 50px; border: none; 
-            background: var(--pink); color: white; cursor: pointer; font-weight: bold; 
-        }
-        @keyframes fadeInBtn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 3. GAME HUD & UI --- */
-        #gameHUD {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; align-items: center; z-index: 7000;
-            background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink);
-            width: auto; min-width: 280px; justify-content: space-around;
+        .flip-book {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            display: none; 
         }
-        .hud-item { display: flex; flex-direction: column; align-items: center; }
-        .hud-label { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
-        .hud-icon { width: 28px; height: 28px; object-fit: contain; }
-        #scoreCounter { font-size: 24px; font-weight: 900; color: var(--pink); line-height: 1; }
-        #scoreTotal { font-size: 12px; font-weight: bold; color: #aaa; }
 
-        #progressWrapper { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            width: 85%; z-index: 7000; display: none; text-align: center; 
-            background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
+        .page {
+            padding: 40px 35px;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 15px;
+            line-height: 1.8;
+            position: relative;
+            transition: background-color 0.5s ease; 
         }
-        #barBase { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; }
-        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff758f, #ff4d6d); transition: 0.2s; }
-        #barText { color: var(--pink); font-weight: bold; margin-top: 3px; font-size: 12px; }
 
-        .centerBox { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; 
-            border-radius: 30px; z-index: 100; width: 90%; max-width: 400px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
-        }
-        button.actionBtn { padding: 12px 25px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; margin: 8px; background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
-        
-        #noBtn { background: #adb5bd; position: relative; z-index: 200; border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin: 8px; }
-        .hidden { display: none !important; }
-        
-        /* FINAL STAGES */
-        #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
-        
-        /* Updated Beating Heart & Text */
-        #beatingHeart { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            display: none; z-index: 600; cursor: pointer; text-align: center;
-        }
-        #heartEmoji {
-            font-size: 100px;
-            animation: pBeat 0.8s infinite;
-        }
-        #heartText {
-            color: #ff4d6d;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-            font-family: 'Segoe UI', sans-serif;
-            text-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
-            white-space: nowrap;
-            animation: fadeText 1.5s infinite alternate;
-        }
-        @keyframes pBeat { 
-            0% { transform: scale(1); } 
-            50% { transform: scale(1.3); } 
-            100% { transform: scale(1); } 
-        }
-        @keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
-
-        #glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
-        
-        /* FRUIT NINJA ITEMS */
-        .toss-item { position: fixed; cursor: crosshair; z-index: 9000; bottom: -300px; user-select: none; pointer-events: auto; padding: 15px; }
-        @keyframes tossUp { 0% { bottom: -300px; transform: rotate(0deg); } 50% { bottom: var(--peakHeight); } 100% { bottom: -300px; transform: rotate(720deg); } }
-
-        /* --- 4. CUPID FINALE CSS --- */
-        #cupidFinale {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 8000; display: none;
-            flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.7);
-        }
-        #finaleCupid { 
-            width: 50vw; max-width: 250px; 
-            animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        .page p {
             margin-bottom: 20px;
+            text-align: justify;
         }
-        @keyframes flyInCupid { from { transform: translate(-100vw, -20vh) rotate(-20deg); opacity: 0; } to { transform: translate(0, 0) rotate(0deg); opacity: 1; } }
-        
-        .final-letter-card {
-            background: #fff; padding: 30px 20px; border-radius: 30px;
-            max-width: 500px; width: 90%; text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink);
-            animation: popUp 0.5s 1s backwards;
-            display: flex; flex-direction: column; align-items: center; 
+
+        .story-quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.25em; 
+            display: block; 
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        .page::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 20px;
+            pointer-events: none;
+        }
+        .page.--left::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 100%);
+        }
+        .page.--right::after {
+            left: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 100%);
+        }
+
+        /* PHASE 1: Warm & Romantic */
+        .phase-1 { background-color: #fff7f2; color: #3b2828; }
+        .phase-1 .story-quote { color: #8a4e4e; }
+        .phase-1 .cover-title { color: #2c1a1a; }
+        .phase-1 img { mix-blend-mode: multiply; opacity: 0.9; }
+
+        /* PHASE 2: Fading & Neutral */
+        .phase-2 { background-color: #f0f0f0; color: #333333; }
+        .phase-2 .story-quote { color: #555555; }
+        .phase-2 img { mix-blend-mode: multiply; filter: grayscale(50%); opacity: 0.8; }
+
+        /* PHASE 3: Dark & Heavy */
+        .phase-3 { background-color: #3a3a3a; color: #e0e0e0; }
+        .phase-3 .story-quote { color: #b0b0b0; }
+        .phase-3 .page-number { opacity: 0.4; color: #fff; }
+        .phase-3::after { background: linear-gradient(to left, rgba(0,0,0,0.5) 0%, transparent 100%); } 
+        .phase-3.--right::after { background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 100%); }
+        .phase-3 img { filter: grayscale(100%) invert(80%); opacity: 0.7; mix-blend-mode: screen; }
+
+        /* PHASE 4: Monochrome, Cold, Black */
+        .phase-4 { background-color: #111111; color: #d6d6d6; }
+        .phase-4 .story-quote { color: #ffffff; border-left: 2px solid #555; padding-left: 15px; text-align: left; }
+        .phase-4 .back-cover-quote { color: #aaaaaa; border: none; text-align: center; }
+        .phase-4 .page-number { opacity: 0.3; color: #fff; }
+        .phase-4::after { background: linear-gradient(to left, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .phase-4.--right::after { background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .phase-4 img { filter: grayscale(100%) invert(100%); opacity: 0.6; mix-blend-mode: screen; }
+
+        .page-cover-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px; 
+            text-align: center;
+            position: relative;
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 2.2em; 
+            line-height: 1.3;
+            margin-bottom: 30px;
+        }
+
+        .back-cover-quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.3em; 
+            line-height: 1.6;
+            margin-top: 30px;
+            max-width: 90%; 
+        }
+
+        .decor-img {
+            max-width: 60px;
+            margin: 25px auto;
+            display: block;
+        }
+        .cover-img {
+            max-width: 65px;
+            margin: 20px auto;
+        }
+
+        /* --- THE SURPRISE BUTTON --- */
+        #surpriseBtn {
+            margin-top: 40px;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-family: 'Merriweather', serif;
+            background: transparent;
+            color: #ff4d6d;
+            border: 1px solid #ff4d6d;
+            border-radius: 30px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+            pointer-events: none; /* Prevents clicking while hidden */
+            box-shadow: 0 0 10px rgba(255, 77, 109, 0.2);
+        }
+
+        #surpriseBtn.visible {
+            opacity: 1;
+            transform: translateY(0);
             pointer-events: auto;
         }
-        @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* --- 5. WHITE SCREEN FINALE CSS --- */
-        #whiteScreen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: white; z-index: 10000; display: flex; 
-            flex-direction: column; justify-content: center; align-items: center; 
-            opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px;
-        }
-        #finalRedText { 
-            color: #d00000; 
-            font-size: clamp(20px, 5vw, 36px); 
-            text-align: center; font-weight: bold; 
-            opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px;
-            text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5;
-        }
-        
-        #finaleLoadingBox {
-            width: 80%; max-width: 250px; height: 10px;
-            background: #f0f0f0; border-radius: 20px;
-            margin-top: 30px; overflow: hidden;
-            opacity: 0; transition: opacity 1s;
-            border: 1px solid #ff4d6d;
-        }
-        #finaleBar {
-            height: 100%; width: 0%; 
-            background: #ff4d6d; 
-            transition: width 5s linear;
+        #surpriseBtn:hover {
+            background: #ff4d6d;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 77, 109, 0.6);
         }
 
-        #byeText { 
-            color: #ff4d6d; 
-            font-size: clamp(28px, 6vw, 50px); 
-            text-align: center; font-weight: bold; 
-            opacity: 0; position: absolute; transition: opacity 1s; width: 100%;
+        @media (max-width: 600px) {
+            .page { padding: 30px 25px; font-size: 14px; }
+            .cover-title { font-size: 1.8em; } 
+            .back-cover-quote { font-size: 1.1em; } 
         }
-
-        .love-pop { position: fixed; color: #ff0055; font-weight: bold; font-size: 24px; pointer-events: none; z-index: 9500; text-shadow: 0 0 5px white; animation: floatUp 3s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity:1; transform: translateY(0) scale(1); } 100% { opacity:0; transform: translateY(-80px) scale(1.5); } }
-
-        #rulesPopup { z-index: 7500; }
-        #dimpuImg { transition: transform 1s ease-in; max-width: 100%; border-radius: 20px; width: 100%; }
-        input[type="number"] { padding: 12px; font-size: 18px; border-radius: 15px; border: 2px solid var(--pink); outline: none; width: 100%; text-align: center; margin-bottom: 15px; }
-        #redFlash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 9500; transition: opacity 0.2s; }
     </style>
 </head>
 <body>
 
-<div id="sword"></div>
-<img id="cupid-img" src="cupid.png" style="position:fixed; width:100px; pointer-events:none; z-index:9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s;">
-
-<audio id="cuteMusic" loop src="cute-bgm.mp3" preload="auto"></audio>
-<audio id="letterMusic" src="lettersong.mp3" preload="auto"></audio>
-<audio id="sliceSound" src="slice.mp3" preload="auto"></audio>
-<audio id="yaySound" src="yay.mp3" preload="auto"></audio>
-<audio id="sadSound" src="sad.mp3" preload="auto"></audio>
-<audio id="afterCakeSound" src="after cake.mp3" preload="auto"></audio>
-<audio id="heartSound" loop src="heart.mp3" preload="auto"></audio>
-<audio id="chaloSound" src="chalo.mp3" preload="auto"></audio>
-<audio id="tugayaSound" src="tugaya.mp3" preload="auto"></audio>
-<audio id="bounceSound" src="bounce.mp3" preload="auto"></audio>
-<audio id="sadIndianSound" src="sadindian.mp3" preload="auto"></audio>
-
-<div id="startScreen">
-    <div class="rain-container" id="rainBox"></div>
-    <div class="start-card">
-        <div class="loader-heart">❤️</div>
-        <h1>Hey Mannu... 👋</h1>
-        <p>Wait karna padega... Special cheez hai! 😉</p>
-        <div id="loaderBox">
-            <div class="loader-container"><div class="loader-bar" id="fillBar"></div></div>
-            <p id="loadingText">Ittu sa pyar...</p>
-        </div>
-        <button id="startBtn" onclick="triggerIntro()">Open Your Gift 🎁</button>
-    </div>
-</div>
-
-<div id="introScene">
-    <div id="impactFlash"></div>
-    <div id="valentineText">Valentine's Day? 🌹</div>
-    <div id="birthdayText">Mannu ka Birthday! 🎂</div>
-    <button id="letsGoBtn" onclick="startMainExperience()">Let's Go! ✨</button>
-</div>
-
-<div id="gameHUD" class="hidden">
-    <div class="hud-item">
-        <span class="hud-label">Slice:</span>
-        <img src="letter.png" class="hud-icon">
-    </div>
-    <div class="hud-score-box">
-        <div id="scoreCounter">0</div>
-        <div id="scoreTotal">/ 19</div>
-    </div>
-    <div class="hud-item">
-        <span class="hud-label">Avoid:</span>
-        <div style="display:flex; gap:5px;">
-            <img src="dal.png" class="hud-icon">
-            <img src="roti.png" class="hud-icon">
-        </div>
-    </div>
-</div>
-
-<div id="progressWrapper">
-    <div id="barBase"><div id="barFill"></div></div>
-    <div id="barText">Collect Letters: 0/19</div>
-</div>
-<div id="redFlash"></div>
-
-<div id="stage1" class="centerBox hidden">
-    <h1>Will you be my Valentine, Mannu? ❤️</h1>
-    <div style="display:flex; justify-content:center; gap:10px; margin-top: 20px; flex-wrap:wrap;">
-        <button class="actionBtn" onclick="toStage2()">Yes 😍</button>
-        <button id="noBtn">No 😒</button>
-    </div>
-</div>
-
-<div id="stage2" class="centerBox hidden">
-    <h2 id="counter" style="color:var(--pink)">Slices left: 19</h2>
-    <h1>Mannu, slash it! 🎂</h1>
-    <img id="cake" src="cake.png" style="width:80%; margin: 20px 0;">
-    <div id="cakeChoices" class="hidden" style="margin-top: 10px;">
-        <button class="actionBtn" onclick="showDimpu()">Give to Adi 🙋‍♂️</button>
-        <button class="actionBtn" onclick="eatSelf()">Eat yourself 😋</button>
-    </div>
-</div>
-
-<div id="guiltPopup" class="centerBox hidden" style="z-index:2001;">
-    <h2>🤨 Busted!</h2>
-    <p style="font-size: 18px; margin: 20px 0;">Akele khana gandi baat hai Mannu baby.</p>
-    <button class="actionBtn" onclick="showDimpu()">Mujhe bhi dedo hehe 🍰</button>
-</div>
-
-<div id="dimpuStage" class="centerBox hidden" style="z-index: 2005;">
-    <img id="dimpuImg" src="dimpu.png">
-    <h2 style="margin: 15px 0;">Accept these flowers? 🌷</h2>
-    <p style="margin-bottom: 10px;">To confirm, tell me Adi's birth year:</p>
-    <input type="number" id="adiYear" placeholder="YYYY">
-    <br>
-    <button class="actionBtn" onclick="checkYear()">Confirm ✅</button>
-</div>
-
-<div id="rulesPopup" class="centerBox hidden">
-    <h2 style="color: var(--pink); margin-bottom: 15px;">Putku Suno Meri Baat... 🤫</h2>
-    <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.6;">
-        Baby suno tumko na ye <b>Letters</b> slice krne hai cursor move karke 💌
-    </p>
-    <p style="font-size: 16px; margin-bottom: 20px; color: #d00000; font-weight: bold;">
-        Par wo <b>Dal aur Rota</b> ko maat slice karna putku! ⚠️<br>
-        Warna zero ho jayega score apka... 💣
-    </p>
-    <button class="actionBtn" onclick="startFinalGame()">I am Ready! 🥷❤️</button>
-</div>
-
-<div id="blackout"></div>
-<div id="beatingHeart">
-    <div id="heartEmoji">❤️</div>
-    <div id="heartText">Mere dil pe tap karo babe</div>
-</div>
-<div id="glassOverlay"></div>
-
-<div id="cupidFinale">
-    <img src="cupid.png" id="finaleCupid">
-    <div class="final-letter-card">
-        <h1 style="color: #ff4d6d; margin-bottom: 15px; font-size:24px;">My Dearest Mannu ❤️</h1>
-        <p style="font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 20px;">
-            Tum ek akeli aisi insaan ho jisse baat karna mujhe sabse jadha accha lagta hai, aur mai papa mummy ko thanks bolna chahunga ki unhone mujhe itni pyari pyari mannu di, aaj ke din, you are the best baby!! Sabse best hai meri mannu! Happy Birthday to you babyjaan <br><br>
-            <b>I Love You Forever!</b>
-        </p>
-        <button class="actionBtn" style="font-size: 20px; padding: 15px 30px; margin-top: 10px;" onclick="showFinalWhiteScreen()">Click Here ❤️</button>
-    </div>
-</div>
-
-<div id="whiteScreen">
-    <h1 id="finalRedText">Mannu, tum ho meri best friend, meri darling, meri jaaneman, hehe! I love you sooooooo much! ❤️</h1>
-    
-    <div id="finaleLoadingBox">
-        <div id="finaleBar"></div>
-    </div>
-
-    <h1 id="byeText">biee biee cutie 🎀</h1>
-</div>
-
-<script>
-    // --- RESPONSIVE TOUCH & CURSOR LOGIC ---
-    function updateCupid(x, y) {
-        const cupid = document.getElementById("cupid-img");
-        if (cupid) {
-            cupid.style.left = (x + 15) + "px";
-            cupid.style.top = (y + 15) + "px";
-        }
-    }
-
-    document.addEventListener("touchmove", function(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        mouse.x = touch.clientX;
-        mouse.y = touch.clientY;
-        updateSword();
-        updateCupid(mouse.x, mouse.y); 
-
-        const element = document.elementFromPoint(mouse.x, mouse.y);
-        
-        // Handle Game Slicing
-        if(element && element.classList.contains('toss-item') && !element.hit) {
-            element.hit = true; 
-            element.sliceHandler();
-        }
-        
-        // Handle Cake Slicing
-        if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) {
-            checkHit();
-        }
-    }, { passive: false });
-
-    // --- MAIN LOGIC ---
-    window.onload = function() {
-        const rainContainer = document.getElementById('rainBox');
-        for(let i=0; i<45; i++) {
-            const span = document.createElement('span');
-            span.innerText = "14 Feb"; span.className = "rain-text";
-            span.style.left = Math.random() * 100 + 'vw';
-            span.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
-            span.style.fontSize = (Math.random() * 12 + 12) + 'px';
-            rainContainer.appendChild(span);
-        }
-
-        let load = 0;
-        const txt = document.getElementById('loadingText');
-        const interval = setInterval(() => {
-            load++; document.getElementById('fillBar').style.width = load + "%";
-            if(load < 25) txt.innerText = "Preparing surprise for Mannu... 🎁";
-            else if(load < 50) txt.innerText = "Adding extra love & kisses... 💋";
-            else if(load < 80) txt.innerText = "Bas thoda sa aur baby... 🤏";
-            else txt.innerText = "Ye lo aapka gift! ❤️";
-            if(load >= 100) { clearInterval(interval); document.getElementById('loaderBox').style.display = 'none'; document.getElementById('startBtn').style.display = 'inline-block'; }
-        }, 45);
-    };
-
-    function triggerIntro() {
-        const sfx = ['yaySound', 'sadSound', 'sliceSound', 'afterCakeSound', 'heartSound', 'letterMusic', 'chaloSound', 'tugayaSound', 'bounceSound', 'sadIndianSound'];
-        sfx.forEach(id => { const el = document.getElementById(id); el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(e => console.log(id)); });
-
-        document.getElementById('startScreen').style.display = 'none';
-        const scene = document.getElementById('introScene');
-        scene.style.display = 'flex';
-
-        const vText = document.getElementById('valentineText');
-        const bText = document.getElementById('birthdayText');
-        const flash = document.getElementById('impactFlash');
-        const bounce = document.getElementById('bounceSound');
-
-        setTimeout(() => { vText.classList.add('pop-in'); }, 300);
-
-        setTimeout(() => {
-            bText.classList.add('crash-in');
-            setTimeout(() => {
-                bounce.play();
-                scene.classList.add('screen-shake');
-                flash.classList.add('flash-now');
-                vText.classList.add('knockout');
-            }, 300); 
-
-            setTimeout(() => { document.getElementById('letsGoBtn').style.display = 'block'; }, 1500);
-        }, 1500);
-    }
-
-    function startMainExperience() {
-        const bounce = document.getElementById('bounceSound');
-        bounce.pause(); bounce.currentTime = 0;
-
-        const bgm = document.getElementById('cuteMusic');
-        bgm.volume = 0.2; bgm.play();
-        document.getElementById('introScene').style.display = 'none';
-        document.getElementById('stage1').classList.remove('hidden');
-    }
-
-    let mouse = { x:0, y:0, lx:0, ly:0 };
-    let slices = 19;
-    let letterScore = 0;
-    const targetScore = 19;
-    let isGameOver = false;
-    let stopGame = false;
-
-    document.addEventListener("mousemove", (e) => {
-        mouse.x = e.clientX; mouse.y = e.clientY;
-        updateSword();
-        updateCupid(mouse.x, mouse.y); // Update cupid position
-
-        let speed = Math.sqrt(Math.pow(mouse.x - mouse.lx, 2) + Math.pow(mouse.y - mouse.ly, 2));
-        if (speed > 15) {
-            createSlash(mouse.x, mouse.y);
-            if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) checkHit();
-        }
-        mouse.lx = mouse.x; mouse.ly = mouse.y;
-    });
-
-    function updateSword() {
-        const sword = document.getElementById("sword");
-        sword.style.left = mouse.x + "px"; sword.style.top = mouse.y + "px";
-    }
-
-    function createSlash(x, y) {
-        const s = document.createElement("div"); s.className = "slash";
-        s.style.left = x + "px"; s.style.top = y + "px";
-        s.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(y - mouse.ly, x - mouse.lx) * 180 / Math.PI}deg)`;
-        document.body.appendChild(s);
-        setTimeout(() => s.remove(), 400);
-    }
-
-    function toStage2() { document.getElementById("yaySound").play(); document.getElementById("stage1").classList.add("hidden"); document.getElementById("noBtn").style.display = "none"; document.getElementById("stage2").classList.remove("hidden"); }
-
-    document.getElementById("noBtn").addEventListener('mouseover', function() {
-        const btn = this; document.getElementById("sadSound").currentTime = 0; document.getElementById("sadSound").play();
-        if (btn.parentNode.id !== 'body') { document.body.appendChild(btn); }
-        btn.style.position = "fixed"; btn.style.left = Math.random() * 80 + "vw"; btn.style.top = Math.random() * 80 + "vh";
-    });
-
-    function checkHit() {
-        if(slices <= 0) return; 
-        const rect = document.getElementById("cake").getBoundingClientRect();
-        if(mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) {
-            if(Date.now() - (window.lh || 0) > 150) {
-                slices--; 
-                if (slices < 0) slices = 0;
-                document.getElementById("counter").innerText = `Slices left: ${slices}`;
-                const s = document.getElementById("sliceSound"); s.currentTime = 0; s.play();
-                if(slices === 0) { document.getElementById("afterCakeSound").play(); document.getElementById("cake").src = "sliced cake.png"; document.getElementById("cakeChoices").classList.remove("hidden"); }
-                window.lh = Date.now();
-            }
-        }
-    }
-
-    function eatSelf() { 
-        document.getElementById("guiltPopup").classList.remove("hidden"); 
-        document.getElementById("cuteMusic").pause();
-        document.getElementById("sadIndianSound").play();
-    }
-    
-    function showDimpu() { 
-        document.getElementById("sadIndianSound").pause();
-        document.getElementById("sadIndianSound").currentTime = 0;
-        document.getElementById("cuteMusic").play();
-        document.getElementById("stage2").classList.add("hidden"); 
-        document.getElementById("guiltPopup").classList.add("hidden"); 
-        document.getElementById("dimpuStage").classList.remove("hidden"); 
-    }
-
-    function checkYear() {
-        const val = document.getElementById("adiYear").value;
-        const img = document.getElementById("dimpuImg");
-        const tugaya = document.getElementById("tugayaSound");
-        if(val === "2004") { tugaya.pause(); tugaya.currentTime = 0; document.getElementById("chaloSound").play(); img.src = "dimpu2.png"; setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); setTimeout(() => { triggerRealBlackout(); }, 3000); }
-        else { tugaya.currentTime = 0; tugaya.play(); img.src = "dimpuangry.png"; alert("Wrong year! Try again 😼"); }
-    }
-
-    function triggerRealBlackout() { isGameOver = true; document.getElementById("dimpuStage").classList.add("hidden"); document.getElementById("blackout").style.display = "block"; setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); setTimeout(() => { document.getElementById("beatingHeart").style.display = "block"; document.getElementById("heartSound").play(); }, 3000); }
-
-    document.getElementById("beatingHeart").onclick = function() { document.getElementById("heartSound").pause(); this.style.display = "none"; document.getElementById("blackout").style.display = "none"; document.getElementById("glassOverlay").style.display = "block"; document.getElementById("rulesPopup").classList.remove("hidden"); };
-
-    function startFinalGame() {
-        document.getElementById("rulesPopup").classList.add("hidden");
-        document.getElementById("progressWrapper").style.display = "block";
-        document.getElementById("gameHUD").classList.remove("hidden");
-        document.getElementById("gameHUD").style.display = "flex";
-        
-        const bgm = document.getElementById("cuteMusic"); bgm.pause();
-        document.getElementById("letterMusic").play();
-        startFruitNinja();
-    }
-
-    // --- ZOOM LOGIC ---
-    function startFruitNinja() {
-        const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
-        const spawnItem = () => {
-            if (stopGame) return;
-            const item = document.createElement("img");
-            const isBomb = Math.random() > 0.7; 
-            const type = isBomb ? (Math.random() > 0.5 ? "dal.png" : "roti.png") : "letter.png";
-            item.src = type; item.className = "toss-item";
-            const size = isBomb ? (Math.random() * 60 + 80) : (Math.random() * 100 + 150); 
-            item.style.width = size + "px";
-            item.style.left = Math.random() * 80 + 10 + "vw";
-            const peak = 40 + Math.random() * 40 + "vh";
-            item.style.setProperty('--peakHeight', peak);
-            const drift = (Math.random() - 0.5) * 300 + "px";
-            item.style.transform = `translateX(${drift})`;
-            const duration = 2 + Math.random();
-            item.style.animation = `tossUp ${duration}s ease-in-out forwards`;
-
-            // Define behavior
-            item.sliceHandler = function() {
-                if (stopGame) return;
-                if (isBomb) { 
-                    letterScore = 0; updateHUD();
-                    const bad = document.getElementById("tugayaSound"); bad.currentTime = 0; bad.play(); 
-                    const flash = document.getElementById("redFlash"); flash.style.opacity = "0.6"; setTimeout(() => flash.style.opacity = "0", 200); 
-                    item.remove(); 
-                } else { 
-                    letterScore++; 
-                    document.getElementById("scoreCounter").innerText = letterScore;
-                    document.getElementById("barFill").style.width = Math.min((letterScore/targetScore)*100, 100) + "%";
-                    
-                    const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
-
-                    // --- CHECK IF 19TH LETTER ---
-                    if (letterScore >= targetScore) {
-                        stopGame = true; // Stop spawns
-                        
-                        // 1. Freeze animation
-                        item.style.animation = 'none';
-                        
-                        // 2. Center & Zoom BIG
-                        item.style.transition = "all 2.5s cubic-bezier(0.25, 1, 0.5, 1)";
-                        item.style.position = "fixed";
-                        item.style.left = "50%";
-                        item.style.top = "50%";
-                        item.style.zIndex = "10000";
-                        // Force transform next tick
-                        requestAnimationFrame(() => {
-                            item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)";
-                            item.style.opacity = "0"; // Fade out during zoom
-                        });
-
-                        // 3. Trigger Finale after zoom finishes
-                        setTimeout(() => {
-                            document.querySelectorAll('.toss-item').forEach(el => el.remove());
-                            document.getElementById("gameHUD").style.display = "none"; 
-                            document.getElementById("progressWrapper").style.opacity = "0"; 
-                            document.getElementById("cupid-img").style.display = "none"; 
-                            document.getElementById("cupidFinale").style.display = "flex";
-                        }, 2500);
-                        
-                    } else {
-                        // Normal behavior
-                        showFloatingText(item.getBoundingClientRect().left, item.getBoundingClientRect().top, loveWords); 
-                        item.remove(); 
-                    }
-                }
-            };
-
-            // Mouse interaction
-            item.onmouseover = function() {
-                if(!this.hit) { this.hit = true; this.sliceHandler(); }
-            };
-
-            document.body.appendChild(item);
-            setTimeout(() => { if(item.parentNode) item.remove(); }, duration * 1000 + 100);
-            if (!stopGame) setTimeout(spawnItem, Math.random() * 600 + 300); 
-        };
-        spawnItem();
-    }
-
-    function showFloatingText(x, y, words) {
-        const txt = document.createElement("div"); txt.className = "love-pop";
-        txt.innerText = words[Math.floor(Math.random() * words.length)];
-        txt.style.left = x + "px"; txt.style.top = y + "px";
-        document.body.appendChild(txt); setTimeout(() => txt.remove(), 3000);
-    }
-
-    function updateHUD() {
-        document.getElementById("scoreCounter").innerText = letterScore;
-        const pct = (letterScore / targetScore) * 100;
-        document.getElementById("barFill").style.width = Math.min(pct, 100) + "%";
-    }
-
-    function showFinalWhiteScreen() {
-        const whiteScreen = document.getElementById("whiteScreen");
-        whiteScreen.style.opacity = "1";
-        whiteScreen.style.pointerEvents = "auto";
-        
-        // 1. Fade In Red Text
-        setTimeout(() => {
-            document.getElementById("finalRedText").style.opacity = "1";
-            document.getElementById("finaleLoadingBox").style.opacity = "1";
+    <div class="container">
+        <div class="flip-book" id="book">
             
-            // 2. Start Bar Animation (takes 5s)
-            document.getElementById("finaleBar").style.width = "100%";
-        }, 500);
+            <div class="page phase-1" data-density="hard">
+                <div class="page-cover-top">
+                    <div class="cover-title">The New<br>Replaced Old</div>
+                    <img src="rose.png" alt="Rose" class="cover-img" onerror="this.style.display='none'">
+                </div>
+            </div>
 
-        // 3. Fade Out Red Text & Bar after 5.5s
-        setTimeout(() => {
-            document.getElementById("finalRedText").style.opacity = "0";
-            document.getElementById("finaleLoadingBox").style.opacity = "0";
-        }, 5500); 
+            <div class="page phase-1">
+                <p>There are some stories that don’t end when they break.</p>
+                <p>They end much earlier, in a quiet way, when one person has already decided they are going to leave, but hasn’t said it yet.</p>
+                <p>This was one of those stories.</p>
+                <p>They never met.</p>
+                <p>No shared places, no memories outside a screen. Everything they had lived inside a phone. Messages, late nights, calls that felt longer than they were, and a connection that felt real. At least to him.</p>
+                <div class="page-number">1</div>
+            </div>
+            <div class="page phase-1">
+                <p>She was the one who started it.</p>
+                <p>A simple message, then another, then consistency. She chose him first. She texted first, called first, stayed longer than she needed to. She made him feel important before he even asked to be.</p>
+                <p>And when someone walks into your life like that, you don’t question it.</p>
+                <p>You trust it.</p>
+                <p>Being chosen so clearly makes you believe you will not be unchosen.</p>
+                <p>And he believed it.</p>
+                <div class="page-number">2</div>
+            </div>
+            <div class="page phase-1">
+                <img src="letter.png" alt="Letter" class="decor-img" onerror="this.style.display='none'">
+                <p>He gave her everything he could. Time, attention, patience. He learned her moods, understood her silences, noticed the smallest changes in the way she texted.</p>
+                <p>But his life was different.</p>
+                <p>He lived in a house where things were strict. Where calls were not easy, where privacy did not exist the way it should. Being on the phone for too long meant questions. Being heard meant trouble.</p>
+                <div class="page-number">3</div>
+            </div>
+            <div class="page phase-1">
+                <p>So he found his own way.</p>
+                <p>He walked.</p>
+                <p>Kilometres.</p>
+                <p>Just to find a place where he could talk to her freely. Empty roads, quiet corners, places where no one knew him. Just so he could hear her voice without fear.</p>
+                <p>Some people travel distances not to reach a place, but to reach a person.</p>
+                <div class="page-number">4</div>
+            </div>
+            <div class="page phase-1">
+                <p>And still, that was not all.</p>
+                <p>He wanted to see her.</p>
+                <p>So he stayed up at night, fighting sleep, waiting for the chance to video call. Because for him, seeing her face meant everything. It made the distance feel smaller. It made her feel real.</p>
+                <p>Sometimes she agreed.</p>
+                <p>Most of the time, she had a reason.</p>
+                <span class="story-quote">“My family is around.”</span>
+                <span class="story-quote">“I can’t right now.”</span>
+                <span class="story-quote">“Maybe later.”</span>
+                <div class="page-number">5</div>
+            </div>
 
-        // 4. Fade In Bye Text after 6.5s
-        setTimeout(() => {
-            document.getElementById("byeText").style.opacity = "1";
-        }, 6500); 
-    }
-</script>
+            <div class="page phase-2">
+                <p>And he understood.</p>
+                <p>Or maybe he just chose to.</p>
+                <p>Because he loved her.</p>
+                <p>But slowly, things started changing.</p>
+                <p>Not in what he did.</p>
+                <p>In what she expected.</p>
+                <p>The same girl who could not video call because of her family started asking him to call more. Openly. Freely. Even when he was around his own family.</p>
+                <div class="page-number">6</div>
+            </div>
+            <div class="page phase-2">
+                <p>And when he couldn’t, it became a problem.</p>
+                <span class="story-quote">“You can’t even call me properly.”</span>
+                <p>At first it felt like frustration.</p>
+                <p>Then it became a pattern.</p>
+                <span class="story-quote">“You don’t give me time.”</span>
+                <span class="story-quote">“This doesn’t feel real.”</span>
+                <span class="story-quote">“I need more than this.”</span>
+                <p>And he tried.</p>
+                <div class="page-number">7</div>
+            </div>
+            <div class="page phase-2">
+                <p>He walked further. Stayed longer. Tried harder to be present in every way he could. He gave everything he had within the limits he never chose.</p>
+                <p>But no matter what he did, it stopped being enough.</p>
+                <p>And somewhere during all of this, her life outside the screen was not standing still.</p>
+                <p>It was moving.</p>
+                <div class="page-number">8</div>
+            </div>
+            <div class="page phase-2">
+                <p>There were new conversations he did not know about. New moments that did not include him. Laughter that did not need to be typed out. Time that was being spent somewhere else.</p>
+                <p>At first, it was just less time for him.</p>
+                <p>Then it became less interest.</p>
+                <p>Her replies got shorter, not just because she was busy, but because her attention was somewhere else. Calls stopped not because she could not, but because she no longer wanted to make that effort.</p>
+                <div class="page-number">9</div>
+            </div>
+
+            <div class="page phase-3">
+                <p>And slowly, someone else took the place he never saw.</p>
+                <p>Not all at once.</p>
+                <p>Just enough that she did not need him the same way anymore.</p>
+                <p>He was still there, trying to hold on to what they had.</p>
+                <p>But she had already started building something new.</p>
+                <p>With someone she could see.</p>
+                <p>Someone she could meet.</p>
+                <div class="page-number">10</div>
+            </div>
+            <div class="page phase-3">
+                <p>Someone who did not have to walk kilometres just to talk.</p>
+                <p>Someone who did not have to wait for the right time.</p>
+                <p>Someone who was simply there.</p>
+                <p>Real.</p>
+                <p>And once that happened, everything about him started feeling less.</p>
+                <p>Not because he changed.</p>
+                <p>But because she had something to compare him to.</p>
+                <div class="page-number">11</div>
+            </div>
+            <div class="page phase-3">
+                <p>Distance started feeling like a problem.</p>
+                <p>Silence started feeling like neglect.</p>
+                <p>Effort started feeling like it was not enough.</p>
+                <p>And instead of saying she found someone else,</p>
+                <p>she found a reason.</p>
+                <p>The easiest one.</p>
+                <p>He could not call freely.</p>
+                <p>And she turned that into the problem.</p>
+                <div class="page-number">12</div>
+            </div>
+            <div class="page phase-3">
+                <p>If he did not call, he did not care.</p>
+                <p>If he explained, he was making excuses.</p>
+                <p>If he tried, it still was not enough.</p>
+                <p>There was no version of him that could win.</p>
+                <p>Because the decision had already been made.</p>
+                <p>She was not fixing things.</p>
+                <p>She was creating a reason to leave.</p>
+                <div class="page-number">13</div>
+            </div>
+
+            <div class="page phase-4">
+                <p>And when it finally ended, it sounded simple.</p>
+                <p>She needed more.</p>
+                <p>He could not give it.</p>
+                <p>So she left.</p>
+                <p>Clean.</p>
+                <p>Understandable.</p>
+                <p>But not true.</p>
+                <p>The truth was that she did not leave because he could not call.</p>
+                <p>She left because she no longer needed him.</p>
+                <div class="page-number">14</div>
+            </div>
+            <div class="page phase-4">
+                <img src="promise.png" alt="Promise" class="decor-img" onerror="this.style.display='none'">
+                <p>Because someone else was already there.</p>
+                <p>Closer. Easier. Present.</p>
+                <p>If she really loved him, she would have seen the effort instead of the limitation. She would have understood why he stayed quiet, instead of using it against him.</p>
+                <p>Love does not make your situation a reason to leave. It makes it something to stand through.</p>
+                <p>But she did not stay.</p>
+                <div class="page-number">15</div>
+            </div>
+            <div class="page phase-4">
+                <p>Because she had already found something that did not require waiting.</p>
+                <p>And when that option came, she chose it.</p>
+                <p>And before leaving completely, she made sure the story made sense.</p>
+                <p>In her version, she tried.</p>
+                <p>In her version, he failed.</p>
+                <p>In her version, she had no choice.</p>
+                <p>And just like that, he became the reason.</p>
+                <p>The villain.</p>
+                <div class="page-number">16</div>
+            </div>
+            <div class="page phase-4">
+                <p>The hardest part is not being left.</p>
+                <p>It is being made to feel like you deserved it.</p>
+                <p>And he stayed there for a long time.</p>
+                <p>Reading old chats. Replaying moments. Thinking about what he could have done better. Wondering if he really was not enough.</p>
+                <p>But the truth was simple.</p>
+                <p>He did not lose her because he could not call.</p>
+                <p>He did not lose her because he did not try.</p>
+                <div class="page-number">17</div>
+            </div>
+            <div class="page phase-4">
+                <p>He lost her because she found someone else who was easier to choose.</p>
+                <p>And somewhere, late at night, when everything is quiet, he finally starts to understand something that once felt impossible to accept.</p>
+                <p>You do not lose someone who truly wants to stay.</p>
+                <p>And no matter how real it felt,</p>
+                <p>if it was that easy for them to leave,</p>
+                <p>it was never as real for them as it was for you.</p>
+                <div class="page-number">18</div>
+            </div>
+
+            <div class="page phase-4" data-density="hard">
+                <div class="page-cover-top">
+                    <div class="cover-title" style="color:#e0e0e0;">She Found<br>Someone Else</div>
+                    <span class="story-quote back-cover-quote">
+                        “She traded distance for convenience, a screen for a reality, and in choosing him, she let go of the one who walked a thousand miles for her voice.”
+                    </span>
+                    
+                    <button id="surpriseBtn" onclick="window.location.href='mannu.html'">Open Birthday Surprise ❤️</button>
+                    
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageFlip = new St.PageFlip(document.getElementById('book'), {
+                width: 450, 
+                height: 600, 
+                size: "stretch",
+                minWidth: 315,
+                maxWidth: 500,
+                minHeight: 420,
+                maxHeight: 700,
+                maxShadowOpacity: 0.5,
+                showCover: true,
+                mobileScrollSupport: false,
+                usePortrait: true 
+            });
+
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+            document.getElementById('book').style.display = 'block';
+
+            // --- EVENT LISTENER FOR THE LAST PAGE ---
+            // The book has 20 pages (index 0 to 19). Index 19 is the back cover.
+            pageFlip.on('flip', (e) => {
+                const btn = document.getElementById('surpriseBtn');
+                if (e.data === 19) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
