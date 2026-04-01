@@ -152,24 +152,6 @@
             margin: 20px auto;
         }
 
-        /* Pulsing text to prompt the tilt action */
-        .tilt-instruction {
-            font-family: 'Merriweather', serif;
-            font-size: 11px;
-            color: #8a4e4e;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            position: absolute;
-            bottom: 30px;
-            animation: pulseTilt 2s infinite alternate;
-            opacity: 0.7;
-        }
-
-        @keyframes pulseTilt {
-            0% { opacity: 0.3; transform: scale(0.95); }
-            100% { opacity: 0.8; transform: scale(1.05); }
-        }
-
         @media (max-width: 600px) {
             .page { padding: 30px 25px; font-size: 14px; }
             .cover-title { font-size: 1.8em; } 
@@ -186,8 +168,6 @@
                 <div class="page-cover-top">
                     <div class="cover-title">The New<br>Replaced Old</div>
                     <img src="rose.png" alt="Rose" class="cover-img" onerror="this.style.display='none'">
-                    
-                    <div class="tilt-instruction">Tilt phone to open</div>
                 </div>
             </div>
 
@@ -391,70 +371,30 @@
                 maxShadowOpacity: 0.5,
                 showCover: true,
                 mobileScrollSupport: false,
-                usePortrait: true 
+                usePortrait: true,
+                flipDuration: 2000 // Slow motion, cinematic flip (2 seconds)
             });
 
             pageFlip.loadFromHTML(document.querySelectorAll('.page'));
             document.getElementById('book').style.display = 'block';
 
-            // --- HIDE TILT INSTRUCTION WHEN PAGE TURNS ---
-            pageFlip.on('flip', (e) => {
-                const tiltText = document.querySelector('.tilt-instruction');
-                if (tiltText) {
-                    tiltText.style.display = e.data === 0 ? 'block' : 'none';
-                }
-            });
-
             // ==========================================
-            // --- TILT TO FLIP LOGIC (GYROSCOPE) ---
+            // --- AUTO-FLIP WITH VIBRATION ---
             // ==========================================
-            let hasFlippedWithTilt = false;
-
-            function handleOrientation(event) {
-                if (hasFlippedWithTilt) return;
-
-                // event.gamma is left-to-right tilt in degrees
-                const gamma = event.gamma; 
-
-                // If phone is tilted more than 25 degrees to the left or right
-                if (gamma > 25 || gamma < -25) {
-                    if (pageFlip.getCurrentPageIndex() === 0) {
-                        pageFlip.flipNext(); // Turn the page!
-                        hasFlippedWithTilt = true; // Prevent it from firing over and over
-                        
-                        // Remove the listener to save battery once the book is open
-                        window.removeEventListener('deviceorientation', handleOrientation);
+            setTimeout(() => {
+                // Only flip if the user hasn't already turned the page themselves
+                if (pageFlip.getCurrentPageIndex() === 0) {
+                    
+                    // Attempt cinematic heartbeat vibration 
+                    // Note: Browsers may block this if the user hasn't touched the screen yet
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 50, 200, 50, 300]); 
                     }
+
+                    // Trigger the slow-mo page flip
+                    pageFlip.flipNext();
                 }
-            }
-
-            function requestDeviceOrientation() {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    // iOS 13+ devices require explicit permission
-                    DeviceOrientationEvent.requestPermission()
-                        .then(permissionState => {
-                            if (permissionState === 'granted') {
-                                window.addEventListener('deviceorientation', handleOrientation);
-                            }
-                        })
-                        .catch(console.error);
-                } else {
-                    // Android and older iOS devices
-                    window.addEventListener('deviceorientation', handleOrientation);
-                }
-            }
-
-            // 1. Try to enable immediately (works on Android)
-            requestDeviceOrientation();
-
-            // 2. Fallback for iPhones: Request permission on the user's very first touch of the screen
-            document.body.addEventListener('touchstart', () => {
-                requestDeviceOrientation();
-            }, { once: true });
-            
-            document.body.addEventListener('click', () => {
-                requestDeviceOrientation();
-            }, { once: true });
+            }, 3000); // 3 seconds after page load
 
         });
     </script>
