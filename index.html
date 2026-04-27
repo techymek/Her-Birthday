@@ -3,400 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The New Replaced Old</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <title>For Mannu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            background-color: #0f0f0f; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        * {
             margin: 0;
-            font-family: 'Merriweather', serif;
-            overflow: hidden;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .container {
-            width: 100%;
+        body {
+            background-color: #05070a;
+            color: #ffffff;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .flip-book {
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-            display: none; 
-        }
-
-        .page {
-            padding: 40px 35px;
-            box-sizing: border-box;
+            width: 100vw;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            font-size: 15px;
-            line-height: 1.8;
             position: relative;
-            transition: background-color 0.5s ease; 
+            font-family: 'Montserrat', sans-serif;
         }
 
-        .page p {
-            margin-bottom: 20px;
-            text-align: justify;
-        }
-
-        .story-quote {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 1.25em; 
-            display: block; 
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .page-number {
+        /* =========================================
+           VFX & BACKGROUND LAYER
+           ========================================= */
+        .vfx-container {
             position: absolute;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 12px;
-            font-style: italic;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(to bottom, #05070a 0%, #111a22 60%, #000000 100%);
+        }
+
+        /* Moon / Backlight */
+        .moon {
+            position: absolute;
+            top: 15%; left: 50%;
+            transform: translateX(-50%);
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            box-shadow: 0 0 60px rgba(255,255,255,0.2);
             opacity: 0.6;
         }
 
-        .page::after {
-            content: '';
+        /* Mountains (Pahadi Vibe) */
+        .mountains {
             position: absolute;
-            top: 0; bottom: 0;
-            width: 20px;
+            bottom: 0; left: 0; width: 100%; height: 40vh;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23030406' d='M0,192L48,197.3C96,203,192,213,288,192C384,171,480,117,576,112C672,107,768,149,864,170.7C960,192,1056,192,1152,176C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3Cpath fill='%23080a0f' d='M0,256L80,240C160,224,320,192,480,181.3C640,171,800,181,960,202.7C1120,224,1280,256,1360,272L1440,288L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom center;
+            background-size: cover;
+            opacity: 0.8;
+        }
+
+        /* Lucknow Architecture Silhouette */
+        .lucknow-skyline {
+            position: absolute;
+            bottom: -5px; left: 50%;
+            transform: translateX(-50%);
+            width: 80%; height: 35vh;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 300'%3E%3Cpath fill='%23000000' d='M350,300 L350,150 C350,100 400,80 400,80 C400,80 450,100 450,150 L450,300 Z M250,300 L250,200 C250,170 280,160 280,160 C280,160 310,170 310,200 L310,300 Z M490,300 L490,200 C490,170 520,160 520,160 C520,160 550,170 550,200 L550,300 Z M150,300 L150,240 C150,220 180,210 180,210 C180,210 210,220 210,240 L210,300 Z M590,300 L590,240 C590,220 620,210 620,210 C620,210 650,220 650,240 L650,300 Z' /%3E%3Ccircle fill='%23000000' cx='400' cy='60' r='10'/%3E%3Crect fill='%23000000' x='398' y='40' width='4' height='20'/%3E%3C/svg%3E") no-repeat bottom center;
+            background-size: contain;
+            opacity: 0.9;
+        }
+
+        /* Tree Shadows Overlay */
+        .tree-branch {
+            position: absolute;
+            top: -20px;
+            width: 300px;
+            height: 300px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='%23000000' d='M0,0 L100,50 C120,60 140,40 180,80 C150,90 120,70 90,100 C70,120 80,150 40,180 C50,140 20,110 0,100 Z' /%3E%3C/svg%3E") no-repeat top left;
+            background-size: contain;
+            filter: blur(2px) drop-shadow(0 0 10px rgba(0,0,0,0.8));
+            opacity: 0.7;
+            transform-origin: top left;
+            animation: windSway 8s ease-in-out infinite alternate;
+        }
+        .tree-right {
+            right: -20px; left: auto;
+            transform-origin: top right;
+            transform: scaleX(-1);
+            animation: windSwayRight 10s ease-in-out infinite alternate;
+        }
+
+        /* Fog / Mist Animation */
+        .fog {
+            position: absolute;
+            bottom: 0; left: 0; width: 200%; height: 50vh;
+            background: linear-gradient(to top, rgba(255,255,255,0.05), transparent);
+            filter: blur(20px);
+            animation: fogDrift 30s linear infinite;
+        }
+
+        /* Flying Birds */
+        .bird {
+            position: absolute;
+            width: 20px; height: 10px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' opacity='0.3' d='M2,14 C6,10 10,12 12,16 C14,12 18,10 22,14 C18,8 14,8 12,12 C10,8 6,8 2,14 Z'/%3E%3C/svg%3E") no-repeat center;
+            background-size: contain;
+            animation: flyBird 15s linear infinite;
+        }
+        .bird1 { top: 20%; left: -10%; animation-duration: 20s; }
+        .bird2 { top: 25%; left: -5%; animation-duration: 25s; animation-delay: 5s; transform: scale(0.8); }
+
+        @keyframes windSway { 0% { transform: rotate(0deg); } 100% { transform: rotate(3deg); } }
+        @keyframes windSwayRight { 0% { transform: scaleX(-1) rotate(0deg); } 100% { transform: scaleX(-1) rotate(-3deg); } }
+        @keyframes fogDrift { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes flyBird { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(120vw, -10vh) scale(0.5); opacity: 0; } }
+
+        /* =========================================
+           CONTENT & LAYOUT
+           ========================================= */
+        #text-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
-        }
-        .page.--left::after {
-            right: 0;
-            background: linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 100%);
-        }
-        .page.--right::after {
-            left: 0;
-            background: linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 100%);
+            z-index: 5;
         }
 
-        /* PHASE 1: Warm & Romantic */
-        .phase-1 { background-color: #fff7f2; color: #3b2828; }
-        .phase-1 .story-quote { color: #8a4e4e; }
-        .phase-1 .cover-title { color: #2c1a1a; }
-        .phase-1 img { mix-blend-mode: multiply; opacity: 0.9; }
+        .cinematic-text {
+            position: absolute;
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            text-align: center;
+            letter-spacing: 5px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            animation: dramaticFade 6s ease-in-out forwards;
+        }
 
-        /* PHASE 2: Fading & Neutral */
-        .phase-2 { background-color: #f0f0f0; color: #333333; }
-        .phase-2 .story-quote { color: #555555; }
-        .phase-2 img { mix-blend-mode: multiply; filter: grayscale(50%); opacity: 0.8; }
+        @keyframes dramaticFade {
+            0% { opacity: 0; filter: blur(15px); transform: translate(-50%, -50%) scale(0.8); }
+            20% { opacity: 1; filter: blur(0px); transform: translate(-50%, -50%) scale(1); }
+            80% { opacity: 1; filter: blur(0px); transform: translate(-50%, -50%) scale(1.05); }
+            100% { opacity: 0; filter: blur(15px); transform: translate(-50%, -50%) scale(1.1); }
+        }
 
-        /* PHASE 3: Dark & Heavy */
-        .phase-3 { background-color: #3a3a3a; color: #e0e0e0; }
-        .phase-3 .story-quote { color: #b0b0b0; }
-        .phase-3 .page-number { opacity: 0.4; color: #fff; }
-        .phase-3::after { background: linear-gradient(to left, rgba(0,0,0,0.5) 0%, transparent 100%); } 
-        .phase-3.--right::after { background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 100%); }
-        .phase-3 img { filter: grayscale(100%) invert(80%); opacity: 0.7; mix-blend-mode: screen; }
+        /* Central Layout Wrapper */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 40px; /* Ensures space between text and button */
+        }
 
-        /* PHASE 4: Monochrome, Cold, Black */
-        .phase-4 { background-color: #111111; color: #d6d6d6; }
-        .phase-4 .story-quote { color: #ffffff; border-left: 2px solid #555; padding-left: 15px; text-align: left; }
-        .phase-4 .back-cover-quote { color: #aaaaaa; border: none; text-align: center; }
-        .phase-4 .page-number { opacity: 0.3; color: #fff; }
-        .phase-4::after { background: linear-gradient(to left, rgba(0,0,0,0.8) 0%, transparent 100%); }
-        .phase-4.--right::after { background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, transparent 100%); }
-        .phase-4 img { filter: grayscale(100%) invert(100%); opacity: 0.6; mix-blend-mode: screen; }
+        /* Handwritten Pen Message */
+        #written-bg {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            font-family: 'Caveat', cursive;
+            font-size: 2.2rem;
+            line-height: 1.6;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.2);
+            min-height: 150px; /* Prevents layout jump */
+        }
+        #written-bg span { opacity: 0; transition: opacity 0.15s ease-out; }
 
-        .page-cover-top {
+        /* Action Area (Prompt + Button) */
+        .action-area {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 20px; 
-            text-align: center;
-            position: relative;
+            gap: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(30px);
+            transition: all 2s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        .cover-title {
-            font-family: 'Playfair Display', serif;
-            font-weight: 600;
-            font-size: 2.2em; 
-            line-height: 1.3;
-            margin-bottom: 30px;
+        .action-area.reveal {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
-        .back-cover-quote {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 1.3em; 
-            line-height: 1.6;
-            margin-top: 30px;
-            max-width: 90%; 
+        .emotional-prompt {
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+            letter-spacing: 2px;
+            animation: pulseText 3s infinite alternate;
         }
 
-        .decor-img {
-            max-width: 60px;
-            margin: 25px auto;
-            display: block;
-        }
-        .cover-img {
-            max-width: 65px;
-            margin: 20px auto;
+        @keyframes pulseText { 0% { opacity: 0.6; } 100% { opacity: 1; text-shadow: 0 0 15px rgba(255,255,255,0.5); } }
+
+        /* Cinematic Button */
+        #action-btn {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #fff;
+            text-decoration: none;
+            padding: 16px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
         }
 
-        @media (max-width: 600px) {
-            .page { padding: 30px 25px; font-size: 14px; }
-            .cover-title { font-size: 1.8em; } 
-            .back-cover-quote { font-size: 1.1em; } 
+        #action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 7px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #written-bg { font-size: 1.6rem; }
+            .cinematic-text { font-size: 1.4rem; width: 90%; }
+            #action-btn { font-size: 0.9rem; padding: 14px 30px; }
+            .emotional-prompt { font-size: 1.2rem; }
+            .content-wrapper { justify-content: flex-start; padding-top: 15vh; gap: 30px; }
+            .mountains { height: 30vh; }
+            .lucknow-skyline { height: 25vh; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="flip-book" id="book">
-            
-            <div class="page phase-1" data-density="hard">
-                <div class="page-cover-top">
-                    <div class="cover-title">The New<br>Replaced Old</div>
-                    <img src="rose.png" alt="Rose" class="cover-img" onerror="this.style.display='none'">
-                </div>
-            </div>
+    <div class="vfx-container">
+        <div class="moon"></div>
+        <div class="mountains"></div>
+        <div class="lucknow-skyline"></div>
+        <div class="fog"></div>
+        <div class="fog" style="animation-duration: 40s; animation-direction: reverse; opacity: 0.5;"></div>
+        <div class="tree-branch"></div>
+        <div class="tree-branch tree-right"></div>
+        <div class="bird bird1"></div>
+        <div class="bird bird2"></div>
+    </div>
 
-            <div class="page phase-1">
-                <p>There are some stories that don’t end when they break.</p>
-                <p>They end much earlier, in a quiet way, when one person has already decided they are going to leave, but hasn’t said it yet.</p>
-                <p>This was one of those stories.</p>
-                <p>They never met.</p>
-                <p>No shared places, no memories outside a screen. Everything they had lived inside a phone. Messages, late nights, calls that felt longer than they were, and a connection that felt real. At least to him.</p>
-                <div class="page-number">1</div>
-            </div>
-            <div class="page phase-1">
-                <p>She was the one who started it.</p>
-                <p>A simple message, then another, then consistency. She chose him first. She texted first, called first, stayed longer than she needed to. She made him feel important before he even asked to be.</p>
-                <p>And when someone walks into your life like that, you don’t question it.</p>
-                <p>You trust it.</p>
-                <p>Being chosen so clearly makes you believe you will not be unchosen.</p>
-                <p>And he believed it.</p>
-                <div class="page-number">2</div>
-            </div>
-            <div class="page phase-1">
-                <img src="letter.png" alt="Letter" class="decor-img" onerror="this.style.display='none'">
-                <p>He gave her everything he could. Time, attention, patience. He learned her moods, understood her silences, noticed the smallest changes in the way she texted.</p>
-                <p>But his life was different.</p>
-                <p>He lived in a house where things were strict. Where calls were not easy, where privacy did not exist the way it should. Being on the phone for too long meant questions. Being heard meant trouble.</p>
-                <div class="page-number">3</div>
-            </div>
-            <div class="page phase-1">
-                <p>So he found his own way.</p>
-                <p>He walked.</p>
-                <p>Kilometres.</p>
-                <p>Just to find a place where he could talk to her freely. Empty roads, quiet corners, places where no one knew him. Just so he could hear her voice without fear.</p>
-                <p>Some people travel distances not to reach a place, but to reach a person.</p>
-                <div class="page-number">4</div>
-            </div>
-            <div class="page phase-1">
-                <p>And still, that was not all.</p>
-                <p>He wanted to see her.</p>
-                <p>So he stayed up at night, fighting sleep, waiting for the chance to video call. Because for him, seeing her face meant everything. It made the distance feel smaller. It made her feel real.</p>
-                <p>Sometimes she agreed.</p>
-                <p>Most of the time, she had a reason.</p>
-                <span class="story-quote">“My family is around.”</span>
-                <span class="story-quote">“I can’t right now.”</span>
-                <span class="story-quote">“Maybe later.”</span>
-                <div class="page-number">5</div>
-            </div>
-
-            <div class="page phase-2">
-                <p>And he understood.</p>
-                <p>Or maybe he just chose to.</p>
-                <p>Because he loved her.</p>
-                <p>But slowly, things started changing.</p>
-                <p>Not in what he did.</p>
-                <p>In what she expected.</p>
-                <p>The same girl who could not video call because of her family started asking him to call more. Openly. Freely. Even when he was around his own family.</p>
-                <div class="page-number">6</div>
-            </div>
-            <div class="page phase-2">
-                <p>And when he couldn’t, it became a problem.</p>
-                <span class="story-quote">“You can’t even call me properly.”</span>
-                <p>At first it felt like frustration.</p>
-                <p>Then it became a pattern.</p>
-                <span class="story-quote">“You don’t give me time.”</span>
-                <span class="story-quote">“This doesn’t feel real.”</span>
-                <span class="story-quote">“I need more than this.”</span>
-                <p>And he tried.</p>
-                <div class="page-number">7</div>
-            </div>
-            <div class="page phase-2">
-                <p>He walked further. Stayed longer. Tried harder to be present in every way he could. He gave everything he had within the limits he never chose.</p>
-                <p>But no matter what he did, it stopped being enough.</p>
-                <p>And somewhere during all of this, her life outside the screen was not standing still.</p>
-                <p>It was moving.</p>
-                <div class="page-number">8</div>
-            </div>
-            <div class="page phase-2">
-                <p>There were new conversations he did not know about. New moments that did not include him. Laughter that did not need to be typed out. Time that was being spent somewhere else.</p>
-                <p>At first, it was just less time for him.</p>
-                <p>Then it became less interest.</p>
-                <p>Her replies got shorter, not just because she was busy, but because her attention was somewhere else. Calls stopped not because she could not, but because she no longer wanted to make that effort.</p>
-                <div class="page-number">9</div>
-            </div>
-
-            <div class="page phase-3">
-                <p>And slowly, someone else took the place he never saw.</p>
-                <p>Not all at once.</p>
-                <p>Just enough that she did not need him the same way anymore.</p>
-                <p>He was still there, trying to hold on to what they had.</p>
-                <p>But she had already started building something new.</p>
-                <p>With someone she could see.</p>
-                <p>Someone she could meet.</p>
-                <div class="page-number">10</div>
-            </div>
-            <div class="page phase-3">
-                <p>Someone who did not have to walk kilometres just to talk.</p>
-                <p>Someone who did not have to wait for the right time.</p>
-                <p>Someone who was simply there.</p>
-                <p>Real.</p>
-                <p>And once that happened, everything about him started feeling less.</p>
-                <p>Not because he changed.</p>
-                <p>But because she had something to compare him to.</p>
-                <div class="page-number">11</div>
-            </div>
-            <div class="page phase-3">
-                <p>Distance started feeling like a problem.</p>
-                <p>Silence started feeling like neglect.</p>
-                <p>Effort started feeling like it was not enough.</p>
-                <p>And instead of saying she found someone else,</p>
-                <p>she found a reason.</p>
-                <p>The easiest one.</p>
-                <p>He could not call freely.</p>
-                <p>And she turned that into the problem.</p>
-                <div class="page-number">12</div>
-            </div>
-            <div class="page phase-3">
-                <p>If he did not call, he did not care.</p>
-                <p>If he explained, he was making excuses.</p>
-                <p>If he tried, it still was not enough.</p>
-                <p>There was no version of him that could win.</p>
-                <p>Because the decision had already been made.</p>
-                <p>She was not fixing things.</p>
-                <p>She was creating a reason to leave.</p>
-                <div class="page-number">13</div>
-            </div>
-
-            <div class="page phase-4">
-                <p>And when it finally ended, it sounded simple.</p>
-                <p>She needed more.</p>
-                <p>He could not give it.</p>
-                <p>So she left.</p>
-                <p>Clean.</p>
-                <p>Understandable.</p>
-                <p>But not true.</p>
-                <p>The truth was that she did not leave because he could not call.</p>
-                <p>She left because she no longer needed him.</p>
-                <div class="page-number">14</div>
-            </div>
-            <div class="page phase-4">
-                <img src="promise.png" alt="Promise" class="decor-img" onerror="this.style.display='none'">
-                <p>Because someone else was already there.</p>
-                <p>Closer. Easier. Present.</p>
-                <p>If she really loved him, she would have seen the effort instead of the limitation. She would have understood why he stayed quiet, instead of using it against him.</p>
-                <p>Love does not make your situation a reason to leave. It makes it something to stand through.</p>
-                <p>But she did not stay.</p>
-                <div class="page-number">15</div>
-            </div>
-            <div class="page phase-4">
-                <p>Because she had already found something that did not require waiting.</p>
-                <p>And when that option came, she chose it.</p>
-                <p>And before leaving completely, she made sure the story made sense.</p>
-                <p>In her version, she tried.</p>
-                <p>In her version, he failed.</p>
-                <p>In her version, she had no choice.</p>
-                <p>And just like that, he became the reason.</p>
-                <p>The villain.</p>
-                <div class="page-number">16</div>
-            </div>
-            <div class="page phase-4">
-                <p>The hardest part is not being left.</p>
-                <p>It is being made to feel like you deserved it.</p>
-                <p>And he stayed there for a long time.</p>
-                <p>Reading old chats. Replaying moments. Thinking about what he could have done better. Wondering if he really was not enough.</p>
-                <p>But the truth was simple.</p>
-                <p>He did not lose her because he could not call.</p>
-                <p>He did not lose her because he did not try.</p>
-                <div class="page-number">17</div>
-            </div>
-            <div class="page phase-4">
-                <p>He lost her because she found someone else who was easier to choose.</p>
-                <p>And somewhere, late at night, when everything is quiet, he finally starts to understand something that once felt impossible to accept.</p>
-                <p>You do not lose someone who truly wants to stay.</p>
-                <p>And no matter how real it felt,</p>
-                <p>if it was that easy for them to leave,</p>
-                <p>it was never as real for them as it was for you.</p>
-                <div class="page-number">18</div>
-            </div>
-
-            <div class="page phase-4" data-density="hard">
-                <div class="page-cover-top">
-                    <div class="cover-title" style="color:#e0e0e0;">She Found<br>Someone Else</div>
-                    <span class="story-quote back-cover-quote">
-                        “She traded distance for convenience, a screen for a reality, and in choosing him, she let go of the one who walked a thousand miles for her voice.”
-                    </span>
-                </div>
-            </div>
-
+    <div id="text-container"></div>
+    
+    <div class="content-wrapper">
+        <div id="written-bg"></div>
+        
+        <div class="action-area" id="action-area">
+            <p class="emotional-prompt">Meri ek aakhri umeed... kya hum ek baar baat kar sakte hain?</p>
+            <a href="https://wa.me/916393711041" id="action-btn">Let's talk mannu</a>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pageFlip = new St.PageFlip(document.getElementById('book'), {
-                width: 450, 
-                height: 600, 
-                size: "stretch",
-                minWidth: 315,
-                maxWidth: 500,
-                minHeight: 420,
-                maxHeight: 700,
-                maxShadowOpacity: 0.5,
-                showCover: true,
-                mobileScrollSupport: false,
-                usePortrait: true,
-                flipDuration: 2000 // Slow motion, cinematic flip (2 seconds)
-            });
+        const messages = [
+            "you can still fix everything",
+            "we can still fix everything",
+            "It's not too late"
+        ];
 
-            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-            document.getElementById('book').style.display = 'block';
+        const container = document.getElementById('text-container');
+        const actionArea = document.getElementById('action-area');
+        const writtenBg = document.getElementById('written-bg');
 
-            // ==========================================
-            // --- AUTO-FLIP WITH VIBRATION ---
-            // ==========================================
+        // Updated text with original sentence
+        const paragraphToWrite = "Mannu, main tumhe roz miss karta hoon... Us din se aaj tak main roz tumhe WhatsApp par ek message bhejta hoon, is umeed mein ki shayad kisi din tum mujhe unblock kar dogi. Wo messages roz single tick par hi reh jaate hain, par meri koshish khatam nahi hoti. Shayad hi tum kabhi ye site dekho, par agar tum yahan ho, toh please... ek baar dil se sochna is baare mein.";
+
+        let delayTime = 1000;
+
+        // Phase 1: Random Dramatic Texts
+        messages.forEach((msg, index) => {
             setTimeout(() => {
-                // Only flip if the user hasn't already turned the page themselves
-                if (pageFlip.getCurrentPageIndex() === 0) {
-                    
-                    // Attempt cinematic heartbeat vibration 
-                    // Note: Browsers may block this if the user hasn't touched the screen yet
-                    if (navigator.vibrate) {
-                        navigator.vibrate([200, 50, 200, 50, 300]); 
-                    }
+                const textElement = document.createElement('div');
+                textElement.classList.add('cinematic-text');
+                textElement.innerText = msg;
 
-                    // Trigger the slow-mo page flip
-                    pageFlip.flipNext();
-                }
-            }, 3000); // 3 seconds after page load
+                // Center area random positioning to avoid edges
+                const topPos = Math.floor(Math.random() * 30) + 35; 
+                const leftPos = Math.floor(Math.random() * 40) + 30;
 
+                textElement.style.top = `${topPos}%`;
+                textElement.style.left = `${leftPos}%`;
+
+                container.appendChild(textElement);
+
+                setTimeout(() => { textElement.remove(); }, 6000);
+            }, delayTime);
+            
+            delayTime += 3500; 
         });
+
+        // Phase 2: Pen Writing Effect
+        function writeWithPenEffect(text, element, callback) {
+            element.innerHTML = '';
+            let i = 0;
+            
+            function nextChar() {
+                if (i < text.length) {
+                    let span = document.createElement('span');
+                    span.textContent = text[i];
+                    element.appendChild(span);
+                    
+                    void span.offsetWidth; 
+                    span.style.opacity = '1';
+
+                    i++;
+                    
+                    let speed = Math.random() * 40 + 20; // Human typing speed
+                    
+                    // Pause for punctuation
+                    if (text[i-1] === '.' || text[i-1] === ',') {
+                        speed += 250;
+                    }
+                    
+                    setTimeout(nextChar, speed);
+                } else {
+                    if (callback) callback();
+                }
+            }
+            nextChar();
+        }
+
+        // Start writing after intro texts fade
+        setTimeout(() => {
+            writeWithPenEffect(paragraphToWrite, writtenBg, () => {
+                // Phase 3: Reveal Action Area (Prompt + Button) seamlessly
+                setTimeout(() => {
+                    actionArea.classList.add('reveal');
+                }, 800); 
+            });
+        }, delayTime + 2000);
+
     </script>
 </body>
 </html>
+
