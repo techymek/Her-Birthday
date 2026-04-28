@@ -3,453 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Truth - Unmasked</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Caveat:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
-    
+    <title>Listen</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            var(--glow-color): rgba(255, 255, 255, 0.5);
-            var(--bg-color): rgba(10, 10, 10, 0.5);
-        }
-
+        /* Absolute black background, resets everything */
         body {
+            margin: 0;
+            padding: 0;
             background-color: #000000;
-            color: #ffffff;
             height: 100vh;
-            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
         }
 
-        /* Start Screen (Required by browsers to play audio) */
-        #start-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #000000;
-            z-index: 50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1.5s ease;
-        }
-
-        #start-btn {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            letter-spacing: 5px;
-            color: #fff;
+        /* Clean, minimalist button */
+        #play-btn {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 15px 40px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.4s ease;
-        }
-
-        #start-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            border-color: #fff;
-        }
-
-        /* YouTube Background Video */
-        #video-container {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden;
-            z-index: 0;
-            background-color: #000;
-        }
-
-        #video-container iframe {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 120vw; height: 67.5vw; 
-            min-height: 120vh; min-width: 213.33vh;
-            transform: translate(-50%, -50%);
-            pointer-events: none; 
-            filter: grayscale(40%) brightness(0.6); 
-        }
-
-        /* Dynamic Theme Overlay */
-        #theme-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, var(--bg-color) 0%, rgba(0, 0, 0, 0.9) 100%);
-            transition: background 3s ease-in-out;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        #theme-layer::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3;
-        }
-
-        /* Intro Text */
-        #intro-text {
-            position: absolute;
-            font-family: 'Cinzel', serif;
-            font-size: 2.2rem;
-            text-align: center;
-            letter-spacing: 6px;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 20px var(--glow-color);
-            z-index: 10;
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 2s ease-in-out, filter 2s ease-in-out, transform 4s ease-out;
-            width: 90%; /* Keeps it from touching edges */
-        }
-
-        /* Quote Container */
-        #quote-container {
-            position: absolute;
-            width: 90%;
-            max-width: 1000px;
-            text-align: center;
-            font-family: 'Caveat', cursive;
-            font-size: 3rem; /* PC size */
-            line-height: 1.4;
             color: #ffffff;
-            text-shadow: 0 0 10px var(--glow-color), 0 0 25px rgba(255, 255, 255, 0.5);
-            z-index: 5;
-            top: 40%;
-            transform: translateY(-50%);
-            transition: opacity 1.5s ease-in-out, text-shadow 3s ease;
-        }
-
-        #quote-container span {
-            opacity: 0;
-            transition: opacity 0.1s ease-out;
-        }
-
-        /* Control Panel */
-        #controls-wrapper {
-            position: absolute;
-            bottom: 50px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            z-index: 15;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-            transition: all 2s ease;
-        }
-
-        #controls-wrapper.reveal {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .buttons-row {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            width: 90%;
-            max-width: 900px;
-        }
-
-        .action-btn {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-            font-size: 0.85rem;
+            border: 1px solid #ffffff;
+            padding: 15px 40px;
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px 20px;
             cursor: pointer;
-            backdrop-filter: blur(8px);
-            transition: all 0.4s ease;
-            flex: 1; /* Makes buttons equal width */
-            text-align: center;
+            transition: all 0.3s ease;
         }
 
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: var(--glow-color);
-            box-shadow: 0 0 20px var(--glow-color);
-            letter-spacing: 3px;
-        }
-
-        .action-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        /* MOBILE OPTIMIZATION */
-        @media (max-width: 768px) {
-            #intro-text { 
-                font-size: 1.4rem; 
-                letter-spacing: 4px;
-            }
-            #quote-container { 
-                font-size: 1.8rem; /* Scaled down heavily for phone */
-                top: 42%; 
-                width: 92%;
-            }
-            #controls-wrapper { 
-                bottom: 30px; 
-            }
-            .buttons-row { 
-                flex-direction: column; /* Stacks buttons on top of each other */
-                gap: 12px; 
-                width: 85%; /* Prevents touching edges */
-            }
-            .action-btn { 
-                font-size: 0.75rem; 
-                padding: 12px 10px; 
-                width: 100%; 
-            }
+        /* Inverts colors when hovering over it */
+        #play-btn:hover {
+            background: #ffffff;
+            color: #000000;
         }
     </style>
 </head>
 <body>
 
-    <div id="start-screen">
-        <button id="start-btn" onclick="startExperience()">Enter The Truth</button>
-    </div>
-
-    <div id="video-container"></div>
-
-    <div id="theme-layer"></div>
+    <button id="play-btn">Click Here</button>
     
-    <div id="intro-text">Here is what I think about you now</div>
-    <div id="quote-container"></div>
-    
-    <div id="controls-wrapper">
-        <div class="buttons-row">
-            <button class="action-btn" onclick="playCategory('cheated')">How You Cheated</button>
-            <button class="action-btn" onclick="playCategory('blamed')">How You Blamed Me</button>
-            <button class="action-btn" onclick="playCategory('fooled')">How You Fooled Me</button>
-        </div>
-    </div>
+    <div id="audio-container"></div>
 
     <script>
-        const truthDatabase = {
-            cheated: [
-                "You looked me in the eyes with an innocent smile while your hands were busy typing to him.",
-                "You wore loyalty like a costume, taking it off the moment I turned my back.",
-                "Your biggest talent wasn't cheating, it was acting like you were the loyal one.",
-                "You used your 'innocence' as a shield to hide your double life.",
-                "I was defending your character while you were busy destroying it behind my back.",
-                "You didn't just cheat on me, you cheated on the version of you I believed in.",
-                "You cried when I doubted you, not because you were innocent, but because you were almost caught.",
-                "You kept me around as a backup plan while you auditioned my replacements.",
-                "Your eyes never lied, but your innocent face was a masterclass in deception.",
-                "You hugged me tight while your mind was already in someone else's arms.",
-                "You didn't slip into someone else's life by mistake, you planned it while holding my hand.",
-                "You acted so pure, making me feel toxic for ever doubting your filthy secrets.",
-                "The scariest part wasn't the cheating, it was how easily you looked innocent doing it.",
-                "You deleted messages with the same fingers you used to wipe away my tears.",
-                "You wanted the safety of my love while entertaining the thrill of his attention.",
-                "You played the victim perfectly, while holding the knife behind your back.",
-                "You swore on everything you loved, just to protect a lie you created.",
-                "You kept your phone face down, and your innocent mask face up.",
-                "You didn't cheat because you were confused, you cheated because you felt you could get away with it.",
-                "Your sweetness was just a distraction from your betrayal.",
-                "You made me feel bad for asking questions you already knew the guilty answers to.",
-                "You cheated with a straight face and an 'I love you' on your lips.",
-                "You didn't make a mistake, you made choices, and you made sure to hide them well.",
-                "You used my absolute trust as a blindfold so you could do whatever you wanted.",
-                "You were holding onto me just to ensure you didn't fall while climbing into another bed.",
-                "You acted like a saint in public while being a stranger to loyalty in private.",
-                "Your betrayal was loud, but your innocent act was deafening.",
-                "You didn't want to break my heart, you just didn't care if it broke while you had your fun.",
-                "You lied to my face, smiled, and then asked me what was wrong.",
-                "You weaponized your cute, innocent persona to commit the cruelest betrayal."
-            ],
-            blamed: [
-                "You used a missed call as an excuse to miss out on our entire future.",
-                "You didn't leave because I had no time, you left because you found someone else to spend yours with.",
-                "You turned a busy day into a crime just so you could justify your escape.",
-                "You were looking for a reason to leave, and you made my schedule the scapegoat.",
-                "You blamed me for not giving you time, while you were giving your time to someone else.",
-                "You made me apologize for working hard, just so you wouldn't have to apologize for giving up.",
-                "You didn't want my time, you wanted a reason to walk away guilt-free.",
-                "You turned a simple misunderstanding over a call into a weapon to murder our relationship.",
-                "You made me feel like the villain for missing a ring, while you were missing basic loyalty.",
-                "You gaslit me into thinking my lack of time was the problem, hiding the fact that your lack of love was.",
-                "You couldn't handle the guilt of leaving, so you placed the blame squarely on my shoulders.",
-                "You used 'you never have time for me' as a smokescreen for 'I don't want you anymore'.",
-                "You expected me to be available 24/7, just so you could leave in the 1 minute I wasn't.",
-                "You picked a fight over a phone call because you needed an excuse to pack your bags.",
-                "You didn't leave because of what I did, you left and made up a story about what I didn't do.",
-                "You made me beg for forgiveness for being busy, while you were secretly busy moving on.",
-                "You shifted the blame so perfectly, I almost believed I broke my own heart.",
-                "You used my ambition against me, acting like my career was the other woman.",
-                "You walked away pointing fingers at me, hoping I wouldn't notice the dirt on your hands.",
-                "You punished me for not picking up the phone, but the truth is, you had already hung up on us.",
-                "You made me feel inadequate for not giving you time, while you were giving your body to him.",
-                "You rewrote our history to make yourself the neglected victim instead of the selfish runner.",
-                "You needed to be the good guy in your own story, so you cast me as the neglectful monster.",
-                "You blamed my lack of calls, but ignored the hundreds of texts and efforts I poured into you.",
-                "You used my one mistake as a permanent exit door, locking it from the outside.",
-                "You didn't just break my heart, you convinced me it was my fault for dropping it.",
-                "You made a missed call feel like a betrayal, just to cover up your actual betrayal.",
-                "You kept complaining about time, but when I finally had it, you were already gone.",
-                "You engineered a scenario where you could leave and I would be left saying sorry.",
-                "You blamed me for losing you, but you had already let go of my hand long ago."
-            ],
-            fooled: [
-                "You didn't fall in love with me, you just calculated what you could extract from me.",
-                "Your 'I love you's were just passwords to bypass my defenses.",
-                "You faked emotions so well, you deserve an award for breaking my reality.",
-                "You used my genuine heart as a playground for your selfish ego.",
-                "You weren't confused, you were incredibly smart. You knew exactly what you were doing.",
-                "You treated my love like a free subscription, canceling it the moment you found a better deal.",
-                "You played the perfect partner, not because you loved me, but because it kept you comfortable.",
-                "You didn't care about my feelings, you just cared about how my feelings benefited you.",
-                "Your tears were nothing but special effects for a script you wrote to manipulate me.",
-                "You faked vulnerability just to find out where my weak spots were.",
-                "You didn't give me your heart, you just rented space in mine until you were bored.",
-                "You were so smart with your lies, making me feel lucky to have someone who was actively destroying me.",
-                "You mirrored my love just enough to keep me hooked while you felt absolutely nothing.",
-                "You fed off my validation and affection, leaving me empty while you walked away full.",
-                "You were a parasite disguised as a soulmate.",
-                "You knew I would give you everything, so you strategically gave me just enough to keep me trying.",
-                "You didn't break my trust, you hacked it using fake feelings and sweet words.",
-                "You turned my genuine care into a tool for your own convenience.",
-                "You were playing chess while I was blindly handing you my heart.",
-                "You acted like you were afraid to lose me, when in reality, you were just afraid of losing what I did for you.",
-                "You used my blind loyalty as a smokescreen for your calculated deception.",
-                "You faked a future with me just to get through your present.",
-                "Your love wasn't a feeling, it was a beautifully executed strategy.",
-                "You didn't love me, you loved how easy I made your life.",
-                "You manipulated my empathy, making me care for a person who didn't actually exist.",
-                "You wore the mask of a loving partner until it became too heavy to carry.",
-                "You treated our relationship like a transaction, and you made sure I paid all the costs.",
-                "You fooled me not by lying, but by faking the truth so flawlessly.",
-                "You were intellectually cold, dissecting my emotions and using them against me.",
-                "You left me marveling at your smartness, disgusted by how perfectly you faked it all."
-            ]
-        };
-
-        const themes = {
-            cheated: { bg: 'rgba(40, 5, 5, 0.6)', glow: 'rgba(255, 40, 40, 0.8)' },  
-            blamed:  { bg: 'rgba(5, 10, 40, 0.6)', glow: 'rgba(50, 150, 255, 0.8)' }, 
-            fooled:  { bg: 'rgba(5, 30, 10, 0.6)', glow: 'rgba(40, 255, 100, 0.8)' }, 
-            intro:   { bg: 'rgba(10, 10, 10, 0.5)', glow: 'rgba(255, 255, 255, 0.6)' }  
-        };
-
-        let isWriting = false;
-        let lastQuotes = { cheated: -1, blamed: -1, fooled: -1 };
-
-        const introElement = document.getElementById('intro-text');
-        const quoteContainer = document.getElementById('quote-container');
-        const controlsWrapper = document.getElementById('controls-wrapper');
-        const allButtons = document.querySelectorAll('.action-btn');
-
-        function applyTheme(category) {
-            const theme = themes[category];
-            document.documentElement.style.setProperty('--bg-color', theme.bg);
-            document.documentElement.style.setProperty('--glow-color', theme.glow);
-        }
-
-        function getRandomQuote(category) {
-            const array = truthDatabase[category];
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * array.length);
-            } while (newIndex === lastQuotes[category] && array.length > 1);
-            lastQuotes[category] = newIndex;
-            return array[newIndex];
-        }
-
-        function toggleButtons(state) {
-            allButtons.forEach(btn => btn.disabled = !state);
-        }
-
-        function writeWithPenEffect(text, element, callback) {
-            isWriting = true;
-            toggleButtons(false);
-            element.innerHTML = '';
-            element.style.opacity = '1';
-            let i = 0;
+        document.getElementById('play-btn').addEventListener('click', function() {
+            // 1. Hide the button completely so the screen is just black
+            this.style.display = 'none';
             
-            function nextChar() {
-                if (i < text.length) {
-                    let span = document.createElement('span');
-                    span.textContent = text[i];
-                    element.appendChild(span);
-                    
-                    void span.offsetWidth; 
-                    span.style.opacity = '1';
-
-                    i++;
-                    
-                    let speed = Math.random() * 40 + 20; 
-                    if (text[i-1] === ',' || text[i-1] === '.') speed += 250;
-                    
-                    setTimeout(nextChar, speed);
-                } else {
-                    isWriting = false;
-                    toggleButtons(true);
-                    if (callback) callback();
-                }
-            }
-            nextChar();
-        }
-
-        function playCategory(category) {
-            if (isWriting) return;
-            
-            quoteContainer.style.opacity = '0';
-            
-            setTimeout(() => {
-                applyTheme(category);
-                const newText = getRandomQuote(category);
-                writeWithPenEffect(newText, quoteContainer);
-            }, 1000); 
-        }
-
-        // This function starts the whole experience after the user clicks "Enter"
-        function startExperience() {
-            // Hide the start screen
-            const startScreen = document.getElementById('start-screen');
-            startScreen.style.opacity = '0';
-            setTimeout(() => { startScreen.style.display = 'none'; }, 1500);
-
-            // Inject the video with mute=0 (audio on)
-            document.getElementById('video-container').innerHTML = '<iframe src="https://www.youtube.com/embed/DC-cqWO_GM0?autoplay=1&mute=0&loop=1&playlist=DC-cqWO_GM0&controls=0&showinfo=0&rel=0&playsinline=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
-
-            // Start Intro Sequence
-            applyTheme('intro');
-
-            setTimeout(() => {
-                introElement.style.opacity = '1';
-                introElement.style.transform = 'scale(1)';
-            }, 1000);
-
-            setTimeout(() => {
-                introElement.style.opacity = '0';
-                introElement.style.filter = 'blur(10px)';
-                introElement.style.transform = 'scale(1.05)';
-            }, 4500);
-
-            setTimeout(() => {
-                writeWithPenEffect("Choose the truth you want to hear.", quoteContainer, () => {
-                    setTimeout(() => {
-                        controlsWrapper.classList.add('reveal');
-                    }, 800);
-                });
-            }, 6500);
-        }
-
+            // 2. Inject the YouTube video as an invisible 0x0 iframe that plays instantly
+            // Note: 'DC-cqWO_GM0' is the video ID from the link you shared earlier.
+            document.getElementById('audio-container').innerHTML = 
+                '<iframe width="0" height="0" src="https://www.youtube.com/embed/DC-cqWO_GM0?autoplay=1&mute=0" frameborder="0" allow="autoplay"></iframe>';
+        });
     </script>
 </body>
 </html>
