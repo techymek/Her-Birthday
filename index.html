@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Truth - Unmasked</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Caveat:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            /* Translucent backgrounds so video shows through */
-            --glow-color: rgba(255, 255, 255, 0.5);
-            --bg-color: rgba(10, 10, 10, 0.5);
+            var(--glow-color): rgba(255, 255, 255, 0.5);
+            var(--bg-color): rgba(10, 10, 10, 0.5);
         }
 
         body {
@@ -29,8 +27,39 @@
             position: relative;
         }
 
+        /* Start Screen (Required by browsers to play audio) */
+        #start-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000000;
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease;
+        }
+
+        #start-btn {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 5px;
+            color: #fff;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 40px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+        }
+
+        #start-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            border-color: #fff;
+        }
+
         /* YouTube Background Video */
-        .video-container {
+        #video-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             overflow: hidden;
@@ -38,18 +67,17 @@
             background-color: #000;
         }
 
-        .video-container iframe {
+        #video-container iframe {
             position: absolute;
             top: 50%; left: 50%;
-            /* Scaled slightly larger than 100% to hide YouTube watermarks and controls */
             width: 120vw; height: 67.5vw; 
             min-height: 120vh; min-width: 213.33vh;
             transform: translate(-50%, -50%);
-            pointer-events: none; /* Prevents clicking on the video */
-            filter: grayscale(40%) brightness(0.6); /* Darkened so the text stands out */
+            pointer-events: none; 
+            filter: grayscale(40%) brightness(0.6); 
         }
 
-        /* Dynamic Theme Overlay (Sits over the video) */
+        /* Dynamic Theme Overlay */
         #theme-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -80,17 +108,18 @@
             opacity: 0;
             transform: scale(0.95);
             transition: opacity 2s ease-in-out, filter 2s ease-in-out, transform 4s ease-out;
+            width: 90%; /* Keeps it from touching edges */
         }
 
         /* Quote Container */
         #quote-container {
             position: absolute;
-            width: 85%;
-            max-width: 900px;
+            width: 90%;
+            max-width: 1000px;
             text-align: center;
             font-family: 'Caveat', cursive;
-            font-size: 3rem;
-            line-height: 1.5;
+            font-size: 3rem; /* PC size */
+            line-height: 1.4;
             color: #ffffff;
             text-shadow: 0 0 10px var(--glow-color), 0 0 25px rgba(255, 255, 255, 0.5);
             z-index: 5;
@@ -107,12 +136,10 @@
         /* Control Panel */
         #controls-wrapper {
             position: absolute;
-            bottom: 40px;
+            bottom: 50px;
             width: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            justify-content: center;
             z-index: 15;
             opacity: 0;
             visibility: hidden;
@@ -128,11 +155,10 @@
 
         .buttons-row {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 20px;
             justify-content: center;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
         }
 
         .action-btn {
@@ -140,24 +166,23 @@
             font-weight: 300;
             font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: #fff;
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
+            padding: 15px 20px;
             cursor: pointer;
             backdrop-filter: blur(8px);
             transition: all 0.4s ease;
-            flex: 1 1 auto;
+            flex: 1; /* Makes buttons equal width */
             text-align: center;
-            min-width: 200px;
         }
 
         .action-btn:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: var(--glow-color);
             box-shadow: 0 0 20px var(--glow-color);
-            letter-spacing: 4px;
+            letter-spacing: 3px;
         }
 
         .action-btn:disabled {
@@ -166,28 +191,40 @@
             pointer-events: none;
         }
 
-        .screenshot-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.4);
-            margin-top: 10px;
-            min-width: 250px;
-            font-weight: 400;
-        }
-
+        /* MOBILE OPTIMIZATION */
         @media (max-width: 768px) {
-            #intro-text { font-size: 1.4rem; width: 90%; }
-            #quote-container { font-size: 2.2rem; width: 95%; top: 35%; }
-            #controls-wrapper { bottom: 20px; }
-            .action-btn { font-size: 0.75rem; padding: 10px; min-width: 140px; }
-            .buttons-row { gap: 10px; }
+            #intro-text { 
+                font-size: 1.4rem; 
+                letter-spacing: 4px;
+            }
+            #quote-container { 
+                font-size: 1.8rem; /* Scaled down heavily for phone */
+                top: 42%; 
+                width: 92%;
+            }
+            #controls-wrapper { 
+                bottom: 30px; 
+            }
+            .buttons-row { 
+                flex-direction: column; /* Stacks buttons on top of each other */
+                gap: 12px; 
+                width: 85%; /* Prevents touching edges */
+            }
+            .action-btn { 
+                font-size: 0.75rem; 
+                padding: 12px 10px; 
+                width: 100%; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/DC-cqWO_GM0?autoplay=1&mute=1&loop=1&playlist=DC-cqWO_GM0&controls=0&showinfo=0&rel=0&playsinline=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    <div id="start-screen">
+        <button id="start-btn" onclick="startExperience()">Enter The Truth</button>
     </div>
+
+    <div id="video-container"></div>
 
     <div id="theme-layer"></div>
     
@@ -200,7 +237,6 @@
             <button class="action-btn" onclick="playCategory('blamed')">How You Blamed Me</button>
             <button class="action-btn" onclick="playCategory('fooled')">How You Fooled Me</button>
         </div>
-        <button class="action-btn screenshot-btn" onclick="takeScreenshot()">Capture Truth</button>
     </div>
 
     <script>
@@ -303,12 +339,11 @@
             ]
         };
 
-        // Theme colors updated to use RGBA so the video remains visible
         const themes = {
-            cheated: { bg: 'rgba(40, 5, 5, 0.6)', glow: 'rgba(255, 40, 40, 0.8)' },  // Crimson
-            blamed:  { bg: 'rgba(5, 10, 40, 0.6)', glow: 'rgba(50, 150, 255, 0.8)' }, // Cold Blue
-            fooled:  { bg: 'rgba(5, 30, 10, 0.6)', glow: 'rgba(40, 255, 100, 0.8)' }, // Toxic Green
-            intro:   { bg: 'rgba(10, 10, 10, 0.5)', glow: 'rgba(255, 255, 255, 0.6)' }  // Void Grey
+            cheated: { bg: 'rgba(40, 5, 5, 0.6)', glow: 'rgba(255, 40, 40, 0.8)' },  
+            blamed:  { bg: 'rgba(5, 10, 40, 0.6)', glow: 'rgba(50, 150, 255, 0.8)' }, 
+            fooled:  { bg: 'rgba(5, 30, 10, 0.6)', glow: 'rgba(40, 255, 100, 0.8)' }, 
+            intro:   { bg: 'rgba(10, 10, 10, 0.5)', glow: 'rgba(255, 255, 255, 0.6)' }  
         };
 
         let isWriting = false;
@@ -382,49 +417,38 @@
             }, 1000); 
         }
 
-        // Note: html2canvas has security limits with cross-origin iframes (like YouTube).
-        // This will capture the glowing text and atmospheric gradient overlay perfectly, 
-        // giving a clean cinematic screenshot even if the background video itself isn't saved in the image.
-        function takeScreenshot() {
-            controlsWrapper.style.opacity = '0'; 
-            
+        // This function starts the whole experience after the user clicks "Enter"
+        function startExperience() {
+            // Hide the start screen
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.opacity = '0';
+            setTimeout(() => { startScreen.style.display = 'none'; }, 1500);
+
+            // Inject the video with mute=0 (audio on)
+            document.getElementById('video-container').innerHTML = '<iframe src="https://www.youtube.com/embed/DC-cqWO_GM0?autoplay=1&mute=0&loop=1&playlist=DC-cqWO_GM0&controls=0&showinfo=0&rel=0&playsinline=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+
+            // Start Intro Sequence
+            applyTheme('intro');
+
             setTimeout(() => {
-                html2canvas(document.body, { 
-                    backgroundColor: '#000000',
-                    scale: window.devicePixelRatio,
-                    useCORS: true 
-                }).then(canvas => {
-                    let link = document.createElement('a');
-                    link.download = 'The_Truth.png';
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    
-                    controlsWrapper.style.opacity = '1'; 
+                introElement.style.opacity = '1';
+                introElement.style.transform = 'scale(1)';
+            }, 1000);
+
+            setTimeout(() => {
+                introElement.style.opacity = '0';
+                introElement.style.filter = 'blur(10px)';
+                introElement.style.transform = 'scale(1.05)';
+            }, 4500);
+
+            setTimeout(() => {
+                writeWithPenEffect("Choose the truth you want to hear.", quoteContainer, () => {
+                    setTimeout(() => {
+                        controlsWrapper.classList.add('reveal');
+                    }, 800);
                 });
-            }, 400); 
+            }, 6500);
         }
-
-        // Initial Sequence
-        applyTheme('intro');
-
-        setTimeout(() => {
-            introElement.style.opacity = '1';
-            introElement.style.transform = 'scale(1)';
-        }, 500);
-
-        setTimeout(() => {
-            introElement.style.opacity = '0';
-            introElement.style.filter = 'blur(10px)';
-            introElement.style.transform = 'scale(1.05)';
-        }, 4000);
-
-        setTimeout(() => {
-            writeWithPenEffect("Choose the truth you want to hear.", quoteContainer, () => {
-                setTimeout(() => {
-                    controlsWrapper.classList.add('reveal');
-                }, 800);
-            });
-        }, 6000);
 
     </script>
 </body>
