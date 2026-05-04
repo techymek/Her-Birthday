@@ -1,59 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listen</title>
-    <style>
-        /* Absolute black background, resets everything */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematic Chat Narrative</title>
+<style>
+    * {
+        margin: 0; padding: 0; box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-        /* Clean, minimalist button */
-        #play-btn {
-            background: transparent;
-            color: #ffffff;
-            border: 1px solid #ffffff;
-            padding: 15px 40px;
-            font-family: Arial, sans-serif;
-            font-size: 1rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    body {
+        background-color: #000; height: 100vh; display: flex; justify-content: center;
+        align-items: center; overflow: hidden; color: #e9edef;
+    }
 
-        /* Inverts colors when hovering over it */
-        #play-btn:hover {
-            background: #ffffff;
-            color: #000000;
-        }
-    </style>
+    #start-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: #000; display: flex; justify-content: center; align-items: center;
+        z-index: 300; cursor: pointer; transition: opacity 1.5s ease;
+    }
+
+    #start-btn {
+        padding: 15px 30px; color: rgba(255, 255, 255, 0.5); font-size: 1.1rem;
+        letter-spacing: 3px; text-transform: lowercase; animation: pulseText 3s infinite alternate;
+    }
+
+    @keyframes pulseText { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+
+    #phone-container {
+        width: 100%; max-width: 400px; height: 100vh; max-height: 850px;
+        background-color: #0b141a; position: relative; display: flex; flex-direction: column;
+        overflow: hidden; filter: grayscale(0.1) contrast(1.02); 
+        box-shadow: 0 0 50px rgba(0,0,0,0.9); transition: box-shadow 3s ease, filter 3s ease;
+    }
+
+    #phone-container::after {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        box-shadow: inset 0 0 60px rgba(0,0,0,0.8); pointer-events: none; z-index: 20; transition: 3s;
+    }
+    .cinematic-darken::after { box-shadow: inset 0 0 180px rgba(0,0,0,1) !important; }
+
+    /* --- REALISTIC WHATSAPP STYLING --- */
+    #header {
+        background-color: #202c33; padding: 10px 15px; display: flex; align-items: center;
+        z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: opacity 2.5s ease;
+    }
+
+    .profile-pic {
+        width: 40px; height: 40px; background-color: #3b4a54; border-radius: 50%;
+        margin-right: 12px; display: flex; justify-content: center; align-items: center; 
+        overflow: hidden; background-image: url('dp.jpg'); background-size: cover; background-position: center;
+    }
+    
+    .default-avatar {
+        background-color: #cfd8dc; color: #fff; font-size: 24px; font-weight: bold; background-image: none !important;
+    }
+
+    .contact-info { display: flex; flex-direction: column; justify-content: center; }
+    .contact-name { font-size: 1.05rem; font-weight: 500; color: #e9edef; line-height: 1.2; }
+    .status { font-size: 0.8rem; color: #8696a0; height: 16px; line-height: 16px; margin-top: 2px;}
+
+    #chat-body {
+        flex: 1; background-color: #0b141a;
+        background-image: linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+        background-size: cover; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth;
+    }
+
+    #chat-body::-webkit-scrollbar, #fb-msg-container::-webkit-scrollbar { display: none; }
+
+    .message-wrapper {
+        display: flex; width: 100%; margin-bottom: 8px; opacity: 0;
+        transform: translateY(10px); animation: fadeInUp 0.6s ease forwards;
+        background: transparent !important;
+    }
+    .message-wrapper.sent { justify-content: flex-end; }
+    .message-wrapper.received { justify-content: flex-start; }
+
+    .message {
+        width: fit-content; max-width: 80%; padding: 6px 8px 6px 10px; border-radius: 8px; 
+        position: relative; line-height: 1.3; box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 8px;
+    }
+
+    .sent .message { background-color: #005c4b; border-top-right-radius: 0; color: #e9edef; }
+    .received .message { background-color: #202c33; border-top-left-radius: 0; color: #e9edef; }
+
+    .text { font-size: 0.95rem; word-wrap: break-word; }
+    
+    .meta { display: flex; align-items: center; gap: 4px; float: right; margin-bottom: -2px; margin-right: -2px; }
+    .time { font-size: 0.65rem; color: rgba(255,255,255,0.55); }
+    .ticks { font-size: 0.75rem; color: #8696a0; }
+    .ticks.read { color: #53bdeb; }
+
+    .date-header { display: flex; justify-content: center; margin: 12px 0; width: 100%; opacity: 0; animation: fadeInUp 1s ease forwards; }
+    .date-badge { background-color: #182229; color: #8696a0; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; width: fit-content; box-shadow: 0 1px 1px rgba(0,0,0,0.3); text-transform: uppercase; }
+
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+    .typing-indicator { font-style: italic; color: #8696a0; }
+    .fade-out { opacity: 0.1 !important; filter: blur(5px) !important; }
+    
+    #target-msg { z-index: 50; box-shadow: 0 0 20px rgba(0,0,0,0.7); }
+
+    /* --- FLASHBACK OVERLAY (DYNAMIC APP SWITCHER) --- */
+    #flashback-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #0b141a; z-index: 60;
+        display: none; flex-direction: column; opacity: 0; transition: opacity 1s ease;
+    }
+
+    #fb-header {
+        display: flex; align-items: center; padding: 10px 15px; z-index: 75;
+        position: sticky; top: 0; transition: background 0.1s, border 0.1s;
+    }
+    .fb-back { font-size: 1.5rem; margin-right: 12px; color: #fff; opacity: 0.7; }
+    .fb-pic { 
+        width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; 
+        align-items: center; margin-right: 12px; overflow: hidden; background-size: cover; background-position: center;
+    }
+    .fb-info { display: flex; flex-direction: column; justify-content: center; }
+    .fb-name { font-size: 1.05rem; font-weight: 500; color: #e9edef; line-height: 1.2; }
+    .fb-status { font-size: 0.8rem; color: #8696a0; height: 16px; margin-top: 2px;}
+
+    #fb-msg-container { 
+        flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; scroll-behavior: smooth; 
+        background-color: #0b141a; background-size: cover;
+    }
+
+    /* THEME: WhatsApp (BLOCKED STATE) */
+    .theme-wa #fb-header { background-color: #202c33; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+    .theme-wa .fb-status { display: none !important; } 
+    .theme-wa #fb-msg-container { background-image: linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
+    .theme-wa .message.sent { background-color: #005c4b; border-radius: 8px 0 8px 8px; }
+
+    /* THEME: iMessage / SMS (BLOCKED / FALLBACK STATE) */
+    .theme-sms #fb-header { background: rgba(28, 28, 30, 0.95); border-bottom: 1px solid #333; }
+    .theme-sms .fb-status { display: none !important; }
+    .theme-sms #fb-msg-container { background: #000; }
+    .theme-sms .message-wrapper.sent { justify-content: flex-end; flex-direction: column; align-items: flex-end; }
+    .theme-sms .message.sent { background-color: #34c759; border-radius: 18px 18px 4px 18px; padding: 8px 12px; color: #fff; gap: 0;}
+    .theme-sms .meta { display: none; } 
+    .not-delivered { color: #ff3b30; font-size: 0.75rem; font-weight: 500; margin-top: 4px; display: block; }
+
+    /* THEME: Instagram (BLOCKED STATE) */
+    .theme-ig #fb-header { background: #000; border-bottom: 1px solid #262626; }
+    .theme-ig .fb-status { display: none !important; }
+    .theme-ig .fb-pic { background: #262626 !important; border: none; } 
+    .theme-ig #fb-msg-container { background: #000; }
+    .theme-ig .message.sent { background: #262626; border-radius: 18px; padding: 8px 12px; }
+    .theme-ig .meta { display: none; }
+
+    /* System Warnings */
+    .sys-msg { text-align: center; color: #8696a0; font-size: 0.8rem; margin: 15px 0; width: 100%; animation: snapFocus 0.4s forwards; }
+
+    /* --- SPECIFIC SNAPCHAT SEARCH OVERLAY --- */
+    #snap-search-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: #0f0f0f; z-index: 85; display: none; flex-direction: column;
+        opacity: 0; transition: opacity 0.2s ease;
+    }
+    
+    .snap-top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: #fff; font-size: 1.2rem; font-weight: 600; padding-top: 40px; }
+    .snap-search-input-container { padding: 0 15px; margin-top: 5px; }
+    .snap-search-bar { background-color: #262626; border-radius: 20px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; }
+    .snap-search-text { color: #fff; font-size: 1rem; flex: 1; margin-left: 10px; font-weight: 500; }
+    .snap-center-result { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-bottom: 20%; }
+    .snap-poop { font-size: 3rem; margin-bottom: 10px; }
+    .snap-no-results-text { color: #fff; font-size: 1.1rem; font-weight: 500; }
+    .snap-keyboard-fake { height: 280px; width: 100%; background: #1a1a1a; position: absolute; bottom: 0; border-top: 1px solid #333; display: flex; justify-content: center; padding-top: 10px; color: #555; font-size: 0.8rem; }
+
+    /* --- GLITCH & PANIC EFFECTS --- */
+    .app-switch-glitch { animation: uiGlitch 0.2s linear forwards; }
+    @keyframes uiGlitch {
+        0% { filter: contrast(1); transform: translate(0); }
+        25% { filter: invert(0.8) hue-rotate(90deg); transform: translate(-3px, 2px); }
+        50% { filter: contrast(2) hue-rotate(-90deg); transform: translate(3px, -2px); }
+        75% { filter: invert(0.2); transform: translate(-2px, -1px); }
+        100% { filter: contrast(1); transform: translate(0); }
+    }
+
+    .memory-pop { opacity: 0; transform: translateY(5px); animation: snapFocus 0.2s ease-out forwards; }
+    @keyframes snapFocus { to { opacity: 1; transform: translateY(0); } }
+
+    .panic-shake { animation: anxietyTremble 0.15s linear infinite alternate !important; }
+    @keyframes anxietyTremble {
+        0% { transform: scale(1.01) translate(1px, 0); }
+        100% { transform: scale(1.01) translate(-1px, 0); }
+    }
+
+    /* --- GHOST TEXT --- */
+    #ghost-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 65; pointer-events: none; overflow: hidden; }
+    .ghost-word { position: absolute; color: rgba(255, 255, 255, 0.08); font-size: 2.5rem; font-weight: 900; font-style: italic; white-space: nowrap; animation: ghostFade 2.5s ease-in-out forwards; }
+    @keyframes ghostFade { 0% { opacity: 0; transform: scale(0.9) translate(-50%, -50%); filter: blur(4px); } 40% { opacity: 1; transform: scale(1.05) translate(-50%, -50%); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.2) translate(-50%, -50%); filter: blur(6px); } }
+
+    /* --- CALL OVERLAY --- */
+    #call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #121b22; z-index: 90; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 20%; opacity: 0; transition: opacity 0.2s; }
+    .call-avatar { width: 90px; height: 90px; background-color: #cfd8dc; border-radius: 50%; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
+    .call-name { font-size: 1.6rem; font-weight: 400; color: #fff; margin-bottom: 8px; }
+    .call-status { font-size: 1rem; color: #8696a0; }
+    .end-call-btn { width: 60px; height: 60px; background-color: #f15c6d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; transform: rotate(135deg); position: absolute; bottom: 15%;}
+
+    /* --- FINAL SCREENS --- */
+    #white-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 100; opacity: 0; pointer-events: none; }
+    .trigger-flash { animation: flashAnim 1s forwards; }
+    @keyframes flashAnim { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+
+    /* --- TYPEWRITER TEXT EFFECT --- */
+    #quote-screen { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; 
+        z-index: 200; display: flex; flex-direction: column; justify-content: center; 
+        align-items: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 3s ease; 
+    }
+    
+    .quote-line { 
+        color: #8c8c8c; font-family: Georgia, serif; font-size: 1.05rem; 
+        line-height: 1.8; text-align: center; margin-bottom: 30px; 
+    }
+</style>
 </head>
 <body>
 
-    <button id="play-btn">Click Here</button>
-    
-    <div id="audio-container"></div>
+<div id="start-screen" onclick="startExperience()">
+    <div id="start-btn">Tap here..</div>
+</div>
 
-    <script>
-        document.getElementById('play-btn').addEventListener('click', function() {
-            // 1. Hide the button completely so the screen is just black
-            this.style.display = 'none';
+<div id="phone-container">
+    <!-- Initial WhatsApp Header -->
+    <div id="header">
+        <div class="profile-pic"></div>
+        <div class="contact-info">
+            <div class="contact-name">Mannu</div>
+            <div class="status" id="status-text"></div>
+        </div>
+    </div>
+    
+    <div id="chat-body"></div>
+    <div id="white-flash"></div>
+    
+    <!-- Dynamic Flashback Container -->
+    <div id="flashback-overlay">
+        <div id="fb-header" class="theme-wa">
+            <div class="fb-back">‹</div>
+            <div class="fb-pic default-avatar" id="fb-pic-el">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="fb-info">
+                <div class="fb-name" id="fb-name-el">Mannu</div>
+                <div class="fb-status" id="fb-status-el"></div> 
+            </div>
+        </div>
+        <div id="fb-msg-container" class="theme-wa"></div>
+    </div>
+
+    <!-- Snapchat Search Reject Screen Overlay -->
+    <div id="snap-search-screen">
+        <div class="snap-top-bar">
+            <span>‹</span>
+            <span>Add Friends</span>
+            <span>•••</span>
+        </div>
+        <div class="snap-search-input-container">
+            <div class="snap-search-bar">
+                <span style="color:#888; font-size:1.1rem">🔍</span>
+                <span class="snap-search-text">meghapant121<span style="color:#3498db">|</span></span>
+                <span style="background:#444; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-size:12px">✖</span>
+            </div>
+        </div>
+        <div class="snap-center-result">
+            <div class="snap-poop">💩</div>
+            <div class="snap-no-results-text">No results</div>
+        </div>
+        <div class="snap-keyboard-fake">[ Keyboard Interface ]</div>
+    </div>
+
+    <div id="ghost-container"></div>
+    
+    <!-- Call Reject Overlay -->
+    <div id="call-overlay">
+        <div class="call-avatar">
+            <svg viewBox="0 0 24 24" width="60" height="60" fill="#fff" style="margin-top:15px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div class="call-name" id="call-title">+91 92XXXXXX85</div>
+        <div class="call-status" id="call-status">Dialing...</div>
+        <div class="end-call-btn">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M17 19.22H5V7h7V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h-2v7zM19 2h-8v2h5.59L5 15.59 6.41 17 18 5.41V11h2V2z"/></svg>
+        </div>
+    </div>
+</div>
+
+<!-- Empty containers for the clean JS Typewriter effect -->
+<div id="quote-screen">
+    <div class="quote-line" id="line1"></div>
+    <div class="quote-line" id="line2"></div>
+    <div class="quote-line" id="line3"></div>
+</div>
+
+<audio id="bg-music" src="babydoll.mp3" preload="auto"></audio>
+
+<script>
+    const chatBody = document.getElementById('chat-body');
+    const statusText = document.getElementById('status-text');
+    const phoneContainer = document.getElementById('phone-container');
+    const whiteFlash = document.getElementById('white-flash');
+    
+    const flashbackOverlay = document.getElementById('flashback-overlay');
+    const fbHeader = document.getElementById('fb-header');
+    const fbMsgContainer = document.getElementById('fb-msg-container');
+    const snapSearchScreen = document.getElementById('snap-search-screen');
+    const ghostContainer = document.getElementById('ghost-container');
+    const callOverlay = document.getElementById('call-overlay');
+    
+    const bgMusic = document.getElementById('bg-music');
+    const quoteScreen = document.getElementById('quote-screen');
+
+    let ghostInterval;
+
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const scrollToBottom = (element) => { element.scrollTop = element.scrollHeight; };
+
+    const createBaseMessage = (text, type, time, ticksClass = 'read', isTarget = false) => {
+        const id = isTarget ? 'id="target-msg"' : '';
+        const tickHTML = type === 'sent' ? `<span class="ticks ${ticksClass}">✓✓</span>` : '';
+        return `
+            <div class="message-wrapper ${type} msg-item">
+                <div class="message" ${id}>
+                    <span class="text">${text}</span>
+                    <span class="meta">
+                        <span class="time">${time}</span>
+                        ${tickHTML}
+                    </span>
+                </div>
+            </div>
+        `;
+    };
+
+    const createUnansweredCallMsg = (time) => {
+        return `
+            <div class="message-wrapper sent msg-item">
+                <div class="message" style="display:flex; gap: 12px; align-items:center; padding: 8px 10px;">
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center;">
+                        <span style="font-size: 1.1rem; transform: rotate(135deg); color: #8696a0;">📞</span>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.95rem; font-weight: 500;">Voice call</div>
+                        <div style="font-size: 0.75rem; color: #8696a0;">Unanswered</div>
+                    </div>
+                    <div class="meta" style="margin-left: 10px; align-self: flex-end;">
+                        <span class="time">${time}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    const createDynamicMessage = (text, app) => {
+        let textContent = text;
+        let extraHTML = '';
+        if (app === 'sms') extraHTML = `<span class="not-delivered">Not Delivered !</span>`;
+
+        let metaHTML = '';
+        if (app === 'wa') {
+            metaHTML = `<span class="meta"><span class="ticks single">✓</span></span>`;
+        }
+        
+        return `
+            <div class="message-wrapper sent msg-item memory-pop">
+                <div class="message">
+                    <span class="text">${textContent}</span>
+                    ${metaHTML}
+                </div>
+                ${extraHTML}
+            </div>
+        `;
+    };
+
+    const createSystemMsg = (text) => `<div class="sys-msg memory-pop">${text}</div>`;
+    const createDateBadge = (dateStr) => `<div class="date-header msg-item memory-pop"><div class="date-badge">${dateStr}</div></div>`;
+
+    function playAudioWithFadeIn() {
+        bgMusic.volume = 0; bgMusic.play().catch(() => {});
+        let vol = 0;
+        const fadeInterval = setInterval(() => {
+            if (vol < 1.0) { vol += 0.05; bgMusic.volume = Math.min(vol, 1); } 
+            else { clearInterval(fadeInterval); }
+        }, 25); 
+    }
+
+    function spawnGhostText() {
+        const span = document.createElement('div');
+        span.classList.add('ghost-word'); span.innerText = "Move on?";
+        span.style.left = `${Math.floor(Math.random() * 70) + 10}%`;
+        span.style.top = `${Math.floor(Math.random() * 80) + 10}%`;
+        ghostContainer.appendChild(span);
+        setTimeout(() => { if (ghostContainer.contains(span)) ghostContainer.removeChild(span); }, 2500);
+    }
+
+    async function triggerAppGlitch(newPlatform) {
+        phoneContainer.classList.add('app-switch-glitch');
+        await sleep(100); 
+        
+        if (newPlatform === 'snap') {
+            snapSearchScreen.style.display = 'flex';
+            snapSearchScreen.style.opacity = '1';
+        } else {
+            snapSearchScreen.style.opacity = '0';
+            setTimeout(() => snapSearchScreen.style.display = 'none', 200);
+
+            fbHeader.className = `theme-${newPlatform}`;
+            fbMsgContainer.className = `theme-${newPlatform}`;
             
-            // 2. Inject the YouTube video as an invisible 0x0 iframe that plays instantly
-            // Note: 'DC-cqWO_GM0' is the video ID from the link you shared earlier.
-            document.getElementById('audio-container').innerHTML = 
-                '<iframe width="0" height="0" src="https://www.youtube.com/embed/DC-cqWO_GM0?autoplay=1&mute=0" frameborder="0" allow="autoplay"></iframe>';
-        });
-    </script>
+            const nameEl = document.getElementById('fb-name-el');
+            const picEl = document.getElementById('fb-pic-el');
+
+            if(newPlatform === 'sms') {
+                nameEl.innerText = '+91 92XXXXXX85';
+                picEl.innerHTML = '<span style="color:#fff;font-size:18px">👤</span>';
+                picEl.style.backgroundColor = '#666';
+            }
+            else if(newPlatform === 'ig') {
+                nameEl.innerText = 'Instagram User'; 
+                picEl.innerHTML = ''; 
+                picEl.style.backgroundColor = '#262626';
+            }
+            else { 
+                nameEl.innerText = 'Mannu';
+                picEl.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                picEl.style.backgroundColor = '#cfd8dc';
+            }
+        }
+
+        await sleep(100);
+        phoneContainer.classList.remove('app-switch-glitch');
+    }
+
+    async function triggerCallScreen() {
+        const title = document.getElementById('call-title');
+        const status = document.getElementById('call-status');
+        
+        callOverlay.style.display = 'flex'; await sleep(20); callOverlay.style.opacity = '1';
+
+        title.innerText = '+91 92XXXXXX85'; status.innerText = 'Dialing...'; status.style.color = '#8696a0';
+        await sleep(600);
+
+        title.innerText = 'Mannu'; status.innerText = 'Calling...';
+        await sleep(800);
+
+        status.innerText = 'Rejected / Blocked'; status.style.color = '#f15c6d';
+        callOverlay.classList.add('panic-shake');
+        callOverlay.style.backgroundColor = 'rgba(241, 92, 109, 0.15)';
+
+        await sleep(800); // Wait long enough to clearly see the rejection
+        
+        callOverlay.classList.remove('panic-shake'); callOverlay.style.opacity = '0';
+        await sleep(200); callOverlay.style.display = 'none'; callOverlay.style.backgroundColor = '#121b22';
+    }
+
+    async function startExperience() {
+        document.getElementById('start-screen').style.opacity = '0';
+        setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
+
+        await sleep(1500); 
+        chatBody.innerHTML += createDateBadge('Today'); await sleep(1000);
+
+        chatBody.innerHTML += createBaseMessage('Hi', 'sent', '10:57 PM', 'read'); scrollToBottom(chatBody);
+        await sleep(2000); 
+        
+        chatBody.innerHTML += createUnansweredCallMsg('10:58 PM'); scrollToBottom(chatBody);
+        await sleep(2500); 
+
+        statusText.innerText = 'typing...'; statusText.classList.add('typing-indicator');
+
+        await sleep(2500); statusText.innerText = 'online'; statusText.classList.remove('typing-indicator');
+        
+        chatBody.innerHTML += createBaseMessage('?', 'received', '10:58 PM'); scrollToBottom(chatBody);
+        await sleep(1500); statusText.innerText = 'typing...'; statusText.classList.add('typing-indicator');
+
+        await sleep(3500); statusText.innerText = ''; statusText.classList.remove('typing-indicator');
+
+        playAudioWithFadeIn();
+
+        const longText = "Adarsh please maine phele bhi bola tha firse bol rahi hu mtt kro mujhe text mseg kuch bhi ek month se jyada ho gya ab tk to ho gya hoga Move on number kyu rkha h hta do permanent mtt kro text call mujhe";
+        chatBody.innerHTML += createBaseMessage(longText, 'received', '10:59 PM'); scrollToBottom(chatBody);
+
+        await sleep(4000); 
+        chatBody.innerHTML += createBaseMessage('Move on??', 'sent', '10:59 PM', 'read', true); scrollToBottom(chatBody);
+
+        await sleep(2000); await triggerCinematicTransition();
+    }
+
+    async function triggerCinematicTransition() {
+        const allOtherMsgs = document.querySelectorAll('.msg-item:not(#target-msg)');
+        phoneContainer.classList.add('cinematic-darken');
+        allOtherMsgs.forEach(msg => msg.classList.add('fade-out')); 
+        document.getElementById('header').classList.add('fade-out');
+
+        await sleep(2500); 
+
+        whiteFlash.classList.add('trigger-flash');
+        await sleep(150); 
+        flashbackOverlay.style.display = 'flex'; 
+        flashbackOverlay.style.opacity = '1';
+
+        await generateFlashback();
+    }
+
+    async function generateFlashback() {
+        const startDate = new Date(2026, 3, 7); const endDate = new Date(2026, 4, 4);   
+        let currentDate = new Date(startDate); let dayCount = 0; 
+
+        while (currentDate <= endDate) {
+            dayCount++;
+            const month = currentDate.toLocaleString('default', { month: 'short' });
+            const day = currentDate.getDate();
+            
+            fbMsgContainer.innerHTML += createDateBadge(`${month} ${day}`);
+            scrollToBottom(fbMsgContainer);
+            
+            // --- OPTIMIZED, GUARANTEED NARRATIVE ---
+            
+            // Phase 1: Slow Denial (WhatsApp)
+            if (dayCount <= 8) {
+                await sleep(400); 
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
+                scrollToBottom(fbMsgContainer); await sleep(600); 
+            } 
+            
+            // Phase 2: Desperation Switch (SMS)
+            else if (dayCount === 9) {
+                await triggerAppGlitch('sms');
+                await sleep(500);
+                fbMsgContainer.innerHTML += createDynamicMessage("unblock?", 'sms');
+                scrollToBottom(fbMsgContainer); await sleep(800); 
+            }
+            
+            // Phase 3: Blocked on Instagram
+            else if (dayCount === 10) {
+                await triggerAppGlitch('ig');
+                await sleep(500);
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'ig');
+                scrollToBottom(fbMsgContainer); await sleep(300);
+                fbMsgContainer.innerHTML += createSystemMsg("You can't reply to this conversation.");
+                scrollToBottom(fbMsgContainer); await sleep(1200); // Let the rejection hurt
+            }
+            
+            // Phase 4: First Panic Call
+            else if (dayCount === 11) {
+                await triggerAppGlitch('wa');
+                await sleep(500);
+                await triggerCallScreen();
+            }
+            
+            // Phase 5: The Snapchat Reality Check
+            else if (dayCount === 12) {
+                await triggerAppGlitch('snap');
+                await sleep(2500); // Force the user to stare at the "No results" screen
+            }
+
+            // Phase 6: Second Call & Full Breakdown
+            else if (dayCount === 13) {
+                await triggerAppGlitch('wa');
+                await sleep(300);
+                await triggerCallScreen();
+            }
+
+            // Phase 7: The Flood (Violent WA Spam)
+            else if (dayCount >= 14 && dayCount <= 17) {
+                flashbackOverlay.classList.add('panic-shake');
+                if (!ghostInterval) {
+                    ghostInterval = setInterval(() => { spawnGhostText(); }, 800); // Intrusive thoughts kick in hard
+                }
+                
+                for(let i = 0; i < 3; i++) {
+                    const spamTexts = ["hi", "mannu ek baar unblock kardo", "hi"];
+                    fbMsgContainer.innerHTML += createDynamicMessage(spamTexts[i], 'wa');
+                    scrollToBottom(fbMsgContainer);
+                    await sleep(150); // extremely fast panic texting
+                }
+            }
+            
+            // Phase 8: Acceptance / Exhaustion (Slow WA again)
+            else {
+                flashbackOverlay.classList.remove('panic-shake');
+                clearInterval(ghostInterval); ghostInterval = null; // Thoughts fade
+                
+                await sleep(500); 
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
+                scrollToBottom(fbMsgContainer); await sleep(700); 
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        await sleep(2000); await triggerFinalEnding();
+    }
+
+    // Clean Typewriter effect
+    async function typeWriter(elementId, text) {
+        const el = document.getElementById(elementId);
+        el.style.opacity = '1'; 
+        el.style.transform = 'translateY(0)';
+        el.innerHTML = ''; // clear first
+        
+        for (let i = 0; i < text.length; i++) {
+            el.innerHTML += text[i];
+            await sleep(35); // Fast, clean typing speed
+        }
+    }
+
+    async function triggerFinalEnding() {
+        quoteScreen.style.opacity = '1'; await sleep(2500); 
+
+        await typeWriter('line1', "Just because you found people to replace me doesn’t mean you felt what I felt.");
+        await sleep(1200);
+        await typeWriter('line2', "You moved on fast because your love was weak, mine stayed because it was real.");
+        await sleep(1200);
+        await typeWriter('line3', "But I’m never coming back. The person I loved doesn’t exist anymore, and you’ve become the person I hate the most.");
+    }
+</script>
+
 </body>
 </html>
