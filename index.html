@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cinematic Chat Narrative</title>
+<title>Move on?</title>
 <style>
     * {
         margin: 0; padding: 0; box-sizing: border-box;
@@ -353,14 +353,22 @@
         `;
     };
 
-    const createDynamicMessage = (text, app) => {
+    const createDynamicMessage = (text, app, timeOverride = null) => {
         let textContent = text;
         let extraHTML = '';
         if (app === 'sms') extraHTML = `<span class="not-delivered">Not Delivered !</span>`;
 
         let metaHTML = '';
         if (app === 'wa') {
-            metaHTML = `<span class="meta"><span class="ticks single">✓</span></span>`;
+            // Generate random time if none is provided
+            let timeStr = timeOverride;
+            if (!timeStr) {
+                let h = Math.floor(Math.random() * 12) + 1;
+                let m = Math.floor(Math.random() * 59).toString().padStart(2, '0');
+                let ampm = Math.random() > 0.5 ? 'AM' : 'PM';
+                timeStr = `${h}:${m} ${ampm}`;
+            }
+            metaHTML = `<span class="meta"><span class="time">${timeStr}</span><span class="ticks single">✓</span></span>`;
         }
         
         return `
@@ -378,7 +386,6 @@
     const createDateBadge = (dateStr) => `<div class="date-header msg-item memory-pop"><div class="date-badge">${dateStr}</div></div>`;
 
     function playAudioWithFadeIn() {
-        bgMusic.volume = 0; bgMusic.play().catch(() => {});
         let vol = 0;
         const fadeInterval = setInterval(() => {
             if (vol < 1.0) { vol += 0.05; bgMusic.volume = Math.min(vol, 1); } 
@@ -449,13 +456,17 @@
         callOverlay.classList.add('panic-shake');
         callOverlay.style.backgroundColor = 'rgba(241, 92, 109, 0.15)';
 
-        await sleep(800); // Wait long enough to clearly see the rejection
+        await sleep(800); 
         
         callOverlay.classList.remove('panic-shake'); callOverlay.style.opacity = '0';
         await sleep(200); callOverlay.style.display = 'none'; callOverlay.style.backgroundColor = '#121b22';
     }
 
     async function startExperience() {
+        // Unlock audio context safely on first user interaction
+        bgMusic.volume = 0; 
+        bgMusic.play().catch(e => console.log("Audio unlock failed: ", e));
+
         document.getElementById('start-screen').style.opacity = '0';
         setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
 
@@ -516,12 +527,18 @@
             fbMsgContainer.innerHTML += createDateBadge(`${month} ${day}`);
             scrollToBottom(fbMsgContainer);
             
-            // --- OPTIMIZED, GUARANTEED NARRATIVE ---
+            // --- GUARANTEED NARRATIVE STRUCTURE ---
             
             // Phase 1: Slow Denial (WhatsApp)
             if (dayCount <= 8) {
                 await sleep(400); 
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
+                let numRandom = Math.floor(Math.random() * 3) + 1; // 1 to 3 random texts
+                for(let i=0; i<numRandom; i++) {
+                    fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
+                    scrollToBottom(fbMsgContainer); await sleep(500); 
+                }
+                // Mandatory 11:11 PM text
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
                 scrollToBottom(fbMsgContainer); await sleep(600); 
             } 
             
@@ -530,6 +547,8 @@
                 await triggerAppGlitch('sms');
                 await sleep(500);
                 fbMsgContainer.innerHTML += createDynamicMessage("unblock?", 'sms');
+                scrollToBottom(fbMsgContainer); await sleep(500); 
+                fbMsgContainer.innerHTML += createDynamicMessage("kardo unblock", 'sms', "11:11 PM");
                 scrollToBottom(fbMsgContainer); await sleep(800); 
             }
             
@@ -540,7 +559,7 @@
                 fbMsgContainer.innerHTML += createDynamicMessage("hi", 'ig');
                 scrollToBottom(fbMsgContainer); await sleep(300);
                 fbMsgContainer.innerHTML += createSystemMsg("You can't reply to this conversation.");
-                scrollToBottom(fbMsgContainer); await sleep(1200); // Let the rejection hurt
+                scrollToBottom(fbMsgContainer); await sleep(1200); 
             }
             
             // Phase 4: First Panic Call
@@ -548,12 +567,15 @@
                 await triggerAppGlitch('wa');
                 await sleep(500);
                 await triggerCallScreen();
+                // Follow up text after the dropped call
+                fbMsgContainer.innerHTML += createDynamicMessage("mannu ek baar unblock kardo", 'wa', "11:11 PM");
+                scrollToBottom(fbMsgContainer); await sleep(600);
             }
             
             // Phase 5: The Snapchat Reality Check
             else if (dayCount === 12) {
                 await triggerAppGlitch('snap');
-                await sleep(2500); // Force the user to stare at the "No results" screen
+                await sleep(2500); 
             }
 
             // Phase 6: Second Call & Full Breakdown
@@ -561,31 +583,41 @@
                 await triggerAppGlitch('wa');
                 await sleep(300);
                 await triggerCallScreen();
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
+                scrollToBottom(fbMsgContainer); await sleep(400);
             }
 
             // Phase 7: The Flood (Violent WA Spam)
             else if (dayCount >= 14 && dayCount <= 17) {
                 flashbackOverlay.classList.add('panic-shake');
                 if (!ghostInterval) {
-                    ghostInterval = setInterval(() => { spawnGhostText(); }, 800); // Intrusive thoughts kick in hard
+                    ghostInterval = setInterval(() => { spawnGhostText(); }, 800); 
                 }
                 
-                for(let i = 0; i < 3; i++) {
+                let numRandom = Math.floor(Math.random() * 3) + 2; // 2 to 4 rapid texts
+                for(let i=0; i<numRandom; i++) {
                     const spamTexts = ["hi", "mannu ek baar unblock kardo", "hi"];
-                    fbMsgContainer.innerHTML += createDynamicMessage(spamTexts[i], 'wa');
+                    fbMsgContainer.innerHTML += createDynamicMessage(spamTexts[Math.floor(Math.random() * 3)], 'wa');
                     scrollToBottom(fbMsgContainer);
-                    await sleep(150); // extremely fast panic texting
+                    await sleep(150); 
                 }
+                // Mandatory 11:11 PM
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
+                scrollToBottom(fbMsgContainer); await sleep(150);
             }
             
             // Phase 8: Acceptance / Exhaustion (Slow WA again)
             else {
                 flashbackOverlay.classList.remove('panic-shake');
-                clearInterval(ghostInterval); ghostInterval = null; // Thoughts fade
+                clearInterval(ghostInterval); ghostInterval = null; 
                 
                 await sleep(500); 
                 fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
-                scrollToBottom(fbMsgContainer); await sleep(700); 
+                scrollToBottom(fbMsgContainer); await sleep(500); 
+                
+                // Final 11:11 PM text of the day
+                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
+                scrollToBottom(fbMsgContainer); await sleep(700);
             }
 
             currentDate.setDate(currentDate.getDate() + 1);
@@ -594,16 +626,15 @@
         await sleep(2000); await triggerFinalEnding();
     }
 
-    // Clean Typewriter effect
     async function typeWriter(elementId, text) {
         const el = document.getElementById(elementId);
         el.style.opacity = '1'; 
         el.style.transform = 'translateY(0)';
-        el.innerHTML = ''; // clear first
+        el.innerHTML = ''; 
         
         for (let i = 0; i < text.length; i++) {
             el.innerHTML += text[i];
-            await sleep(35); // Fast, clean typing speed
+            await sleep(35); 
         }
     }
 
