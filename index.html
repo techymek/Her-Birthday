@@ -1,653 +1,649 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Move on?</title>
-<style>
-    * {
-        margin: 0; padding: 0; box-sizing: border-box;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meri Pyari Mannu ❤️</title>
+    <style>
+        /* --- GLOBAL VARIABLES --- */
+        :root { --pink: #ff4d6d; --deep-rose: #8d0033; --chocolate: #3e2723; }
+        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+        body { background: #ffc0cb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; cursor: none; height: 100vh; width: 100vw; }
 
-    body {
-        background-color: #000; height: 100vh; display: flex; justify-content: center;
-        align-items: center; overflow: hidden; color: #e9edef;
-    }
+        /* --- BLADE & CURSOR --- */
+        #sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); }
+        .slash { position: fixed; width: 150px; height: 5px; background: linear-gradient(90deg, transparent, white, white, transparent); pointer-events: none; z-index: 9999; animation: slashFade 0.4s forwards; }
+        @keyframes slashFade { 0% { opacity: 1; transform: scaleX(0.2); } 100% { opacity: 0; transform: scaleX(1.6); } }
 
-    #start-screen {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: #000; display: flex; justify-content: center; align-items: center;
-        z-index: 300; cursor: pointer; transition: opacity 1.5s ease;
-    }
+        /* --- 1. LOADING SCREEN --- */
+        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; overflow: hidden; padding: 20px; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        /* 14 Feb Rain Fix */
+        .rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
+        .rain-text { position: absolute; top: -50px; color: rgba(255, 255, 255, 0.6); font-weight: bold; font-family: 'Arial', sans-serif; animation: fallDown linear infinite; white-space: nowrap; }
+        @keyframes fallDown { to { transform: translateY(110vh); } }
 
-    #start-btn {
-        padding: 15px 30px; color: rgba(255, 255, 255, 0.5); font-size: 1.1rem;
-        letter-spacing: 3px; text-transform: lowercase; animation: pulseText 3s infinite alternate;
-    }
+        .start-card { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 2; width: 100%; max-width: 420px; color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
+        .start-card h1 { font-size: clamp(28px, 5vw, 36px); margin-bottom: 10px; font-weight: 800; }
+        .start-card p { font-size: 16px; margin-bottom: 20px; opacity: 0.9; font-weight: 600; }
+        .loader-heart { font-size: 45px; animation: bounceHeart 0.8s infinite alternate; margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5)); }
+        @keyframes bounceHeart { from { transform: scale(1); } to { transform: scale(1.15); } }
+        .loader-container { width: 100%; background: rgba(255,255,255,0.4); height: 10px; border-radius: 20px; overflow: hidden; margin-bottom: 15px; position: relative; }
+        .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff758f, #ff4d6d); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); transition: width 0.1s linear; }
+        #loadingText { font-size: 14px; font-weight: 700; min-height: 25px; color: var(--deep-rose); letter-spacing: 0.5px; }
+        #startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; transition: 0.3s; }
+        @keyframes popBtn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    @keyframes pulseText { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+        /* --- 2. INTRO SCENE --- */
+        #introScene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffc0cb; z-index: 8500; display: none; justify-content: center; align-items: center; overflow: hidden; padding: 20px; }
+        #valentineText { position: absolute; width: 100%; text-align: center; font-size: clamp(28px, 5vw, 48px); color: #ff0055; font-weight: bold; opacity: 0; transform: scale(0.5); text-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #birthdayText { position: absolute; width: 100%; text-align: center; font-size: clamp(32px, 6vw, 60px); color: #d00000; font-weight: 900; opacity: 0; text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); font-family: 'Arial Black', sans-serif; white-space: normal; line-height: 1.2; }
+        .pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { 0% { opacity:0; transform: scale(0.5); } 100% { opacity:1; transform: scale(1); } }
+        .crash-in { animation: crashIn 0.4s ease-in forwards; }
+        @keyframes crashIn { 0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } }
+        .knockout { animation: flyOut 0.8s ease-out forwards; }
+        @keyframes flyOut { 0% { transform: translate(0,0) rotate(0deg); } 20% { transform: translate(-20px, 20px) rotate(-10deg); } 100% { transform: translate(-150vw, -50vh) rotate(-120deg); opacity: 0; } }
+        .screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-5px, 0, 0); } 20%, 80% { transform: translate3d(10px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-10px, 0, 0); } 40%, 60% { transform: translate3d(10px, 0, 0); } }
+        #impactFlash { position: fixed; top:0; left:0; width:100%; height:100%; background: white; opacity: 0; pointer-events: none; z-index: 8600; }
+        .flash-now { animation: flashAnim 0.3s ease-out forwards; }
+        @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
+        #letsGoBtn { position: absolute; bottom: 15%; font-size: 20px; padding: 15px 40px; z-index: 9999; display: none; animation: fadeInBtn 1s; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; }
+        @keyframes fadeInBtn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    #phone-container {
-        width: 100%; max-width: 400px; height: 100vh; max-height: 850px;
-        background-color: #0b141a; position: relative; display: flex; flex-direction: column;
-        overflow: hidden; filter: grayscale(0.1) contrast(1.02); 
-        box-shadow: 0 0 50px rgba(0,0,0,0.9); transition: box-shadow 3s ease, filter 3s ease;
-    }
+        /* --- 3. GAME HUD & UI --- */
+        #gameHUD { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; z-index: 7000; background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink); width: auto; min-width: 280px; justify-content: space-around; }
+        .hud-item { display: flex; flex-direction: column; align-items: center; }
+        .hud-label { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .hud-icon { width: 28px; height: 28px; object-fit: contain; }
+        #scoreCounter { font-size: 24px; font-weight: 900; color: var(--pink); line-height: 1; }
+        #scoreTotal { font-size: 12px; font-weight: bold; color: #aaa; }
+        #progressWrapper { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 7000; display: none; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px); }
+        #barBase { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; }
+        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff758f, #ff4d6d); transition: 0.2s; }
+        #barText { color: var(--pink); font-weight: bold; margin-top: 3px; font-size: 12px; }
 
-    #phone-container::after {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        box-shadow: inset 0 0 60px rgba(0,0,0,0.8); pointer-events: none; z-index: 20; transition: 3s;
-    }
-    .cinematic-darken::after { box-shadow: inset 0 0 180px rgba(0,0,0,1) !important; }
+        .centerBox { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 30px; z-index: 100; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        button.actionBtn { padding: 12px 25px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; margin: 8px; background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+        #noBtn { background: #adb5bd; position: relative; z-index: 200; border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin: 8px; }
+        .hidden { display: none !important; }
+        
+        #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
+        #beatingHeart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 600; cursor: pointer; text-align: center; }
+        #heartEmoji { font-size: 100px; animation: pBeat 0.8s infinite; }
+        #heartText { color: #ff4d6d; font-size: 24px; font-weight: bold; margin-top: 20px; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 15px rgba(255, 77, 109, 0.6); white-space: nowrap; animation: fadeText 1.5s infinite alternate; }
+        @keyframes pBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
+        #glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
+        
+        /* FRUIT NINJA ITEMS */
+        .toss-item { position: fixed; cursor: crosshair; z-index: 9000; bottom: -300px; user-select: none; pointer-events: auto; padding: 15px; }
+        @keyframes tossUp { 0% { bottom: -300px; transform: rotate(0deg); } 50% { bottom: var(--peakHeight); } 100% { bottom: -300px; transform: rotate(720deg); } }
 
-    /* --- REALISTIC WHATSAPP STYLING --- */
-    #header {
-        background-color: #202c33; padding: 10px 15px; display: flex; align-items: center;
-        z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: opacity 2.5s ease;
-    }
+        /* CUPID FINALE */
+        #cupidFinale { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8000; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
+        #finaleCupid { width: 50vw; max-width: 250px; animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; margin-bottom: 20px; }
+        @keyframes flyInCupid { from { transform: translate(-100vw, -20vh) rotate(-20deg); opacity: 0; } to { transform: translate(0, 0) rotate(0deg); opacity: 1; } }
+        .final-letter-card { background: #fff; padding: 30px 20px; border-radius: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink); animation: popUp 0.5s 1s backwards; display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
+        @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    .profile-pic {
-        width: 40px; height: 40px; background-color: #3b4a54; border-radius: 50%;
-        margin-right: 12px; display: flex; justify-content: center; align-items: center; 
-        overflow: hidden; background-image: url('dp.jpg'); background-size: cover; background-position: center;
-    }
-    
-    .default-avatar {
-        background-color: #cfd8dc; color: #fff; font-size: 24px; font-weight: bold; background-image: none !important;
-    }
+        /* --- 4.5 LOVE WEEK OVERLAY & ANIMATIONS --- */
+        #loveWeekOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 8500; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: background 1s ease; padding: 20px; overflow: hidden;
+        }
+        
+        /* 1. Rose Day - Falling Petal Images */
+        .rose-petal { position: absolute; top: -100px; width: 40px; height: auto; user-select: none; pointer-events: none; animation: fall linear forwards; z-index: 8600; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
+        @keyframes fall { to { transform: translateY(120vh) rotate(720deg); } }
+        
+        /* 2. Chocolate Day - Drippier Effect */
+        #chocolateDrip {
+            position: fixed; top: 0; left: 0; width: 100%; height: 0;
+            background: linear-gradient(to bottom, #3e2723 40%, #5d4037 100%); /* Gradient for depth */
+            z-index: 8400; transition: height 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            border-bottom-left-radius: 50% 100px; border-bottom-right-radius: 50% 100px;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.3), 0 15px 30px rgba(0,0,0,0.4); 
+        }
 
-    .contact-info { display: flex; flex-direction: column; justify-content: center; }
-    .contact-name { font-size: 1.05rem; font-weight: 500; color: #e9edef; line-height: 1.2; }
-    .status { font-size: 0.8rem; color: #8696a0; height: 16px; line-height: 16px; margin-top: 2px;}
+        /* 3. Teddy Day - Bike Drive In (Right to Left & Idle) */
+        .week-img.drive-in { 
+            height: auto; width: 85%; max-width: 500px; 
+            margin-bottom: 10px;
+            animation: vroomRightToLeft 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards, idleBike 2s ease-in-out infinite 0.8s; 
+        }
+        @keyframes vroomRightToLeft { 
+            0% { transform: translateX(150vw) skewX(20deg) scale(0.8); opacity: 0; } 
+            70% { transform: translateX(-20px) skewX(-5deg) scale(1.1); opacity: 1; } 
+            100% { transform: translateX(0) skewX(0) scale(1.2); opacity: 1; } 
+        }
+        @keyframes idleBike {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-3px) translateY(-2px); }
+        }
+        /* Bike Drive OUT (Left) */
+        .week-img.drive-out {
+            animation: vroomOutLeft 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
+        }
+        @keyframes vroomOutLeft {
+            0% { transform: translateX(0) skewX(0) scale(1.2); opacity: 1; }
+            100% { transform: translateX(-150vw) skewX(-20deg) scale(1.2); opacity: 1; }
+        }
 
-    #chat-body {
-        flex: 1; background-color: #0b141a;
-        background-image: linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-        background-size: cover; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth;
-    }
+        /* Smoke Effect */
+        .smoke-particle { position: absolute; bottom: 80px; right: -50px; width: 40px; height: 40px; background: rgba(220,220,220,0.6); border-radius: 50%; animation: smokePuff 1s ease-out forwards; z-index: 8700; pointer-events: none; filter: blur(5px); }
+        @keyframes smokePuff { to { transform: translate(-150px, -50px) scale(4); opacity: 0; } }
 
-    #chat-body::-webkit-scrollbar, #fb-msg-container::-webkit-scrollbar { display: none; }
 
-    .message-wrapper {
-        display: flex; width: 100%; margin-bottom: 8px; opacity: 0;
-        transform: translateY(10px); animation: fadeInUp 0.6s ease forwards;
-        background: transparent !important;
-    }
-    .message-wrapper.sent { justify-content: flex-end; }
-    .message-wrapper.received { justify-content: flex-start; }
+        /* 4. Kiss Day - Marks */
+        .kiss-mark { position: absolute; font-size: 50px; animation: popKiss 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 8700; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+        @keyframes popKiss { from { transform: scale(0) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
 
-    .message {
-        width: fit-content; max-width: 80%; padding: 6px 8px 6px 10px; border-radius: 8px; 
-        position: relative; line-height: 1.3; box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-        display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 8px;
-    }
+        /* Card Styles */
+        .week-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px; border-radius: 30px;
+            width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: cardSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; z-index: 8800;
+        }
+        @keyframes cardSlideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        #weekTitle { color: #555; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold; }
+        
+        /* Adjusted Container for Teddy Day (Height auto for bike) */
+        #weekImageContainer { display: flex; justify-content: center; align-items: center; gap: 20px; min-height: 200px; margin-bottom: 20px; position: relative; }
+        .week-img { height: 160px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); transition: transform 0.3s; }
+        .week-img.float { animation: floatImg 3s ease-in-out infinite; }
+        @keyframes floatImg { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-    .sent .message { background-color: #005c4b; border-top-right-radius: 0; color: #e9edef; }
-    .received .message { background-color: #202c33; border-top-left-radius: 0; color: #e9edef; }
+        #weekQuestion { font-size: 20px; font-weight: bold; color: var(--pink); margin-bottom: 25px; line-height: 1.4; white-space: pre-wrap; }
+        #hugMessage { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 4px solid var(--pink); z-index: 9000; text-align: center; color: var(--deep-rose); font-weight: bold; font-size: 24px; display: none; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 80%; }
 
-    .text { font-size: 0.95rem; word-wrap: break-word; }
-    
-    .meta { display: flex; align-items: center; gap: 4px; float: right; margin-bottom: -2px; margin-right: -2px; }
-    .time { font-size: 0.65rem; color: rgba(255,255,255,0.55); }
-    .ticks { font-size: 0.75rem; color: #8696a0; }
-    .ticks.read { color: #53bdeb; }
+        /* --- 5. WHITE SCREEN FINALE --- */
+        #whiteScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px; }
+        #finalRedText { color: #d00000; font-size: clamp(20px, 5vw, 36px); text-align: center; font-weight: bold; opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px; text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5; }
+        #finaleLoadingBox { width: 80%; max-width: 250px; height: 10px; background: #f0f0f0; border-radius: 20px; margin-top: 30px; overflow: hidden; opacity: 0; transition: opacity 1s; border: 1px solid #ff4d6d; }
+        #finaleBar { height: 100%; width: 0%; background: #ff4d6d; transition: width 5s linear; }
+        #byeText { color: #ff4d6d; font-size: clamp(28px, 6vw, 50px); text-align: center; font-weight: bold; opacity: 0; position: absolute; transition: opacity 1s; width: 100%; }
 
-    .date-header { display: flex; justify-content: center; margin: 12px 0; width: 100%; opacity: 0; animation: fadeInUp 1s ease forwards; }
-    .date-badge { background-color: #182229; color: #8696a0; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; width: fit-content; box-shadow: 0 1px 1px rgba(0,0,0,0.3); text-transform: uppercase; }
+        .love-pop { position: fixed; color: #ff0055; font-weight: bold; font-size: 24px; pointer-events: none; z-index: 9500; text-shadow: 0 0 5px white; animation: floatUp 3s ease-out forwards; }
+        @keyframes floatUp { 0% { opacity:1; transform: translateY(0) scale(1); } 100% { opacity:0; transform: translateY(-80px) scale(1.5); } }
 
-    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-    .typing-indicator { font-style: italic; color: #8696a0; }
-    .fade-out { opacity: 0.1 !important; filter: blur(5px) !important; }
-    
-    #target-msg { z-index: 50; box-shadow: 0 0 20px rgba(0,0,0,0.7); }
-
-    /* --- FLASHBACK OVERLAY (DYNAMIC APP SWITCHER) --- */
-    #flashback-overlay {
-        position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #0b141a; z-index: 60;
-        display: none; flex-direction: column; opacity: 0; transition: opacity 1s ease;
-    }
-
-    #fb-header {
-        display: flex; align-items: center; padding: 10px 15px; z-index: 75;
-        position: sticky; top: 0; transition: background 0.1s, border 0.1s;
-    }
-    .fb-back { font-size: 1.5rem; margin-right: 12px; color: #fff; opacity: 0.7; }
-    .fb-pic { 
-        width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; 
-        align-items: center; margin-right: 12px; overflow: hidden; background-size: cover; background-position: center;
-    }
-    .fb-info { display: flex; flex-direction: column; justify-content: center; }
-    .fb-name { font-size: 1.05rem; font-weight: 500; color: #e9edef; line-height: 1.2; }
-    .fb-status { font-size: 0.8rem; color: #8696a0; height: 16px; margin-top: 2px;}
-
-    #fb-msg-container { 
-        flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; scroll-behavior: smooth; 
-        background-color: #0b141a; background-size: cover;
-    }
-
-    /* THEME: WhatsApp (BLOCKED STATE) */
-    .theme-wa #fb-header { background-color: #202c33; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
-    .theme-wa .fb-status { display: none !important; } 
-    .theme-wa #fb-msg-container { background-image: linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-    .theme-wa .message.sent { background-color: #005c4b; border-radius: 8px 0 8px 8px; }
-
-    /* THEME: iMessage / SMS (BLOCKED / FALLBACK STATE) */
-    .theme-sms #fb-header { background: rgba(28, 28, 30, 0.95); border-bottom: 1px solid #333; }
-    .theme-sms .fb-status { display: none !important; }
-    .theme-sms #fb-msg-container { background: #000; }
-    .theme-sms .message-wrapper.sent { justify-content: flex-end; flex-direction: column; align-items: flex-end; }
-    .theme-sms .message.sent { background-color: #34c759; border-radius: 18px 18px 4px 18px; padding: 8px 12px; color: #fff; gap: 0;}
-    .theme-sms .meta { display: none; } 
-    .not-delivered { color: #ff3b30; font-size: 0.75rem; font-weight: 500; margin-top: 4px; display: block; }
-
-    /* THEME: Instagram (BLOCKED STATE) */
-    .theme-ig #fb-header { background: #000; border-bottom: 1px solid #262626; }
-    .theme-ig .fb-status { display: none !important; }
-    .theme-ig .fb-pic { background: #262626 !important; border: none; } 
-    .theme-ig #fb-msg-container { background: #000; }
-    .theme-ig .message.sent { background: #262626; border-radius: 18px; padding: 8px 12px; }
-    .theme-ig .meta { display: none; }
-
-    /* System Warnings */
-    .sys-msg { text-align: center; color: #8696a0; font-size: 0.8rem; margin: 15px 0; width: 100%; animation: snapFocus 0.4s forwards; }
-
-    /* --- SPECIFIC SNAPCHAT SEARCH OVERLAY --- */
-    #snap-search-screen {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background-color: #0f0f0f; z-index: 85; display: none; flex-direction: column;
-        opacity: 0; transition: opacity 0.2s ease;
-    }
-    
-    .snap-top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: #fff; font-size: 1.2rem; font-weight: 600; padding-top: 40px; }
-    .snap-search-input-container { padding: 0 15px; margin-top: 5px; }
-    .snap-search-bar { background-color: #262626; border-radius: 20px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; }
-    .snap-search-text { color: #fff; font-size: 1rem; flex: 1; margin-left: 10px; font-weight: 500; }
-    .snap-center-result { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-bottom: 20%; }
-    .snap-poop { font-size: 3rem; margin-bottom: 10px; }
-    .snap-no-results-text { color: #fff; font-size: 1.1rem; font-weight: 500; }
-    .snap-keyboard-fake { height: 280px; width: 100%; background: #1a1a1a; position: absolute; bottom: 0; border-top: 1px solid #333; display: flex; justify-content: center; padding-top: 10px; color: #555; font-size: 0.8rem; }
-
-    /* --- GLITCH & PANIC EFFECTS --- */
-    .app-switch-glitch { animation: uiGlitch 0.2s linear forwards; }
-    @keyframes uiGlitch {
-        0% { filter: contrast(1); transform: translate(0); }
-        25% { filter: invert(0.8) hue-rotate(90deg); transform: translate(-3px, 2px); }
-        50% { filter: contrast(2) hue-rotate(-90deg); transform: translate(3px, -2px); }
-        75% { filter: invert(0.2); transform: translate(-2px, -1px); }
-        100% { filter: contrast(1); transform: translate(0); }
-    }
-
-    .memory-pop { opacity: 0; transform: translateY(5px); animation: snapFocus 0.2s ease-out forwards; }
-    @keyframes snapFocus { to { opacity: 1; transform: translateY(0); } }
-
-    .panic-shake { animation: anxietyTremble 0.15s linear infinite alternate !important; }
-    @keyframes anxietyTremble {
-        0% { transform: scale(1.01) translate(1px, 0); }
-        100% { transform: scale(1.01) translate(-1px, 0); }
-    }
-
-    /* --- GHOST TEXT --- */
-    #ghost-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 65; pointer-events: none; overflow: hidden; }
-    .ghost-word { position: absolute; color: rgba(255, 255, 255, 0.08); font-size: 2.5rem; font-weight: 900; font-style: italic; white-space: nowrap; animation: ghostFade 2.5s ease-in-out forwards; }
-    @keyframes ghostFade { 0% { opacity: 0; transform: scale(0.9) translate(-50%, -50%); filter: blur(4px); } 40% { opacity: 1; transform: scale(1.05) translate(-50%, -50%); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.2) translate(-50%, -50%); filter: blur(6px); } }
-
-    /* --- CALL OVERLAY --- */
-    #call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #121b22; z-index: 90; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 20%; opacity: 0; transition: opacity 0.2s; }
-    .call-avatar { width: 90px; height: 90px; background-color: #cfd8dc; border-radius: 50%; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
-    .call-name { font-size: 1.6rem; font-weight: 400; color: #fff; margin-bottom: 8px; }
-    .call-status { font-size: 1rem; color: #8696a0; }
-    .end-call-btn { width: 60px; height: 60px; background-color: #f15c6d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; transform: rotate(135deg); position: absolute; bottom: 15%;}
-
-    /* --- FINAL SCREENS --- */
-    #white-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 100; opacity: 0; pointer-events: none; }
-    .trigger-flash { animation: flashAnim 1s forwards; }
-    @keyframes flashAnim { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
-
-    /* --- TYPEWRITER TEXT EFFECT --- */
-    #quote-screen { 
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; 
-        z-index: 200; display: flex; flex-direction: column; justify-content: center; 
-        align-items: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 3s ease; 
-    }
-    
-    .quote-line { 
-        color: #8c8c8c; font-family: Georgia, serif; font-size: 1.05rem; 
-        line-height: 1.8; text-align: center; margin-bottom: 30px; 
-    }
-</style>
+        #rulesPopup { z-index: 7500; }
+        #dimpuImg { transition: transform 1s ease-in; max-width: 100%; border-radius: 20px; width: 100%; }
+        input[type="number"] { padding: 12px; font-size: 18px; border-radius: 15px; border: 2px solid var(--pink); outline: none; width: 100%; text-align: center; margin-bottom: 15px; }
+        #redFlash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 9500; transition: opacity 0.2s; }
+    </style>
 </head>
 <body>
 
-<div id="start-screen" onclick="startExperience()">
-    <div id="start-btn">Tap here..</div>
-</div>
+<div id="sword"></div>
+<img id="cupid-img" src="cupid.png" style="position:fixed; width:100px; pointer-events:none; z-index:9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s;">
 
-<div id="phone-container">
-    <!-- Initial WhatsApp Header -->
-    <div id="header">
-        <div class="profile-pic"></div>
-        <div class="contact-info">
-            <div class="contact-name">Mannu</div>
-            <div class="status" id="status-text"></div>
-        </div>
-    </div>
-    
-    <div id="chat-body"></div>
-    <div id="white-flash"></div>
-    
-    <!-- Dynamic Flashback Container -->
-    <div id="flashback-overlay">
-        <div id="fb-header" class="theme-wa">
-            <div class="fb-back">‹</div>
-            <div class="fb-pic default-avatar" id="fb-pic-el">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            </div>
-            <div class="fb-info">
-                <div class="fb-name" id="fb-name-el">Mannu</div>
-                <div class="fb-status" id="fb-status-el"></div> 
-            </div>
-        </div>
-        <div id="fb-msg-container" class="theme-wa"></div>
-    </div>
+<audio id="cuteMusic" loop src="cute-bgm.mp3" preload="auto"></audio>
+<audio id="letterMusic" src="lettersong.mp3" preload="auto"></audio>
+<audio id="sliceSound" src="slice.mp3" preload="auto"></audio>
+<audio id="yaySound" src="yay.mp3" preload="auto"></audio>
+<audio id="sadSound" src="sad.mp3" preload="auto"></audio>
+<audio id="afterCakeSound" src="after cake.mp3" preload="auto"></audio>
+<audio id="heartSound" loop src="heart.mp3" preload="auto"></audio>
+<audio id="chaloSound" src="chalo.mp3" preload="auto"></audio>
+<audio id="tugayaSound" src="tugaya.mp3" preload="auto"></audio>
+<audio id="bounceSound" src="bounce.mp3" preload="auto"></audio>
+<audio id="sadIndianSound" src="sadindian.mp3" preload="auto"></audio>
+<audio id="bikeIdle" src="bike.mp3" loop preload="auto"></audio>
+<audio id="bikeRev" src="bikerev.mp3" preload="auto"></audio>
 
-    <!-- Snapchat Search Reject Screen Overlay -->
-    <div id="snap-search-screen">
-        <div class="snap-top-bar">
-            <span>‹</span>
-            <span>Add Friends</span>
-            <span>•••</span>
+<div id="startScreen">
+    <div class="rain-container" id="rainBox"></div>
+    <div class="start-card">
+        <div class="loader-heart">❤️</div>
+        <h1>Hey Mannu... 👋</h1>
+        <p>Wait karna padega... Special cheez hai! 😉</p>
+        <div id="loaderBox">
+            <div class="loader-container"><div class="loader-bar" id="fillBar"></div></div>
+            <p id="loadingText">Ittu sa pyar...</p>
         </div>
-        <div class="snap-search-input-container">
-            <div class="snap-search-bar">
-                <span style="color:#888; font-size:1.1rem">🔍</span>
-                <span class="snap-search-text">meghapant121<span style="color:#3498db">|</span></span>
-                <span style="background:#444; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-size:12px">✖</span>
-            </div>
-        </div>
-        <div class="snap-center-result">
-            <div class="snap-poop">💩</div>
-            <div class="snap-no-results-text">No results</div>
-        </div>
-        <div class="snap-keyboard-fake">[ Keyboard Interface ]</div>
-    </div>
-
-    <div id="ghost-container"></div>
-    
-    <!-- Call Reject Overlay -->
-    <div id="call-overlay">
-        <div class="call-avatar">
-            <svg viewBox="0 0 24 24" width="60" height="60" fill="#fff" style="margin-top:15px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </div>
-        <div class="call-name" id="call-title">+91 92XXXXXX85</div>
-        <div class="call-status" id="call-status">Dialing...</div>
-        <div class="end-call-btn">
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M17 19.22H5V7h7V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h-2v7zM19 2h-8v2h5.59L5 15.59 6.41 17 18 5.41V11h2V2z"/></svg>
-        </div>
+        <button id="startBtn" onclick="triggerIntro()">Open Your Gift 🎁</button>
     </div>
 </div>
 
-<!-- Empty containers for the clean JS Typewriter effect -->
-<div id="quote-screen">
-    <div class="quote-line" id="line1"></div>
-    <div class="quote-line" id="line2"></div>
-    <div class="quote-line" id="line3"></div>
+<div id="introScene">
+    <div id="impactFlash"></div>
+    <div id="valentineText">Valentine's Day? 🌹</div>
+    <div id="birthdayText">Mannu ka Birthday Hai! 🎂</div>
+    <button id="letsGoBtn" onclick="startMainExperience()">Let's Go! ✨</button>
 </div>
 
-<audio id="bg-music" src="babydoll.mp3" preload="auto"></audio>
+<div id="gameHUD" class="hidden">
+    <div class="hud-item"><span class="hud-label">Slice:</span><img src="letter.png" class="hud-icon"></div>
+    <div class="hud-score-box"><div id="scoreCounter">0</div><div id="scoreTotal">/ 19</div></div>
+    <div class="hud-item"><span class="hud-label">Avoid:</span><div style="display:flex; gap:5px;"><img src="dal.png" class="hud-icon"><img src="roti.png" class="hud-icon"></div></div>
+</div>
+<div id="progressWrapper"><div id="barBase"><div id="barFill"></div></div><div id="barText">Collect Letters: 0/19</div></div>
+<div id="redFlash"></div>
+
+<div id="stage1" class="centerBox hidden">
+    <h1>Will you be my Valentine, Mannu? ❤️</h1>
+    <div style="display:flex; justify-content:center; gap:10px; margin-top: 20px; flex-wrap:wrap;">
+        <button class="actionBtn" onclick="toStage2()">Yes 😍</button>
+        <button id="noBtn">Nahi 😒</button>
+    </div>
+</div>
+
+<div id="stage2" class="centerBox hidden">
+    <h2 id="counter" style="color:var(--pink)">Slices left: 19</h2>
+    <h1>Mannu, kaato jaldi se! 🎂</h1>
+    <img id="cake" src="cake.png" style="width:80%; margin: 20px 0;">
+    <div id="cakeChoices" class="hidden" style="margin-top: 10px;">
+        <button class="actionBtn" onclick="showDimpu()">Adi ko dedo ek piece 🙋‍♂️</button>
+        <button class="actionBtn" onclick="eatSelf()">Sara Khud Khajao 😋</button>
+    </div>
+</div>
+
+<div id="guiltPopup" class="centerBox hidden" style="z-index:2001;">
+    <h2>🤨 Had hai!</h2>
+    <p style="font-size: 18px; margin: 20px 0;">Akele khana gandi baat hai Mannu baby.</p>
+    <button class="actionBtn" onclick="showDimpu()">Mujhe bhi dedo hehe 🍰</button>
+</div>
+
+<div id="dimpuStage" class="centerBox hidden" style="z-index: 2005;">
+    <img id="dimpuImg" src="dimpu.png">
+    <h2 style="margin: 15px 0;">Ye Guldasta Logi? 🌷</h2>
+    <p style="margin-bottom: 10px;">To confirm, tell me Adi's birth year:</p>
+    <input type="number" id="adiYear" placeholder="YYYY">
+    <br>
+    <button class="actionBtn" onclick="checkYear()">Confirm ✅</button>
+</div>
+
+<div id="rulesPopup" class="centerBox hidden">
+    <h2 style="color: var(--pink); margin-bottom: 15px;">Putku Suno Meri Baat... 🤫</h2>
+    <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.6;">
+        Baby suno tumko na ye <b>Letters</b> slice krne hai cursor move karke 💌
+    </p>
+    <p style="font-size: 16px; margin-bottom: 20px; color: #d00000; font-weight: bold;">
+        Par wo <b>Dal aur Rota</b> ko maat slice karna putku! ⚠️<br>
+        Warna zero ho jayega score apka... 💣
+    </p>
+    <button class="actionBtn" onclick="startFinalGame()">I am Ready! 🥷❤️</button>
+</div>
+
+<div id="blackout"></div>
+<div id="beatingHeart">
+    <div id="heartEmoji">❤️</div>
+    <div id="heartText">Mere dil pe tap karo babe</div>
+</div>
+<div id="glassOverlay"></div>
+
+<div id="cupidFinale">
+    <img src="cupid.png" id="finaleCupid">
+    <div class="final-letter-card">
+        <h1 style="color: #ff4d6d; margin-bottom: 15px; font-size:24px;">My Dearest Mannu ❤️</h1>
+        <p style="font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 20px;">
+            Tum ek akeli aisi insaan ho jisse baat karna mujhe sabse jadha accha lagta hai, aur mai papa mummy ko thanks bolna chahunga ki unhone mujhe itni pyari pyari mannu di, aaj ke din, you are the best baby!! Sabse best hai meri mannu! Happy Birthday to you babyjaan <br><br>
+            <b>I Love You Forever!</b>
+        </p>
+        <button class="actionBtn" style="font-size: 20px; padding: 15px 30px; margin-top: 10px;" onclick="startLoveJourney()">Click Here ❤️</button>
+    </div>
+</div>
+
+<div id="loveWeekOverlay">
+    <div id="chocolateDrip"></div>
+    <div class="rain-container" id="valentineRain" style="display:none; z-index:8600;"></div>
+    
+    <div class="week-card">
+        <div id="weekTitle"></div>
+        <div id="weekImageContainer"></div>
+        <div id="weekQuestion"></div>
+        <div id="weekButtons"></div>
+    </div>
+    <div id="hugMessage">Love you sooo much babyyyyy maja aagya wow wow hug 🤗❤️</div>
+</div>
+
+<div id="whiteScreen">
+    <h1 id="finalRedText">Mannu, tum ho meri best friend, meri darling, meri jaaneman, hehe! I love you sooooooo much! ❤️</h1>
+    <div id="finaleLoadingBox"><div id="finaleBar"></div></div>
+    <h1 id="byeText">biee biee cutie 🎀</h1>
+</div>
 
 <script>
-    const chatBody = document.getElementById('chat-body');
-    const statusText = document.getElementById('status-text');
-    const phoneContainer = document.getElementById('phone-container');
-    const whiteFlash = document.getElementById('white-flash');
-    
-    const flashbackOverlay = document.getElementById('flashback-overlay');
-    const fbHeader = document.getElementById('fb-header');
-    const fbMsgContainer = document.getElementById('fb-msg-container');
-    const snapSearchScreen = document.getElementById('snap-search-screen');
-    const ghostContainer = document.getElementById('ghost-container');
-    const callOverlay = document.getElementById('call-overlay');
-    
-    const bgMusic = document.getElementById('bg-music');
-    const quoteScreen = document.getElementById('quote-screen');
+    // --- MOUSE & TOUCH TRACKING ---
+    let mouse = { x:0, y:0, lx:0, ly:0 };
+    function updateCupid(x, y) {
+        const cupid = document.getElementById("cupid-img");
+        if (cupid) { cupid.style.left = (x + 15) + "px"; cupid.style.top = (y + 15) + "px"; }
+    }
+    document.addEventListener("touchmove", function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        mouse.x = touch.clientX; mouse.y = touch.clientY;
+        updateSword(); updateCupid(mouse.x, mouse.y); 
+        const element = document.elementFromPoint(mouse.x, mouse.y);
+        if(element && element.classList.contains('toss-item') && !element.hit) { element.hit = true; element.sliceHandler(); }
+        if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) { checkHit(); }
+    }, { passive: false });
 
-    let ghostInterval;
+    document.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX; mouse.y = e.clientY;
+        updateSword(); updateCupid(mouse.x, mouse.y);
+        let speed = Math.sqrt(Math.pow(mouse.x - mouse.lx, 2) + Math.pow(mouse.y - mouse.ly, 2));
+        if (speed > 15) { createSlash(mouse.x, mouse.y); if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) checkHit(); }
+        mouse.lx = mouse.x; mouse.ly = mouse.y;
+    });
 
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    const scrollToBottom = (element) => { element.scrollTop = element.scrollHeight; };
+    function updateSword() { const sword = document.getElementById("sword"); sword.style.left = mouse.x + "px"; sword.style.top = mouse.y + "px"; }
+    function createSlash(x, y) { const s = document.createElement("div"); s.className = "slash"; s.style.left = x + "px"; s.style.top = y + "px"; s.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(y - mouse.ly, x - mouse.lx) * 180 / Math.PI}deg)`; document.body.appendChild(s); setTimeout(() => s.remove(), 400); }
 
-    const createBaseMessage = (text, type, time, ticksClass = 'read', isTarget = false) => {
-        const id = isTarget ? 'id="target-msg"' : '';
-        const tickHTML = type === 'sent' ? `<span class="ticks ${ticksClass}">✓✓</span>` : '';
-        return `
-            <div class="message-wrapper ${type} msg-item">
-                <div class="message" ${id}>
-                    <span class="text">${text}</span>
-                    <span class="meta">
-                        <span class="time">${time}</span>
-                        ${tickHTML}
-                    </span>
-                </div>
-            </div>
-        `;
+    // --- MAIN FLOW ---
+    function spawnRain(containerId) {
+        const rainContainer = document.getElementById(containerId);
+        if(!rainContainer) return;
+        rainContainer.innerHTML = '';
+        for(let i=0; i<45; i++) {
+            const span = document.createElement('span'); span.innerText = "14 Feb"; span.className = "rain-text";
+            span.style.left = Math.random() * 100 + '%'; 
+            span.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+            span.style.fontSize = (Math.random() * 12 + 12) + 'px';
+            rainContainer.appendChild(span);
+        }
+    }
+
+    window.onload = function() {
+        spawnRain('rainBox'); // Start Screen Rain
+        let load = 0;
+        const txt = document.getElementById('loadingText');
+        const interval = setInterval(() => {
+            load++; document.getElementById('fillBar').style.width = load + "%";
+            if(load < 25) txt.innerText = "Preparing surprise for Mannu... 🎁";
+            else if(load < 50) txt.innerText = "Adding extra love & kisses... 💋";
+            else if(load < 80) txt.innerText = "Bas thoda sa aur baby... 🤏";
+            else txt.innerText = "Ye lo aapka gift! ❤️";
+            if(load >= 100) { clearInterval(interval); document.getElementById('loaderBox').style.display = 'none'; document.getElementById('startBtn').style.display = 'inline-block'; }
+        }, 45);
     };
 
-    const createUnansweredCallMsg = (time) => {
-        return `
-            <div class="message-wrapper sent msg-item">
-                <div class="message" style="display:flex; gap: 12px; align-items:center; padding: 8px 10px;">
-                    <div style="background: rgba(255,255,255,0.1); border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center;">
-                        <span style="font-size: 1.1rem; transform: rotate(135deg); color: #8696a0;">📞</span>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.95rem; font-weight: 500;">Voice call</div>
-                        <div style="font-size: 0.75rem; color: #8696a0;">Unanswered</div>
-                    </div>
-                    <div class="meta" style="margin-left: 10px; align-self: flex-end;">
-                        <span class="time">${time}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    };
-
-    const createDynamicMessage = (text, app, timeOverride = null) => {
-        let textContent = text;
-        let extraHTML = '';
-        if (app === 'sms') extraHTML = `<span class="not-delivered">Not Delivered !</span>`;
-
-        let metaHTML = '';
-        if (app === 'wa') {
-            // Generate random time if none is provided
-            let timeStr = timeOverride;
-            if (!timeStr) {
-                let h = Math.floor(Math.random() * 12) + 1;
-                let m = Math.floor(Math.random() * 59).toString().padStart(2, '0');
-                let ampm = Math.random() > 0.5 ? 'AM' : 'PM';
-                timeStr = `${h}:${m} ${ampm}`;
-            }
-            metaHTML = `<span class="meta"><span class="time">${timeStr}</span><span class="ticks single">✓</span></span>`;
-        }
-        
-        return `
-            <div class="message-wrapper sent msg-item memory-pop">
-                <div class="message">
-                    <span class="text">${textContent}</span>
-                    ${metaHTML}
-                </div>
-                ${extraHTML}
-            </div>
-        `;
-    };
-
-    const createSystemMsg = (text) => `<div class="sys-msg memory-pop">${text}</div>`;
-    const createDateBadge = (dateStr) => `<div class="date-header msg-item memory-pop"><div class="date-badge">${dateStr}</div></div>`;
-
-    function playAudioWithFadeIn() {
-        let vol = 0;
-        const fadeInterval = setInterval(() => {
-            if (vol < 1.0) { vol += 0.05; bgMusic.volume = Math.min(vol, 1); } 
-            else { clearInterval(fadeInterval); }
-        }, 25); 
+    function triggerIntro() {
+        const sfx = ['yaySound', 'sadSound', 'sliceSound', 'afterCakeSound', 'heartSound', 'letterMusic', 'chaloSound', 'tugayaSound', 'bounceSound', 'sadIndianSound'];
+        sfx.forEach(id => { const el = document.getElementById(id); el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(e => console.log(id)); });
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('introScene').style.display = 'flex';
+        const vText = document.getElementById('valentineText'); const bText = document.getElementById('birthdayText'); const flash = document.getElementById('impactFlash'); const bounce = document.getElementById('bounceSound');
+        setTimeout(() => { vText.classList.add('pop-in'); }, 300);
+        setTimeout(() => { bText.classList.add('crash-in'); setTimeout(() => { bounce.play(); document.getElementById('introScene').classList.add('screen-shake'); flash.classList.add('flash-now'); vText.classList.add('knockout'); }, 300); setTimeout(() => { document.getElementById('letsGoBtn').style.display = 'block'; }, 1500); }, 1500);
     }
 
-    function spawnGhostText() {
-        const span = document.createElement('div');
-        span.classList.add('ghost-word'); span.innerText = "Move on?";
-        span.style.left = `${Math.floor(Math.random() * 70) + 10}%`;
-        span.style.top = `${Math.floor(Math.random() * 80) + 10}%`;
-        ghostContainer.appendChild(span);
-        setTimeout(() => { if (ghostContainer.contains(span)) ghostContainer.removeChild(span); }, 2500);
+    function startMainExperience() {
+        document.getElementById('bounceSound').pause(); document.getElementById('bounceSound').currentTime = 0;
+        document.getElementById('cuteMusic').volume = 0.2; document.getElementById('cuteMusic').play();
+        document.getElementById('introScene').style.display = 'none'; document.getElementById('stage1').classList.remove('hidden');
     }
 
-    async function triggerAppGlitch(newPlatform) {
-        phoneContainer.classList.add('app-switch-glitch');
-        await sleep(100); 
-        
-        if (newPlatform === 'snap') {
-            snapSearchScreen.style.display = 'flex';
-            snapSearchScreen.style.opacity = '1';
-        } else {
-            snapSearchScreen.style.opacity = '0';
-            setTimeout(() => snapSearchScreen.style.display = 'none', 200);
+    let slices = 19; let letterScore = 0; const targetScore = 19; let isGameOver = false; let stopGame = false;
 
-            fbHeader.className = `theme-${newPlatform}`;
-            fbMsgContainer.className = `theme-${newPlatform}`;
-            
-            const nameEl = document.getElementById('fb-name-el');
-            const picEl = document.getElementById('fb-pic-el');
+    function toStage2() { document.getElementById("yaySound").play(); document.getElementById("stage1").classList.add("hidden"); document.getElementById("noBtn").style.display = "none"; document.getElementById("stage2").classList.remove("hidden"); }
+    document.getElementById("noBtn").addEventListener('mouseover', function() { const btn = this; document.getElementById("sadSound").currentTime = 0; document.getElementById("sadSound").play(); if (btn.parentNode.id !== 'body') { document.body.appendChild(btn); } btn.style.position = "fixed"; btn.style.left = Math.random() * 80 + "vw"; btn.style.top = Math.random() * 80 + "vh"; });
 
-            if(newPlatform === 'sms') {
-                nameEl.innerText = '+91 92XXXXXX85';
-                picEl.innerHTML = '<span style="color:#fff;font-size:18px">👤</span>';
-                picEl.style.backgroundColor = '#666';
-            }
-            else if(newPlatform === 'ig') {
-                nameEl.innerText = 'Instagram User'; 
-                picEl.innerHTML = ''; 
-                picEl.style.backgroundColor = '#262626';
-            }
-            else { 
-                nameEl.innerText = 'Mannu';
-                picEl.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-                picEl.style.backgroundColor = '#cfd8dc';
+    function checkHit() {
+        if(slices <= 0) return; 
+        const rect = document.getElementById("cake").getBoundingClientRect();
+        if(mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) {
+            if(Date.now() - (window.lh || 0) > 150) {
+                slices--; if (slices < 0) slices = 0;
+                document.getElementById("counter").innerText = `Slices left: ${slices}`;
+                const s = document.getElementById("sliceSound"); s.currentTime = 0; s.play();
+                if(slices === 0) { document.getElementById("afterCakeSound").play(); document.getElementById("cake").src = "sliced cake.png"; document.getElementById("cakeChoices").classList.remove("hidden"); }
+                window.lh = Date.now();
             }
         }
-
-        await sleep(100);
-        phoneContainer.classList.remove('app-switch-glitch');
     }
 
-    async function triggerCallScreen() {
-        const title = document.getElementById('call-title');
-        const status = document.getElementById('call-status');
-        
-        callOverlay.style.display = 'flex'; await sleep(20); callOverlay.style.opacity = '1';
-
-        title.innerText = '+91 92XXXXXX85'; status.innerText = 'Dialing...'; status.style.color = '#8696a0';
-        await sleep(600);
-
-        title.innerText = 'Mannu'; status.innerText = 'Calling...';
-        await sleep(800);
-
-        status.innerText = 'Rejected / Blocked'; status.style.color = '#f15c6d';
-        callOverlay.classList.add('panic-shake');
-        callOverlay.style.backgroundColor = 'rgba(241, 92, 109, 0.15)';
-
-        await sleep(800); 
-        
-        callOverlay.classList.remove('panic-shake'); callOverlay.style.opacity = '0';
-        await sleep(200); callOverlay.style.display = 'none'; callOverlay.style.backgroundColor = '#121b22';
+    function eatSelf() { document.getElementById("guiltPopup").classList.remove("hidden"); document.getElementById("cuteMusic").pause(); document.getElementById("sadIndianSound").play(); }
+    function showDimpu() { document.getElementById("sadIndianSound").pause(); document.getElementById("sadIndianSound").currentTime = 0; document.getElementById("cuteMusic").play(); document.getElementById("stage2").classList.add("hidden"); document.getElementById("guiltPopup").classList.add("hidden"); document.getElementById("dimpuStage").classList.remove("hidden"); }
+    function checkYear() {
+        const val = document.getElementById("adiYear").value; const img = document.getElementById("dimpuImg"); const tugaya = document.getElementById("tugayaSound");
+        if(val === "2004") { tugaya.pause(); tugaya.currentTime = 0; document.getElementById("chaloSound").play(); img.src = "dimpu2.png"; setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); setTimeout(() => { triggerRealBlackout(); }, 3000); }
+        else { tugaya.currentTime = 0; tugaya.play(); img.src = "dimpuangry.png"; alert("Wrong year! Try again 😼"); }
     }
 
-    async function startExperience() {
-        // Unlock audio context safely on first user interaction
-        bgMusic.volume = 0; 
-        bgMusic.play().catch(e => console.log("Audio unlock failed: ", e));
+    function triggerRealBlackout() { isGameOver = true; document.getElementById("dimpuStage").classList.add("hidden"); document.getElementById("blackout").style.display = "block"; setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); setTimeout(() => { document.getElementById("beatingHeart").style.display = "block"; document.getElementById("heartSound").play(); }, 3000); }
+    document.getElementById("beatingHeart").onclick = function() { document.getElementById("heartSound").pause(); this.style.display = "none"; document.getElementById("blackout").style.display = "none"; document.getElementById("glassOverlay").style.display = "block"; document.getElementById("rulesPopup").classList.remove("hidden"); };
 
-        document.getElementById('start-screen').style.opacity = '0';
-        setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
+    function startFinalGame() { document.getElementById("rulesPopup").classList.add("hidden"); document.getElementById("progressWrapper").style.display = "block"; document.getElementById("gameHUD").classList.remove("hidden"); document.getElementById("gameHUD").style.display = "flex"; document.getElementById("cuteMusic").pause(); document.getElementById("letterMusic").play(); startFruitNinja(); }
 
-        await sleep(1500); 
-        chatBody.innerHTML += createDateBadge('Today'); await sleep(1000);
-
-        chatBody.innerHTML += createBaseMessage('Hi', 'sent', '10:57 PM', 'read'); scrollToBottom(chatBody);
-        await sleep(2000); 
-        
-        chatBody.innerHTML += createUnansweredCallMsg('10:58 PM'); scrollToBottom(chatBody);
-        await sleep(2500); 
-
-        statusText.innerText = 'typing...'; statusText.classList.add('typing-indicator');
-
-        await sleep(2500); statusText.innerText = 'online'; statusText.classList.remove('typing-indicator');
-        
-        chatBody.innerHTML += createBaseMessage('?', 'received', '10:58 PM'); scrollToBottom(chatBody);
-        await sleep(1500); statusText.innerText = 'typing...'; statusText.classList.add('typing-indicator');
-
-        await sleep(3500); statusText.innerText = ''; statusText.classList.remove('typing-indicator');
-
-        playAudioWithFadeIn();
-
-        const longText = "Adarsh please maine phele bhi bola tha firse bol rahi hu mtt kro mujhe text mseg kuch bhi ek month se jyada ho gya ab tk to ho gya hoga Move on number kyu rkha h hta do permanent mtt kro text call mujhe";
-        chatBody.innerHTML += createBaseMessage(longText, 'received', '10:59 PM'); scrollToBottom(chatBody);
-
-        await sleep(4000); 
-        chatBody.innerHTML += createBaseMessage('Move on??', 'sent', '10:59 PM', 'read', true); scrollToBottom(chatBody);
-
-        await sleep(2000); await triggerCinematicTransition();
-    }
-
-    async function triggerCinematicTransition() {
-        const allOtherMsgs = document.querySelectorAll('.msg-item:not(#target-msg)');
-        phoneContainer.classList.add('cinematic-darken');
-        allOtherMsgs.forEach(msg => msg.classList.add('fade-out')); 
-        document.getElementById('header').classList.add('fade-out');
-
-        await sleep(2500); 
-
-        whiteFlash.classList.add('trigger-flash');
-        await sleep(150); 
-        flashbackOverlay.style.display = 'flex'; 
-        flashbackOverlay.style.opacity = '1';
-
-        await generateFlashback();
-    }
-
-    async function generateFlashback() {
-        const startDate = new Date(2026, 3, 7); const endDate = new Date(2026, 4, 4);   
-        let currentDate = new Date(startDate); let dayCount = 0; 
-
-        while (currentDate <= endDate) {
-            dayCount++;
-            const month = currentDate.toLocaleString('default', { month: 'short' });
-            const day = currentDate.getDate();
+    function startFruitNinja() {
+        const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
+        const spawnItem = () => {
+            if (stopGame) return;
+            const item = document.createElement("img");
+            const isBomb = Math.random() > 0.7; 
+            const type = isBomb ? (Math.random() > 0.5 ? "dal.png" : "roti.png") : "letter.png";
+            item.src = type; item.className = "toss-item";
+            const size = isBomb ? (Math.random() * 60 + 80) : (Math.random() * 100 + 150); 
+            item.style.width = size + "px"; item.style.left = Math.random() * 80 + 10 + "vw";
+            const peak = 40 + Math.random() * 40 + "vh"; item.style.setProperty('--peakHeight', peak);
+            const drift = (Math.random() - 0.5) * 300 + "px"; item.style.transform = `translateX(${drift})`;
+            const duration = 2 + Math.random(); item.style.animation = `tossUp ${duration}s ease-in-out forwards`;
             
-            fbMsgContainer.innerHTML += createDateBadge(`${month} ${day}`);
-            scrollToBottom(fbMsgContainer);
-            
-            // --- GUARANTEED NARRATIVE STRUCTURE ---
-            
-            // Phase 1: Slow Denial (WhatsApp)
-            if (dayCount <= 8) {
-                await sleep(400); 
-                let numRandom = Math.floor(Math.random() * 3) + 1; // 1 to 3 random texts
-                for(let i=0; i<numRandom; i++) {
-                    fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
-                    scrollToBottom(fbMsgContainer); await sleep(500); 
+            item.sliceHandler = function() {
+                if (stopGame) return;
+                if (isBomb) { letterScore = 0; updateHUD(); const bad = document.getElementById("tugayaSound"); bad.currentTime = 0; bad.play(); const flash = document.getElementById("redFlash"); flash.style.opacity = "0.6"; setTimeout(() => flash.style.opacity = "0", 200); item.remove(); } 
+                else { 
+                    letterScore++; document.getElementById("scoreCounter").innerText = letterScore; document.getElementById("barFill").style.width = Math.min((letterScore/targetScore)*100, 100) + "%";
+                    const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
+                    if (letterScore >= targetScore) {
+                        stopGame = true; item.style.animation = 'none'; item.style.transition = "all 2.5s cubic-bezier(0.25, 1, 0.5, 1)"; item.style.position = "fixed"; item.style.left = "50%"; item.style.top = "50%"; item.style.zIndex = "10000";
+                        requestAnimationFrame(() => { item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)"; item.style.opacity = "0"; });
+                        setTimeout(() => { document.querySelectorAll('.toss-item').forEach(el => el.remove()); document.getElementById("gameHUD").style.display = "none"; document.getElementById("progressWrapper").style.opacity = "0"; document.getElementById("cupid-img").style.display = "none"; document.getElementById("cupidFinale").style.display = "flex"; }, 2500);
+                    } else { showFloatingText(item.getBoundingClientRect().left, item.getBoundingClientRect().top, loveWords); item.remove(); }
                 }
-                // Mandatory 11:11 PM text
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
-                scrollToBottom(fbMsgContainer); await sleep(600); 
-            } 
-            
-            // Phase 2: Desperation Switch (SMS)
-            else if (dayCount === 9) {
-                await triggerAppGlitch('sms');
-                await sleep(500);
-                fbMsgContainer.innerHTML += createDynamicMessage("unblock?", 'sms');
-                scrollToBottom(fbMsgContainer); await sleep(500); 
-                fbMsgContainer.innerHTML += createDynamicMessage("kardo unblock", 'sms', "11:11 PM");
-                scrollToBottom(fbMsgContainer); await sleep(800); 
-            }
-            
-            // Phase 3: Blocked on Instagram
-            else if (dayCount === 10) {
-                await triggerAppGlitch('ig');
-                await sleep(500);
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'ig');
-                scrollToBottom(fbMsgContainer); await sleep(300);
-                fbMsgContainer.innerHTML += createSystemMsg("You can't reply to this conversation.");
-                scrollToBottom(fbMsgContainer); await sleep(1200); 
-            }
-            
-            // Phase 4: First Panic Call
-            else if (dayCount === 11) {
-                await triggerAppGlitch('wa');
-                await sleep(500);
-                await triggerCallScreen();
-                // Follow up text after the dropped call
-                fbMsgContainer.innerHTML += createDynamicMessage("mannu ek baar unblock kardo", 'wa', "11:11 PM");
-                scrollToBottom(fbMsgContainer); await sleep(600);
-            }
-            
-            // Phase 5: The Snapchat Reality Check
-            else if (dayCount === 12) {
-                await triggerAppGlitch('snap');
-                await sleep(2500); 
-            }
+            };
+            item.onmouseover = function() { if(!this.hit) { this.hit = true; this.sliceHandler(); } };
+            document.body.appendChild(item); setTimeout(() => { if(item.parentNode) item.remove(); }, duration * 1000 + 100);
+            if (!stopGame) setTimeout(spawnItem, Math.random() * 600 + 300); 
+        };
+        spawnItem();
+    }
+    function showFloatingText(x, y, words) { const txt = document.createElement("div"); txt.className = "love-pop"; txt.innerText = words[Math.floor(Math.random() * words.length)]; txt.style.left = x + "px"; txt.style.top = y + "px"; document.body.appendChild(txt); setTimeout(() => txt.remove(), 3000); }
+    function updateHUD() { document.getElementById("scoreCounter").innerText = letterScore; const pct = (letterScore / targetScore) * 100; document.getElementById("barFill").style.width = Math.min(pct, 100) + "%"; }
 
-            // Phase 6: Second Call & Full Breakdown
-            else if (dayCount === 13) {
-                await triggerAppGlitch('wa');
-                await sleep(300);
-                await triggerCallScreen();
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
-                scrollToBottom(fbMsgContainer); await sleep(400);
-            }
+    // --- LOVE WEEK JOURNEY ---
+    const loveData = [
+        { day: "7 Feb - Rose Day", img: "rose.png", q: "Mujhe pata hai pehle wala rose tumse kahi kho gaya… chalo koi baat nahi ye lo cutie kya tumko mera rose pasand aaya? Accept karogi?", bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)", special: "rose", btnText: "Haan, Rose dedo! 🌹" },
+        { day: "8 Feb - Propose Day", img: "propose.png", q: "MAññU, sirf iss janam me nahi kya har janam me tum meri bano gi? I love you sooo much ❤️", bg: "linear-gradient(135deg, #f6d365 0%, #fda085 100%)", special: false, btnText: "Yes, humesha ke liye! 💍" },
+        { day: "9 Feb - Chocolate Day", img: null, q: "Babyjaan, Isme se na aap ek chocolate lelo… Jo bhi apko chahiye. Fir dono khayenge sath me", bg: "linear-gradient(135deg, #5b3e31 0%, #8d6e63 100%)", special: "chocolate" },
+        { day: "10 Feb - Teddy Day", img: "teddy.png", q: "Baby Jaldi se apna bada sa teddy bear pakdo… isko bohot mehnat se laya hi apke liye abhi abhi abhi chahiye tha na apko.. ye lo", bg: "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)", special: "teddy", btnText: "Le Liya! 🧸" },
+        { day: "11 Feb - Promise Day", img: "promise.png", q: "MAññU cutie kya aap mere hamesa sath rehne wale promise ko accept karogi?", bg: "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)", special: false, btnText: "Pinky Promise! 🤞" },
+        { day: "12 Feb - Hug Day", img: "hug.png", q: "Babe kya aap mera pyara sa side hug accept karoge? Ya fir tight wala hug", bg: "linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%)", special: "hug" },
+        { day: "13 Feb - Kiss Day", img: "kiss.png", q: "Kya abhi abhi abhi hum ek aise kissi kar sakte hai?", bg: "linear-gradient(135deg, #fc00ff 0%, #00dbde 100%)", special: "kiss", btnText: "Haan, ek kissi! 💋" },
+        { day: "14 Feb - Valentine's Day", img: "valentine.png", q: "Mannu, sirf 2026 me nahi.. kya tum har saal aur saalon saal.. meri valentine banogi? For ever and forever ♾️", bg: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", special: "valentine", btnText: "Yes, Forever! ♾️" }
+    ];
+    let currentDayIndex = 0; let petalInterval; let kissInterval; let smokeInterval;
 
-            // Phase 7: The Flood (Violent WA Spam)
-            else if (dayCount >= 14 && dayCount <= 17) {
-                flashbackOverlay.classList.add('panic-shake');
-                if (!ghostInterval) {
-                    ghostInterval = setInterval(() => { spawnGhostText(); }, 800); 
-                }
-                
-                let numRandom = Math.floor(Math.random() * 3) + 2; // 2 to 4 rapid texts
-                for(let i=0; i<numRandom; i++) {
-                    const spamTexts = ["hi", "mannu ek baar unblock kardo", "hi"];
-                    fbMsgContainer.innerHTML += createDynamicMessage(spamTexts[Math.floor(Math.random() * 3)], 'wa');
-                    scrollToBottom(fbMsgContainer);
-                    await sleep(150); 
-                }
-                // Mandatory 11:11 PM
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
-                scrollToBottom(fbMsgContainer); await sleep(150);
-            }
-            
-            // Phase 8: Acceptance / Exhaustion (Slow WA again)
-            else {
-                flashbackOverlay.classList.remove('panic-shake');
-                clearInterval(ghostInterval); ghostInterval = null; 
-                
-                await sleep(500); 
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa');
-                scrollToBottom(fbMsgContainer); await sleep(500); 
-                
-                // Final 11:11 PM text of the day
-                fbMsgContainer.innerHTML += createDynamicMessage("hi", 'wa', "11:11 PM");
-                scrollToBottom(fbMsgContainer); await sleep(700);
-            }
-
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        await sleep(2000); await triggerFinalEnding();
+    function startLoveJourney() {
+        document.getElementById("cupidFinale").style.display = "none";
+        document.getElementById("loveWeekOverlay").style.display = "flex";
+        renderDay(); document.getElementById("yaySound").play();
     }
 
-    async function typeWriter(elementId, text) {
-        const el = document.getElementById(elementId);
-        el.style.opacity = '1'; 
-        el.style.transform = 'translateY(0)';
-        el.innerHTML = ''; 
+    function cleanupAnimations() {
+        clearInterval(petalInterval); document.querySelectorAll('.rose-petal').forEach(el => el.remove());
+        document.getElementById("chocolateDrip").style.height = "0";
+        document.getElementById("valentineRain").style.display = "none"; 
+        clearInterval(kissInterval); document.querySelectorAll('.kiss-mark').forEach(el => el.remove());
+        clearInterval(smokeInterval); document.querySelectorAll('.smoke-particle').forEach(el => el.remove());
         
-        for (let i = 0; i < text.length; i++) {
-            el.innerHTML += text[i];
-            await sleep(35); 
-        }
+        // Stop Audio
+        document.getElementById("bikeIdle").pause();
     }
 
-    async function triggerFinalEnding() {
-        quoteScreen.style.opacity = '1'; await sleep(2500); 
+    function renderDay() {
+        cleanupAnimations();
+        const data = loveData[currentDayIndex];
+        const overlay = document.getElementById("loveWeekOverlay");
+        const title = document.getElementById("weekTitle");
+        const imgContainer = document.getElementById("weekImageContainer");
+        const q = document.getElementById("weekQuestion");
+        const btnContainer = document.getElementById("weekButtons");
 
-        await typeWriter('line1', "Just because you found people to replace me doesn’t mean you felt what I felt.");
-        await sleep(1200);
-        await typeWriter('line2', "You moved on fast because your love was weak, mine stayed because it was real.");
-        await sleep(1200);
-        await typeWriter('line3', "But I’m never coming back. The person I loved doesn’t exist anymore, and you’ve become the person I hate the most.");
+        overlay.style.background = data.bg; title.innerText = data.day; q.innerText = data.q;
+        imgContainer.innerHTML = ''; btnContainer.innerHTML = '';
+
+        // --- ROSE DAY ---
+        if (data.special === "rose") {
+            const petalImages = ['petal1.png', 'petal2.png', 'petal3.png'];
+            petalInterval = setInterval(() => {
+                const petalImg = petalImages[Math.floor(Math.random() * petalImages.length)];
+                const petal = document.createElement("img"); petal.src = petalImg; petal.className = "rose-petal";
+                petal.style.left = Math.random() * 95 + "vw"; petal.style.animationDuration = (Math.random() * 3 + 4) + "s";
+                document.body.appendChild(petal); setTimeout(() => petal.remove(), 7000);
+            }, 400);
+            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
+        }
+        // --- CHOCOLATE DAY ---
+        else if (data.special === "chocolate") {
+            document.getElementById("chocolateDrip").style.height = "180px"; 
+            const kitkat = document.createElement("img"); kitkat.src = "kitkat.png"; kitkat.className = "week-img float"; kitkat.onclick = nextDay; kitkat.style.cursor = "pointer";
+            const dairy = document.createElement("img"); dairy.src = "dairymilk.png"; dairy.className = "week-img float"; dairy.id = "runawayDairy"; dairy.style.position = "absolute"; dairy.style.zIndex = "9999";
+            
+            const runAway = (e) => {
+                e.preventDefault(); e.stopPropagation();
+                const newX = Math.random() * (window.innerWidth - 100); const newY = Math.random() * (window.innerHeight - 300) + 100;
+                dairy.style.position = "fixed"; dairy.style.left = newX + "px"; dairy.style.top = newY + "px"; dairy.style.transition = "all 0.2s ease";
+            };
+            dairy.addEventListener("mouseover", runAway); dairy.addEventListener("touchstart", runAway); dairy.addEventListener("click", runAway);
+            imgContainer.appendChild(kitkat); imgContainer.appendChild(dairy);
+            const hint = document.createElement("p"); hint.innerText = "(Click the chocolate!)"; hint.style.fontSize = "12px"; hint.style.color = "#fff"; btnContainer.appendChild(hint);
+        }
+        // --- TEDDY DAY (COMPLEX AUDIO & EXIT) ---
+        else if (data.special === "teddy") {
+            const img = document.createElement("img"); img.src = data.img; 
+            img.className = "week-img drive-in"; 
+            imgContainer.appendChild(img);
+            
+            const revAudio = document.getElementById("bikeRev");
+            const idleAudio = document.getElementById("bikeIdle");
+
+            // 1. Play Entry Sound
+            revAudio.currentTime = 0; revAudio.play();
+            
+            // 2. Switch to Idle after entry (~800ms)
+            setTimeout(() => {
+                revAudio.pause();
+                idleAudio.currentTime = 0; idleAudio.play();
+            }, 1000);
+
+            // Add Entry Smoke
+            smokeInterval = setInterval(() => {
+                const smoke = document.createElement("div"); smoke.className = "smoke-particle";
+                smoke.style.bottom = (80 + Math.random() * 20) + "px";
+                imgContainer.appendChild(smoke); setTimeout(() => smoke.remove(), 1000);
+            }, 150);
+            
+            const btn = document.createElement("button"); 
+            btn.className = "actionBtn"; 
+            btn.innerText = data.btnText;
+            
+            // 3. Exit Logic
+            btn.onclick = function() {
+                idleAudio.pause();
+                revAudio.currentTime = 0; revAudio.play(); // Play Exit Zoom
+                
+                img.classList.remove("drive-in");
+                void img.offsetWidth; // Trigger Reflow
+                img.classList.add("drive-out");
+                
+                // More Smoke for Exit
+                let exitSmoke = setInterval(() => {
+                    const smoke = document.createElement("div"); smoke.className = "smoke-particle";
+                    smoke.style.bottom = (80 + Math.random() * 20) + "px";
+                    smoke.style.left = "50%";
+                    imgContainer.appendChild(smoke); setTimeout(() => smoke.remove(), 1000);
+                }, 100);
+                
+                setTimeout(() => {
+                    clearInterval(exitSmoke);
+                    nextDay();
+                }, 1200);
+            };
+            btnContainer.appendChild(btn);
+        }
+        // --- HUG DAY (FIXED REVERSE LOGIC) ---
+        else if (data.special === "hug") {
+            createStandardLayout(data.img, imgContainer, null);
+            
+            // BUTTON 1: TIGHT HUG (SPECIAL) - Placed First
+            const btnTight = document.createElement("button"); 
+            btnTight.className = "actionBtn"; 
+            btnTight.innerText = "Tight Hug 🤗";
+            btnTight.onclick = function() { 
+                document.getElementById("yaySound").play(); 
+                document.getElementById("hugMessage").style.display = "block"; 
+                setTimeout(() => { 
+                    document.getElementById("hugMessage").style.display = "none"; 
+                    nextDay(); 
+                }, 3000); 
+            };
+            btnContainer.appendChild(btnTight);
+
+            // BUTTON 2: SIDE HUG (NORMAL)
+            const btnSide = document.createElement("button"); 
+            btnSide.className = "actionBtn"; 
+            btnSide.innerText = "Side Hug 🫂"; 
+            btnSide.onclick = nextDay;
+            btnContainer.appendChild(btnSide);
+        }
+        // --- KISS DAY ---
+        else if (data.special === "kiss") {
+            kissInterval = setInterval(() => {
+                const kiss = document.createElement("div"); kiss.innerHTML = "💋"; kiss.className = "kiss-mark";
+                kiss.style.left = Math.random() * 90 + "vw"; kiss.style.top = Math.random() * 90 + "vh"; 
+                kiss.style.transform = `rotate(${Math.random()*360}deg)`;
+                document.body.appendChild(kiss); setTimeout(() => kiss.remove(), 1000);
+            }, 400);
+            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
+        }
+        // --- VALENTINE DAY ---
+        else if (data.special === "valentine") {
+            const rainDiv = document.getElementById("valentineRain");
+            rainDiv.style.display = "block";
+            spawnRain('valentineRain');
+            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
+        }
+        else { createStandardLayout(data.img, imgContainer, btnContainer, data.btnText); }
+    }
+
+    function createStandardLayout(imgSrc, imgContainer, btnContainer, btnText) {
+        const img = document.createElement("img"); img.src = imgSrc; img.className = "week-img float";
+        imgContainer.appendChild(img);
+        if(btnContainer) createYesButton(btnContainer, btnText);
+    }
+    function createYesButton(container, text) {
+        const btn = document.createElement("button"); 
+        btn.className = "actionBtn"; 
+        btn.innerText = text || "Yes, I will! ❤️"; 
+        btn.onclick = nextDay;
+        container.appendChild(btn);
+    }
+
+    function nextDay() {
+        document.getElementById("sliceSound").currentTime = 0; document.getElementById("sliceSound").play();
+        currentDayIndex++;
+        if (currentDayIndex < loveData.length) { renderDay(); } 
+        else { cleanupAnimations(); document.getElementById("loveWeekOverlay").style.display = "none"; showFinalWhiteScreen(); }
+    }
+
+    function showFinalWhiteScreen() {
+        const whiteScreen = document.getElementById("whiteScreen"); whiteScreen.style.opacity = "1"; whiteScreen.style.pointerEvents = "auto";
+        setTimeout(() => { document.getElementById("finalRedText").style.opacity = "1"; document.getElementById("finaleLoadingBox").style.opacity = "1"; document.getElementById("finaleBar").style.width = "100%"; }, 500);
+        setTimeout(() => { document.getElementById("finalRedText").style.opacity = "0"; document.getElementById("finaleLoadingBox").style.opacity = "0"; }, 5500); 
+        setTimeout(() => { document.getElementById("byeText").style.opacity = "1"; }, 6500); 
     }
 </script>
-
 </body>
 </html>
