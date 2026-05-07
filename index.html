@@ -1,463 +1,649 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>When Adi is Bored</title>
-    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=ChaS0JTVFe28_TK6v3viA-9W09g3z6sJscTTBZh_xuB0IZTGJjHnDl7FFF4xoSoFF0uIpPZxRTFRTojIwAefFDpk9NoLFJkB1IMwsmximlvUrahGoCwn5skr_wQzso8AOG5jtiJeAe0i1707Mz4u-jcSAune4PtU7QHeyckO-AZkhaPpGto42KqS0IKL-7kWJJMAuMJiLMwjRu4s4hiHmGN3wiQt71GCtnSGEoO0cXbgwHPS253JYyBXl5Iiqf2p4nPNY8OD57-q8T8c-p_w4Q" charset="UTF-8"></script><style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #030305; /* Deep dark cinematic background */
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meri Pyari Mannu ❤️</title>
+    <style>
+        /* --- GLOBAL VARIABLES --- */
+        :root { --pink: #ff4d6d; --deep-rose: #8d0033; --chocolate: #3e2723; }
+        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+        body { background: #ffc0cb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; cursor: none; height: 100vh; width: 100vw; }
 
-        #ui-container {
-            position: absolute;
-            top: 20%;
-            z-index: 10;
-            text-align: center;
-            background: rgba(10, 10, 15, 0.7);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            transition: opacity 0.5s;
-        }
+        /* --- BLADE & CURSOR --- */
+        #sword { position: fixed; width: 30px; height: 30px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--pink)); box-shadow: 0 0 15px var(--pink); z-index: 10000; transform: translate(-50%, -50%); }
+        .slash { position: fixed; width: 150px; height: 5px; background: linear-gradient(90deg, transparent, white, white, transparent); pointer-events: none; z-index: 9999; animation: slashFade 0.4s forwards; }
+        @keyframes slashFade { 0% { opacity: 1; transform: scaleX(0.2); } 100% { opacity: 0; transform: scaleX(1.6); } }
 
-        h1 {
-            margin-top: 0;
-            background: linear-gradient(to right, #e0c3fc, #8ec5fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.2rem;
-            letter-spacing: 2px;
-        }
+        /* --- 1. LOADING SCREEN --- */
+        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; overflow: hidden; padding: 20px; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        /* 14 Feb Rain Fix */
+        .rain-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
+        .rain-text { position: absolute; top: -50px; color: rgba(255, 255, 255, 0.6); font-weight: bold; font-family: 'Arial', sans-serif; animation: fallDown linear infinite; white-space: nowrap; }
+        @keyframes fallDown { to { transform: translateY(110vh); } }
 
-        #start-btn {
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
-            color: #000;
-            border: none;
-            padding: 15px 35px;
-            font-size: 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-            transition: all 0.3s ease;
-        }
+        .start-card { background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); z-index: 2; width: 100%; max-width: 420px; color: var(--deep-rose); text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
+        .start-card h1 { font-size: clamp(28px, 5vw, 36px); margin-bottom: 10px; font-weight: 800; }
+        .start-card p { font-size: 16px; margin-bottom: 20px; opacity: 0.9; font-weight: 600; }
+        .loader-heart { font-size: 45px; animation: bounceHeart 0.8s infinite alternate; margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5)); }
+        @keyframes bounceHeart { from { transform: scale(1); } to { transform: scale(1.15); } }
+        .loader-container { width: 100%; background: rgba(255,255,255,0.4); height: 10px; border-radius: 20px; overflow: hidden; margin-bottom: 15px; position: relative; }
+        .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff758f, #ff4d6d); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); transition: width 0.1s linear; }
+        #loadingText { font-size: 14px; font-weight: 700; min-height: 25px; color: var(--deep-rose); letter-spacing: 0.5px; }
+        #startBtn { margin-top: 15px; padding: 14px 35px; font-size: 18px; border: none; border-radius: 50px; background: var(--pink); color: white; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3); animation: popBtn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; transition: 0.3s; }
+        @keyframes popBtn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        #start-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
-        }
+        /* --- 2. INTRO SCENE --- */
+        #introScene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffc0cb; z-index: 8500; display: none; justify-content: center; align-items: center; overflow: hidden; padding: 20px; }
+        #valentineText { position: absolute; width: 100%; text-align: center; font-size: clamp(28px, 5vw, 48px); color: #ff0055; font-weight: bold; opacity: 0; transform: scale(0.5); text-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #birthdayText { position: absolute; width: 100%; text-align: center; font-size: clamp(32px, 6vw, 60px); color: #d00000; font-weight: 900; opacity: 0; text-shadow: 3px 3px 0px #fff, 0 0 20px rgba(0,0,0,0.2); font-family: 'Arial Black', sans-serif; white-space: normal; line-height: 1.2; }
+        .pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { 0% { opacity:0; transform: scale(0.5); } 100% { opacity:1; transform: scale(1); } }
+        .crash-in { animation: crashIn 0.4s ease-in forwards; }
+        @keyframes crashIn { 0% { opacity: 0; transform: translateX(100%) scale(1.2) rotate(5deg); } 100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); } }
+        .knockout { animation: flyOut 0.8s ease-out forwards; }
+        @keyframes flyOut { 0% { transform: translate(0,0) rotate(0deg); } 20% { transform: translate(-20px, 20px) rotate(-10deg); } 100% { transform: translate(-150vw, -50vh) rotate(-120deg); opacity: 0; } }
+        .screen-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-5px, 0, 0); } 20%, 80% { transform: translate3d(10px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-10px, 0, 0); } 40%, 60% { transform: translate3d(10px, 0, 0); } }
+        #impactFlash { position: fixed; top:0; left:0; width:100%; height:100%; background: white; opacity: 0; pointer-events: none; z-index: 8600; }
+        .flash-now { animation: flashAnim 0.3s ease-out forwards; }
+        @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
+        #letsGoBtn { position: absolute; bottom: 15%; font-size: 20px; padding: 15px 40px; z-index: 9999; display: none; animation: fadeInBtn 1s; border-radius: 50px; border: none; background: var(--pink); color: white; cursor: pointer; font-weight: bold; }
+        @keyframes fadeInBtn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bottom Music Toggle */
-        #music-controls {
-            position: absolute;
-            bottom: 40px;
-            z-index: 20;
-            display: none; /* Hidden until camera starts */
-        }
+        /* --- 3. GAME HUD & UI --- */
+        #gameHUD { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; z-index: 7000; background: rgba(255, 255, 255, 0.95); padding: 8px 15px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--pink); width: auto; min-width: 280px; justify-content: space-around; }
+        .hud-item { display: flex; flex-direction: column; align-items: center; }
+        .hud-label { font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .hud-icon { width: 28px; height: 28px; object-fit: contain; }
+        #scoreCounter { font-size: 24px; font-weight: 900; color: var(--pink); line-height: 1; }
+        #scoreTotal { font-size: 12px; font-weight: bold; color: #aaa; }
+        #progressWrapper { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 7000; display: none; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px); }
+        #barBase { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; }
+        #barFill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff758f, #ff4d6d); transition: 0.2s; }
+        #barText { color: var(--pink); font-weight: bold; margin-top: 3px; font-size: 12px; }
 
-        .music-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .centerBox { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 30px; z-index: 100; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        button.actionBtn { padding: 12px 25px; font-size: 16px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; margin: 8px; background: var(--pink); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+        #noBtn { background: #adb5bd; position: relative; z-index: 200; border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin: 8px; }
+        .hidden { display: none !important; }
+        
+        #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; display: none; opacity: 0; transition: 2s; }
+        #beatingHeart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 600; cursor: pointer; text-align: center; }
+        #heartEmoji { font-size: 100px; animation: pBeat 0.8s infinite; }
+        #heartText { color: #ff4d6d; font-size: 24px; font-weight: bold; margin-top: 20px; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 15px rgba(255, 77, 109, 0.6); white-space: nowrap; animation: fadeText 1.5s infinite alternate; }
+        @keyframes pBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes fadeText { from { opacity: 0.6; } to { opacity: 1; } }
+        #glassOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; z-index: 1500; }
+        
+        /* FRUIT NINJA ITEMS */
+        .toss-item { position: fixed; cursor: crosshair; z-index: 9000; bottom: -300px; user-select: none; pointer-events: auto; padding: 15px; }
+        @keyframes tossUp { 0% { bottom: -300px; transform: rotate(0deg); } 50% { bottom: var(--peakHeight); } 100% { bottom: -300px; transform: rotate(720deg); } }
 
-        .music-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
+        /* CUPID FINALE */
+        #cupidFinale { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 8000; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
+        #finaleCupid { width: 50vw; max-width: 250px; animation: flyInCupid 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; margin-bottom: 20px; }
+        @keyframes flyInCupid { from { transform: translate(-100vw, -20vh) rotate(-20deg); opacity: 0; } to { transform: translate(0, 0) rotate(0deg); opacity: 1; } }
+        .final-letter-card { background: #fff; padding: 30px 20px; border-radius: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 4px solid var(--pink); animation: popUp 0.5s 1s backwards; display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
+        @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .music-toggle.playing {
-            background: rgba(0, 242, 254, 0.2);
-            border-color: #00f2fe;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-        }
+        /* --- 4.5 LOVE WEEK OVERLAY & ANIMATIONS --- */
+        #loveWeekOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 8500; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            transition: background 1s ease; padding: 20px; overflow: hidden;
+        }
+        
+        /* 1. Rose Day - Falling Petal Images */
+        .rose-petal { position: absolute; top: -100px; width: 40px; height: auto; user-select: none; pointer-events: none; animation: fall linear forwards; z-index: 8600; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
+        @keyframes fall { to { transform: translateY(120vh) rotate(720deg); } }
+        
+        /* 2. Chocolate Day - Drippier Effect */
+        #chocolateDrip {
+            position: fixed; top: 0; left: 0; width: 100%; height: 0;
+            background: linear-gradient(to bottom, #3e2723 40%, #5d4037 100%); /* Gradient for depth */
+            z-index: 8400; transition: height 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            border-bottom-left-radius: 50% 100px; border-bottom-right-radius: 50% 100px;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.3), 0 15px 30px rgba(0,0,0,0.4); 
+        }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Do not mirror the whole canvas here, we handle it in JS so particles render correctly */
-        }
+        /* 3. Teddy Day - Bike Drive In (Right to Left & Idle) */
+        .week-img.drive-in { 
+            height: auto; width: 85%; max-width: 500px; 
+            margin-bottom: 10px;
+            animation: vroomRightToLeft 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards, idleBike 2s ease-in-out infinite 0.8s; 
+        }
+        @keyframes vroomRightToLeft { 
+            0% { transform: translateX(150vw) skewX(20deg) scale(0.8); opacity: 0; } 
+            70% { transform: translateX(-20px) skewX(-5deg) scale(1.1); opacity: 1; } 
+            100% { transform: translateX(0) skewX(0) scale(1.2); opacity: 1; } 
+        }
+        @keyframes idleBike {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-3px) translateY(-2px); }
+        }
+        /* Bike Drive OUT (Left) */
+        .week-img.drive-out {
+            animation: vroomOutLeft 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
+        }
+        @keyframes vroomOutLeft {
+            0% { transform: translateX(0) skewX(0) scale(1.2); opacity: 1; }
+            100% { transform: translateX(-150vw) skewX(-20deg) scale(1.2); opacity: 1; }
+        }
 
-        video { display: none; }
-        audio { display: none; }
-        .hidden { display: none !important; }
-    </style>
+        /* Smoke Effect */
+        .smoke-particle { position: absolute; bottom: 80px; right: -50px; width: 40px; height: 40px; background: rgba(220,220,220,0.6); border-radius: 50%; animation: smokePuff 1s ease-out forwards; z-index: 8700; pointer-events: none; filter: blur(5px); }
+        @keyframes smokePuff { to { transform: translate(-150px, -50px) scale(4); opacity: 0; } }
 
-    <!-- MediaPipe Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+
+        /* 4. Kiss Day - Marks */
+        .kiss-mark { position: absolute; font-size: 50px; animation: popKiss 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 8700; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+        @keyframes popKiss { from { transform: scale(0) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+        /* Card Styles */
+        .week-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px; border-radius: 30px;
+            width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: cardSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; z-index: 8800;
+        }
+        @keyframes cardSlideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        #weekTitle { color: #555; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold; }
+        
+        /* Adjusted Container for Teddy Day (Height auto for bike) */
+        #weekImageContainer { display: flex; justify-content: center; align-items: center; gap: 20px; min-height: 200px; margin-bottom: 20px; position: relative; }
+        .week-img { height: 160px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); transition: transform 0.3s; }
+        .week-img.float { animation: floatImg 3s ease-in-out infinite; }
+        @keyframes floatImg { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        #weekQuestion { font-size: 20px; font-weight: bold; color: var(--pink); margin-bottom: 25px; line-height: 1.4; white-space: pre-wrap; }
+        #hugMessage { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 4px solid var(--pink); z-index: 9000; text-align: center; color: var(--deep-rose); font-weight: bold; font-size: 24px; display: none; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 80%; }
+
+        /* --- 5. WHITE SCREEN FINALE --- */
+        #whiteScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1s; padding: 20px; }
+        #finalRedText { color: #d00000; font-size: clamp(20px, 5vw, 36px); text-align: center; font-weight: bold; opacity: 0; transition: opacity 1s; width: 100%; max-width: 600px; text-shadow: 0 2px 10px rgba(255, 0, 0, 0.1); line-height: 1.5; }
+        #finaleLoadingBox { width: 80%; max-width: 250px; height: 10px; background: #f0f0f0; border-radius: 20px; margin-top: 30px; overflow: hidden; opacity: 0; transition: opacity 1s; border: 1px solid #ff4d6d; }
+        #finaleBar { height: 100%; width: 0%; background: #ff4d6d; transition: width 5s linear; }
+        #byeText { color: #ff4d6d; font-size: clamp(28px, 6vw, 50px); text-align: center; font-weight: bold; opacity: 0; position: absolute; transition: opacity 1s; width: 100%; }
+
+        .love-pop { position: fixed; color: #ff0055; font-weight: bold; font-size: 24px; pointer-events: none; z-index: 9500; text-shadow: 0 0 5px white; animation: floatUp 3s ease-out forwards; }
+        @keyframes floatUp { 0% { opacity:1; transform: translateY(0) scale(1); } 100% { opacity:0; transform: translateY(-80px) scale(1.5); } }
+
+        #rulesPopup { z-index: 7500; }
+        #dimpuImg { transition: transform 1s ease-in; max-width: 100%; border-radius: 20px; width: 100%; }
+        input[type="number"] { padding: 12px; font-size: 18px; border-radius: 15px; border: 2px solid var(--pink); outline: none; width: 100%; text-align: center; margin-bottom: 15px; }
+        #redFlash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 9500; transition: opacity 0.2s; }
+    </style>
 </head>
 <body>
 
-    <div id="ui-container">
-        <h1>Audio React Engine</h1>
-        <p style="color: #aaa;">Ruk jao Initialize tracking to enter the environment.</p>
-        <button id="start-btn">Pehle Connect the Camera</button>
-        <p id="loading-text" class="hidden" style="color: #00f2fe;">Abhi Establishing connection...</p>
-    </div>
+<div id="sword"></div>
+<img id="cupid-img" src="cupid.png" style="position:fixed; width:100px; pointer-events:none; z-index:9995; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); transition: top 0.1s, left 0.1s;">
 
-    <!-- The audio source -->
-    <audio id="audio-player" src="babydoll.mp3" loop></audio>
+<audio id="cuteMusic" loop src="cute-bgm.mp3" preload="auto"></audio>
+<audio id="letterMusic" src="lettersong.mp3" preload="auto"></audio>
+<audio id="sliceSound" src="slice.mp3" preload="auto"></audio>
+<audio id="yaySound" src="yay.mp3" preload="auto"></audio>
+<audio id="sadSound" src="sad.mp3" preload="auto"></audio>
+<audio id="afterCakeSound" src="after cake.mp3" preload="auto"></audio>
+<audio id="heartSound" loop src="heart.mp3" preload="auto"></audio>
+<audio id="chaloSound" src="chalo.mp3" preload="auto"></audio>
+<audio id="tugayaSound" src="tugaya.mp3" preload="auto"></audio>
+<audio id="bounceSound" src="bounce.mp3" preload="auto"></audio>
+<audio id="sadIndianSound" src="sadindian.mp3" preload="auto"></audio>
+<audio id="bikeIdle" src="bike.mp3" loop preload="auto"></audio>
+<audio id="bikeRev" src="bikerev.mp3" preload="auto"></audio>
 
-    <div id="music-controls">
-        <button id="music-toggle-btn" class="music-toggle">Music on karo pehle</button>
-    </div>
+<div id="startScreen">
+    <div class="rain-container" id="rainBox"></div>
+    <div class="start-card">
+        <div class="loader-heart">❤️</div>
+        <h1>Hey Mannu... 👋</h1>
+        <p>Wait karna padega... Special cheez hai! 😉</p>
+        <div id="loaderBox">
+            <div class="loader-container"><div class="loader-bar" id="fillBar"></div></div>
+            <p id="loadingText">Ittu sa pyar...</p>
+        </div>
+        <button id="startBtn" onclick="triggerIntro()">Open Your Gift 🎁</button>
+    </div>
+</div>
 
-    <video id="videoElement" autoplay playsinline></video>
-    <canvas id="outputCanvas"></canvas>
+<div id="introScene">
+    <div id="impactFlash"></div>
+    <div id="valentineText">Valentine's Day? 🌹</div>
+    <div id="birthdayText">Mannu ka Birthday Hai! 🎂</div>
+    <button id="letsGoBtn" onclick="startMainExperience()">Let's Go! ✨</button>
+</div>
 
-    <script>
-        // --- GLOBALS & STATE ---
-        const canvas = document.getElementById('outputCanvas');
-        const ctx = canvas.getContext('2d');
-        const audioPlayer = document.getElementById('audio-player');
-        const musicToggleBtn = document.getElementById('music-toggle-btn');
-        
-        let audioCtx, source, delay, feedback, pinchFilter, eyeFilter, analyser;
-        let audioInitialized = false;
-        let isPlaying = false;
-        
-        // Tracking data shared with the animation loop
-        let trackedHands = [];
-        let eyeLookRatio = 0.5;
+<div id="gameHUD" class="hidden">
+    <div class="hud-item"><span class="hud-label">Slice:</span><img src="letter.png" class="hud-icon"></div>
+    <div class="hud-score-box"><div id="scoreCounter">0</div><div id="scoreTotal">/ 19</div></div>
+    <div class="hud-item"><span class="hud-label">Avoid:</span><div style="display:flex; gap:5px;"><img src="dal.png" class="hud-icon"><img src="roti.png" class="hud-icon"></div></div>
+</div>
+<div id="progressWrapper"><div id="barBase"><div id="barFill"></div></div><div id="barText">Collect Letters: 0/19</div></div>
+<div id="redFlash"></div>
 
-        // --- PARTICLE SYSTEM ---
-        const particles = [];
-        const PARTICLE_COUNT = 150;
-        let audioDataArray;
+<div id="stage1" class="centerBox hidden">
+    <h1>Will you be my Valentine, Mannu? ❤️</h1>
+    <div style="display:flex; justify-content:center; gap:10px; margin-top: 20px; flex-wrap:wrap;">
+        <button class="actionBtn" onclick="toStage2()">Yes 😍</button>
+        <button id="noBtn">Nahi 😒</button>
+    </div>
+</div>
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * window.innerWidth;
-                this.y = Math.random() * window.innerHeight;
-                this.vx = (Math.random() - 0.5) * 1;
-                this.vy = (Math.random() - 0.5) * 1;
-                this.baseRadius = Math.random() * 2 + 1;
-                this.color = `hsla(${200 + Math.random() * 60}, 100%, 70%, 0.8)`; // Blues & Purples
-            }
+<div id="stage2" class="centerBox hidden">
+    <h2 id="counter" style="color:var(--pink)">Slices left: 19</h2>
+    <h1>Mannu, kaato jaldi se! 🎂</h1>
+    <img id="cake" src="cake.png" style="width:80%; margin: 20px 0;">
+    <div id="cakeChoices" class="hidden" style="margin-top: 10px;">
+        <button class="actionBtn" onclick="showDimpu()">Adi ko dedo ek piece 🙋‍♂️</button>
+        <button class="actionBtn" onclick="eatSelf()">Sara Khud Khajao 😋</button>
+    </div>
+</div>
 
-            update(audioVolume) {
-                // Apply Audio Reactivity
-                let currentRadius = this.baseRadius + (audioVolume * 0.05);
+<div id="guiltPopup" class="centerBox hidden" style="z-index:2001;">
+    <h2>🤨 Had hai!</h2>
+    <p style="font-size: 18px; margin: 20px 0;">Akele khana gandi baat hai Mannu baby.</p>
+    <button class="actionBtn" onclick="showDimpu()">Mujhe bhi dedo hehe 🍰</button>
+</div>
 
-                // Apply Hand Gravity
-                trackedHands.forEach(hand => {
-                    // Convert normalized coordinates to screen space (mirrored X)
-                    let hx = (1 - hand.x) * window.innerWidth; 
-                    let hy = hand.y * window.innerHeight;
-                    
-                    let dx = hx - this.x;
-                    let dy = hy - this.y;
-                    let distance = Math.hypot(dx, dy);
-                    
-                    // Gravity pull if hand is close enough
-                    if (distance < 300) {
-                        let force = (300 - distance) / 300;
-                        this.vx += (dx / distance) * force * 0.5;
-                        this.vy += (dy / distance) * force * 0.5;
-                    }
-                });
+<div id="dimpuStage" class="centerBox hidden" style="z-index: 2005;">
+    <img id="dimpuImg" src="dimpu.png">
+    <h2 style="margin: 15px 0;">Ye Guldasta Logi? 🌷</h2>
+    <p style="margin-bottom: 10px;">To confirm, tell me Adi's birth year:</p>
+    <input type="number" id="adiYear" placeholder="YYYY">
+    <br>
+    <button class="actionBtn" onclick="checkYear()">Confirm ✅</button>
+</div>
 
-                // Friction to stop infinite acceleration
-                this.vx *= 0.95;
-                this.vy *= 0.95;
+<div id="rulesPopup" class="centerBox hidden">
+    <h2 style="color: var(--pink); margin-bottom: 15px;">Putku Suno Meri Baat... 🤫</h2>
+    <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.6;">
+        Baby suno tumko na ye <b>Letters</b> slice krne hai cursor move karke 💌
+    </p>
+    <p style="font-size: 16px; margin-bottom: 20px; color: #d00000; font-weight: bold;">
+        Par wo <b>Dal aur Rota</b> ko maat slice karna putku! ⚠️<br>
+        Warna zero ho jayega score apka... 💣
+    </p>
+    <button class="actionBtn" onclick="startFinalGame()">I am Ready! 🥷❤️</button>
+</div>
 
-                // Move
-                this.x += this.vx;
-                this.y += this.vy;
+<div id="blackout"></div>
+<div id="beatingHeart">
+    <div id="heartEmoji">❤️</div>
+    <div id="heartText">Mere dil pe tap karo babe</div>
+</div>
+<div id="glassOverlay"></div>
 
-                // Bounce off walls
-                if (this.x < 0 || this.x > window.innerWidth) this.vx *= -1;
-                if (this.y < 0 || this.y > window.innerHeight) this.vy *= -1;
+<div id="cupidFinale">
+    <img src="cupid.png" id="finaleCupid">
+    <div class="final-letter-card">
+        <h1 style="color: #ff4d6d; margin-bottom: 15px; font-size:24px;">My Dearest Mannu ❤️</h1>
+        <p style="font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 20px;">
+            Tum ek akeli aisi insaan ho jisse baat karna mujhe sabse jadha accha lagta hai, aur mai papa mummy ko thanks bolna chahunga ki unhone mujhe itni pyari pyari mannu di, aaj ke din, you are the best baby!! Sabse best hai meri mannu! Happy Birthday to you babyjaan <br><br>
+            <b>I Love You Forever!</b>
+        </p>
+        <button class="actionBtn" style="font-size: 20px; padding: 15px 30px; margin-top: 10px;" onclick="startLoveJourney()">Click Here ❤️</button>
+    </div>
+</div>
 
-                this.draw(currentRadius);
-            }
+<div id="loveWeekOverlay">
+    <div id="chocolateDrip"></div>
+    <div class="rain-container" id="valentineRain" style="display:none; z-index:8600;"></div>
+    
+    <div class="week-card">
+        <div id="weekTitle"></div>
+        <div id="weekImageContainer"></div>
+        <div id="weekQuestion"></div>
+        <div id="weekButtons"></div>
+    </div>
+    <div id="hugMessage">Love you sooo much babyyyyy maja aagya wow wow hug 🤗❤️</div>
+</div>
 
-            draw(radius) {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = this.color;
-                ctx.fill();
-                ctx.shadowBlur = 0; // Reset for performance
-            }
-        }
+<div id="whiteScreen">
+    <h1 id="finalRedText">Mannu, tum ho meri best friend, meri darling, meri jaaneman, hehe! I love you sooooooo much! ❤️</h1>
+    <div id="finaleLoadingBox"><div id="finaleBar"></div></div>
+    <h1 id="byeText">biee biee cutie 🎀</h1>
+</div>
 
-        function initParticles() {
-            for(let i = 0; i < PARTICLE_COUNT; i++) {
-                particles.push(new Particle());
-            }
-        }
+<script>
+    // --- MOUSE & TOUCH TRACKING ---
+    let mouse = { x:0, y:0, lx:0, ly:0 };
+    function updateCupid(x, y) {
+        const cupid = document.getElementById("cupid-img");
+        if (cupid) { cupid.style.left = (x + 15) + "px"; cupid.style.top = (y + 15) + "px"; }
+    }
+    document.addEventListener("touchmove", function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        mouse.x = touch.clientX; mouse.y = touch.clientY;
+        updateSword(); updateCupid(mouse.x, mouse.y); 
+        const element = document.elementFromPoint(mouse.x, mouse.y);
+        if(element && element.classList.contains('toss-item') && !element.hit) { element.hit = true; element.sliceHandler(); }
+        if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) { checkHit(); }
+    }, { passive: false });
 
-        // --- WEB AUDIO API ENGINE ---
-        function initAudioEngine() {
-            if (audioInitialized) return;
-            
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            source = audioCtx.createMediaElementSource(audioPlayer);
-            
-            // Analyser for particles
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            audioDataArray = new Uint8Array(analyser.frequencyBinCount);
+    document.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX; mouse.y = e.clientY;
+        updateSword(); updateCupid(mouse.x, mouse.y);
+        let speed = Math.sqrt(Math.pow(mouse.x - mouse.lx, 2) + Math.pow(mouse.y - mouse.ly, 2));
+        if (speed > 15) { createSlash(mouse.x, mouse.y); if(!isGameOver && !document.getElementById("stage2").classList.contains("hidden")) checkHit(); }
+        mouse.lx = mouse.x; mouse.ly = mouse.y;
+    });
 
-            // Pinch Filter (Muffles sound)
-            pinchFilter = audioCtx.createBiquadFilter();
-            pinchFilter.type = 'lowpass';
-            pinchFilter.frequency.value = 20000; // Open by default
+    function updateSword() { const sword = document.getElementById("sword"); sword.style.left = mouse.x + "px"; sword.style.top = mouse.y + "px"; }
+    function createSlash(x, y) { const s = document.createElement("div"); s.className = "slash"; s.style.left = x + "px"; s.style.top = y + "px"; s.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(y - mouse.ly, x - mouse.lx) * 180 / Math.PI}deg)`; document.body.appendChild(s); setTimeout(() => s.remove(), 400); }
 
-            // Eye Filter (Wah effect based on looking left/right)
-            eyeFilter = audioCtx.createBiquadFilter();
-            eyeFilter.type = 'peaking';
-            eyeFilter.frequency.value = 1000;
-            eyeFilter.Q.value = 5;
-            eyeFilter.gain.value = 10;
+    // --- MAIN FLOW ---
+    function spawnRain(containerId) {
+        const rainContainer = document.getElementById(containerId);
+        if(!rainContainer) return;
+        rainContainer.innerHTML = '';
+        for(let i=0; i<45; i++) {
+            const span = document.createElement('span'); span.innerText = "14 Feb"; span.className = "rain-text";
+            span.style.left = Math.random() * 100 + '%'; 
+            span.style.animationDuration = (Math.random() * 3 + 4) + 's'; 
+            span.style.fontSize = (Math.random() * 12 + 12) + 'px';
+            rainContainer.appendChild(span);
+        }
+    }
 
-            // Echo / Delay System
-            delay = audioCtx.createDelay(2.0);
-            delay.delayTime.value = 0; // Off by default
-            
-            feedback = audioCtx.createGain();
-            feedback.gain.value = 0; // Echo intensity
-            
-            // Audio Routing
-            source.connect(analyser);
-            analyser.connect(eyeFilter);
-            eyeFilter.connect(pinchFilter);
-            
-            // Dry signal to output
-            pinchFilter.connect(audioCtx.destination);
-            
-            // Wet signal loop (Delay)
-            pinchFilter.connect(delay);
-            delay.connect(feedback);
-            feedback.connect(delay);
-            delay.connect(audioCtx.destination);
+    window.onload = function() {
+        spawnRain('rainBox'); // Start Screen Rain
+        let load = 0;
+        const txt = document.getElementById('loadingText');
+        const interval = setInterval(() => {
+            load++; document.getElementById('fillBar').style.width = load + "%";
+            if(load < 25) txt.innerText = "Preparing surprise for Mannu... 🎁";
+            else if(load < 50) txt.innerText = "Adding extra love & kisses... 💋";
+            else if(load < 80) txt.innerText = "Bas thoda sa aur baby... 🤏";
+            else txt.innerText = "Ye lo aapka gift! ❤️";
+            if(load >= 100) { clearInterval(interval); document.getElementById('loaderBox').style.display = 'none'; document.getElementById('startBtn').style.display = 'inline-block'; }
+        }, 45);
+    };
 
-            audioInitialized = true;
-        }
+    function triggerIntro() {
+        const sfx = ['yaySound', 'sadSound', 'sliceSound', 'afterCakeSound', 'heartSound', 'letterMusic', 'chaloSound', 'tugayaSound', 'bounceSound', 'sadIndianSound'];
+        sfx.forEach(id => { const el = document.getElementById(id); el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(e => console.log(id)); });
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('introScene').style.display = 'flex';
+        const vText = document.getElementById('valentineText'); const bText = document.getElementById('birthdayText'); const flash = document.getElementById('impactFlash'); const bounce = document.getElementById('bounceSound');
+        setTimeout(() => { vText.classList.add('pop-in'); }, 300);
+        setTimeout(() => { bText.classList.add('crash-in'); setTimeout(() => { bounce.play(); document.getElementById('introScene').classList.add('screen-shake'); flash.classList.add('flash-now'); vText.classList.add('knockout'); }, 300); setTimeout(() => { document.getElementById('letsGoBtn').style.display = 'block'; }, 1500); }, 1500);
+    }
 
-        // --- RENDER LOOP ---
-        function renderLoop() {
-            ctx.fillStyle = 'rgba(3, 3, 5, 0.3)'; // Trailing effect for particles
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function startMainExperience() {
+        document.getElementById('bounceSound').pause(); document.getElementById('bounceSound').currentTime = 0;
+        document.getElementById('cuteMusic').volume = 0.2; document.getElementById('cuteMusic').play();
+        document.getElementById('introScene').style.display = 'none'; document.getElementById('stage1').classList.remove('hidden');
+    }
 
-            // Get audio volume for particles
-            let avgVolume = 0;
-            if (audioInitialized && isPlaying) {
-                analyser.getByteFrequencyData(audioDataArray);
-                let sum = audioDataArray.reduce((a, b) => a + b, 0);
-                avgVolume = sum / audioDataArray.length;
-            }
+    let slices = 19; let letterScore = 0; const targetScore = 19; let isGameOver = false; let stopGame = false;
 
-            // Draw and update particles
-            particles.forEach(p => p.update(avgVolume));
+    function toStage2() { document.getElementById("yaySound").play(); document.getElementById("stage1").classList.add("hidden"); document.getElementById("noBtn").style.display = "none"; document.getElementById("stage2").classList.remove("hidden"); }
+    document.getElementById("noBtn").addEventListener('mouseover', function() { const btn = this; document.getElementById("sadSound").currentTime = 0; document.getElementById("sadSound").play(); if (btn.parentNode.id !== 'body') { document.body.appendChild(btn); } btn.style.position = "fixed"; btn.style.left = Math.random() * 80 + "vw"; btn.style.top = Math.random() * 80 + "vh"; });
 
-            // Draw Hands
-            trackedHands.forEach(hand => {
-                let hx = (1 - hand.x) * canvas.width; // Mirror X
-                let hy = hand.y * canvas.height;
-                
-                // Draw a glowing core at the hand position
-                ctx.beginPath();
-                ctx.arc(hx, hy, 10, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = '#00f2fe';
-                ctx.fill();
-                ctx.shadowBlur = 0;
+    function checkHit() {
+        if(slices <= 0) return; 
+        const rect = document.getElementById("cake").getBoundingClientRect();
+        if(mouse.x > rect.left && mouse.x < rect.right && mouse.y > rect.top && mouse.y < rect.bottom) {
+            if(Date.now() - (window.lh || 0) > 150) {
+                slices--; if (slices < 0) slices = 0;
+                document.getElementById("counter").innerText = `Slices left: ${slices}`;
+                const s = document.getElementById("sliceSound"); s.currentTime = 0; s.play();
+                if(slices === 0) { document.getElementById("afterCakeSound").play(); document.getElementById("cake").src = "sliced cake.png"; document.getElementById("cakeChoices").classList.remove("hidden"); }
+                window.lh = Date.now();
+            }
+        }
+    }
 
-                // Visual Pinch Indicator
-                if (hand.pinch < 0.1) {
-                    ctx.beginPath();
-                    ctx.arc(hx, hy, 40, 0, Math.PI * 2);
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${1 - (hand.pinch/0.1)})`;
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-            });
+    function eatSelf() { document.getElementById("guiltPopup").classList.remove("hidden"); document.getElementById("cuteMusic").pause(); document.getElementById("sadIndianSound").play(); }
+    function showDimpu() { document.getElementById("sadIndianSound").pause(); document.getElementById("sadIndianSound").currentTime = 0; document.getElementById("cuteMusic").play(); document.getElementById("stage2").classList.add("hidden"); document.getElementById("guiltPopup").classList.add("hidden"); document.getElementById("dimpuStage").classList.remove("hidden"); }
+    function checkYear() {
+        const val = document.getElementById("adiYear").value; const img = document.getElementById("dimpuImg"); const tugaya = document.getElementById("tugayaSound");
+        if(val === "2004") { tugaya.pause(); tugaya.currentTime = 0; document.getElementById("chaloSound").play(); img.src = "dimpu2.png"; setTimeout(() => { img.style.transform = "translateY(100vh) rotate(20deg)"; }, 2000); setTimeout(() => { triggerRealBlackout(); }, 3000); }
+        else { tugaya.currentTime = 0; tugaya.play(); img.src = "dimpuangry.png"; alert("Wrong year! Try again 😼"); }
+    }
 
-            requestAnimationFrame(renderLoop);
-        }
+    function triggerRealBlackout() { isGameOver = true; document.getElementById("dimpuStage").classList.add("hidden"); document.getElementById("blackout").style.display = "block"; setTimeout(() => document.getElementById("blackout").style.opacity = "1", 100); setTimeout(() => { document.getElementById("beatingHeart").style.display = "block"; document.getElementById("heartSound").play(); }, 3000); }
+    document.getElementById("beatingHeart").onclick = function() { document.getElementById("heartSound").pause(); this.style.display = "none"; document.getElementById("blackout").style.display = "none"; document.getElementById("glassOverlay").style.display = "block"; document.getElementById("rulesPopup").classList.remove("hidden"); };
 
-        // --- AUDIO MANIPULATION FROM TRACKING ---
-        function updateAudioEffects() {
-            if (!audioInitialized || !isPlaying) return;
+    function startFinalGame() { document.getElementById("rulesPopup").classList.add("hidden"); document.getElementById("progressWrapper").style.display = "block"; document.getElementById("gameHUD").classList.remove("hidden"); document.getElementById("gameHUD").style.display = "flex"; document.getElementById("cuteMusic").pause(); document.getElementById("letterMusic").play(); startFruitNinja(); }
 
-            if (trackedHands.length > 0) {
-                let primaryHand = trackedHands[0];
+    function startFruitNinja() {
+        const loveWords = ["I love you baby", "Mannu is always right", "Adi Mannu Forever!", "Happy Birthday Baby!", "Meri Mannu Birthday!", "Adi+Mannu", "Mannu Ko Inna Sara Love you","Meri Puchku","wow mannu","Kya baat hai baby"];
+        const spawnItem = () => {
+            if (stopGame) return;
+            const item = document.createElement("img");
+            const isBomb = Math.random() > 0.7; 
+            const type = isBomb ? (Math.random() > 0.5 ? "dal.png" : "roti.png") : "letter.png";
+            item.src = type; item.className = "toss-item";
+            const size = isBomb ? (Math.random() * 60 + 80) : (Math.random() * 100 + 150); 
+            item.style.width = size + "px"; item.style.left = Math.random() * 80 + 10 + "vw";
+            const peak = 40 + Math.random() * 40 + "vh"; item.style.setProperty('--peakHeight', peak);
+            const drift = (Math.random() - 0.5) * 300 + "px"; item.style.transform = `translateX(${drift})`;
+            const duration = 2 + Math.random(); item.style.animation = `tossUp ${duration}s ease-in-out forwards`;
+            
+            item.sliceHandler = function() {
+                if (stopGame) return;
+                if (isBomb) { letterScore = 0; updateHUD(); const bad = document.getElementById("tugayaSound"); bad.currentTime = 0; bad.play(); const flash = document.getElementById("redFlash"); flash.style.opacity = "0.6"; setTimeout(() => flash.style.opacity = "0", 200); item.remove(); } 
+                else { 
+                    letterScore++; document.getElementById("scoreCounter").innerText = letterScore; document.getElementById("barFill").style.width = Math.min((letterScore/targetScore)*100, 100) + "%";
+                    const good = document.getElementById("sliceSound"); good.currentTime = 0; good.play(); 
+                    if (letterScore >= targetScore) {
+                        stopGame = true; item.style.animation = 'none'; item.style.transition = "all 2.5s cubic-bezier(0.25, 1, 0.5, 1)"; item.style.position = "fixed"; item.style.left = "50%"; item.style.top = "50%"; item.style.zIndex = "10000";
+                        requestAnimationFrame(() => { item.style.transform = "translate(-50%, -50%) scale(15) rotate(20deg)"; item.style.opacity = "0"; });
+                        setTimeout(() => { document.querySelectorAll('.toss-item').forEach(el => el.remove()); document.getElementById("gameHUD").style.display = "none"; document.getElementById("progressWrapper").style.opacity = "0"; document.getElementById("cupid-img").style.display = "none"; document.getElementById("cupidFinale").style.display = "flex"; }, 2500);
+                    } else { showFloatingText(item.getBoundingClientRect().left, item.getBoundingClientRect().top, loveWords); item.remove(); }
+                }
+            };
+            item.onmouseover = function() { if(!this.hit) { this.hit = true; this.sliceHandler(); } };
+            document.body.appendChild(item); setTimeout(() => { if(item.parentNode) item.remove(); }, duration * 1000 + 100);
+            if (!stopGame) setTimeout(spawnItem, Math.random() * 600 + 300); 
+        };
+        spawnItem();
+    }
+    function showFloatingText(x, y, words) { const txt = document.createElement("div"); txt.className = "love-pop"; txt.innerText = words[Math.floor(Math.random() * words.length)]; txt.style.left = x + "px"; txt.style.top = y + "px"; document.body.appendChild(txt); setTimeout(() => txt.remove(), 3000); }
+    function updateHUD() { document.getElementById("scoreCounter").innerText = letterScore; const pct = (letterScore / targetScore) * 100; document.getElementById("barFill").style.width = Math.min(pct, 100) + "%"; }
 
-                // 1. Pinch messes with the Filter (Lowpass)
-                // Pinch distance: ~0.02 (closed) to ~0.15 (open)
-                let filterFreq = 20000; // default open
-                if (primaryHand.pinch < 0.15) {
-                    let squeeze = Math.max(0, 1 - (primaryHand.pinch / 0.15));
-                    // Map squeeze to a muffled sound (200Hz to 20000Hz)
-                    filterFreq = 20000 - (squeeze * 19500); 
-                }
-                pinchFilter.frequency.setTargetAtTime(filterFreq, audioCtx.currentTime, 0.1);
+    // --- LOVE WEEK JOURNEY ---
+    const loveData = [
+        { day: "7 Feb - Rose Day", img: "rose.png", q: "Mujhe pata hai pehle wala rose tumse kahi kho gaya… chalo koi baat nahi ye lo cutie kya tumko mera rose pasand aaya? Accept karogi?", bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)", special: "rose", btnText: "Haan, Rose dedo! 🌹" },
+        { day: "8 Feb - Propose Day", img: "propose.png", q: "MAññU, sirf iss janam me nahi kya har janam me tum meri bano gi? I love you sooo much ❤️", bg: "linear-gradient(135deg, #f6d365 0%, #fda085 100%)", special: false, btnText: "Yes, humesha ke liye! 💍" },
+        { day: "9 Feb - Chocolate Day", img: null, q: "Babyjaan, Isme se na aap ek chocolate lelo… Jo bhi apko chahiye. Fir dono khayenge sath me", bg: "linear-gradient(135deg, #5b3e31 0%, #8d6e63 100%)", special: "chocolate" },
+        { day: "10 Feb - Teddy Day", img: "teddy.png", q: "Baby Jaldi se apna bada sa teddy bear pakdo… isko bohot mehnat se laya hi apke liye abhi abhi abhi chahiye tha na apko.. ye lo", bg: "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)", special: "teddy", btnText: "Le Liya! 🧸" },
+        { day: "11 Feb - Promise Day", img: "promise.png", q: "MAññU cutie kya aap mere hamesa sath rehne wale promise ko accept karogi?", bg: "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)", special: false, btnText: "Pinky Promise! 🤞" },
+        { day: "12 Feb - Hug Day", img: "hug.png", q: "Babe kya aap mera pyara sa side hug accept karoge? Ya fir tight wala hug", bg: "linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%)", special: "hug" },
+        { day: "13 Feb - Kiss Day", img: "kiss.png", q: "Kya abhi abhi abhi hum ek aise kissi kar sakte hai?", bg: "linear-gradient(135deg, #fc00ff 0%, #00dbde 100%)", special: "kiss", btnText: "Haan, ek kissi! 💋" },
+        { day: "14 Feb - Valentine's Day", img: "valentine.png", q: "Mannu, sirf 2026 me nahi.. kya tum har saal aur saalon saal.. meri valentine banogi? For ever and forever ♾️", bg: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", special: "valentine", btnText: "Yes, Forever! ♾️" }
+    ];
+    let currentDayIndex = 0; let petalInterval; let kissInterval; let smokeInterval;
 
-                // 2. Hand X messes with the Echo (Feedback amount)
-                let echoAmount = primaryHand.x; // 0 to 1
-                delay.delayTime.setTargetAtTime(0.4, audioCtx.currentTime, 0.1); // 400ms echo
-                feedback.gain.setTargetAtTime(echoAmount * 0.8, audioCtx.currentTime, 0.1); // Max 80% feedback
+    function startLoveJourney() {
+        document.getElementById("cupidFinale").style.display = "none";
+        document.getElementById("loveWeekOverlay").style.display = "flex";
+        renderDay(); document.getElementById("yaySound").play();
+    }
 
-                // 3. Hand Y messes with Pitch (Playback Rate)
-                // Middle of screen = 1.0 (normal speed). Top = fast/high, Bottom = slow/deep
-                let rate = 1.5 - primaryHand.y; // Maps Y(0..1) to Rate(1.5..0.5)
-                audioPlayer.playbackRate = Math.max(0.5, Math.min(1.5, rate));
+    function cleanupAnimations() {
+        clearInterval(petalInterval); document.querySelectorAll('.rose-petal').forEach(el => el.remove());
+        document.getElementById("chocolateDrip").style.height = "0";
+        document.getElementById("valentineRain").style.display = "none"; 
+        clearInterval(kissInterval); document.querySelectorAll('.kiss-mark').forEach(el => el.remove());
+        clearInterval(smokeInterval); document.querySelectorAll('.smoke-particle').forEach(el => el.remove());
+        
+        // Stop Audio
+        document.getElementById("bikeIdle").pause();
+    }
 
-            } else {
-                // Return to normal if no hands detected
-                pinchFilter.frequency.setTargetAtTime(20000, audioCtx.currentTime, 0.5);
-                feedback.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
-                audioPlayer.playbackRate = 1.0;
-            }
+    function renderDay() {
+        cleanupAnimations();
+        const data = loveData[currentDayIndex];
+        const overlay = document.getElementById("loveWeekOverlay");
+        const title = document.getElementById("weekTitle");
+        const imgContainer = document.getElementById("weekImageContainer");
+        const q = document.getElementById("weekQuestion");
+        const btnContainer = document.getElementById("weekButtons");
 
-            // 4. Eye Tracking controls peaking filter frequency
-            // lookRatio is ~0.3 (left) to ~0.7 (right)
-            let eyeWahFreq = 400 + (eyeLookRatio * 3000); // Sweep between 400Hz and 3400Hz
-            eyeFilter.frequency.setTargetAtTime(eyeWahFreq, audioCtx.currentTime, 0.2);
-        }
+        overlay.style.background = data.bg; title.innerText = data.day; q.innerText = data.q;
+        imgContainer.innerHTML = ''; btnContainer.innerHTML = '';
 
+        // --- ROSE DAY ---
+        if (data.special === "rose") {
+            const petalImages = ['petal1.png', 'petal2.png', 'petal3.png'];
+            petalInterval = setInterval(() => {
+                const petalImg = petalImages[Math.floor(Math.random() * petalImages.length)];
+                const petal = document.createElement("img"); petal.src = petalImg; petal.className = "rose-petal";
+                petal.style.left = Math.random() * 95 + "vw"; petal.style.animationDuration = (Math.random() * 3 + 4) + "s";
+                document.body.appendChild(petal); setTimeout(() => petal.remove(), 7000);
+            }, 400);
+            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
+        }
+        // --- CHOCOLATE DAY ---
+        else if (data.special === "chocolate") {
+            document.getElementById("chocolateDrip").style.height = "180px"; 
+            const kitkat = document.createElement("img"); kitkat.src = "kitkat.png"; kitkat.className = "week-img float"; kitkat.onclick = nextDay; kitkat.style.cursor = "pointer";
+            const dairy = document.createElement("img"); dairy.src = "dairymilk.png"; dairy.className = "week-img float"; dairy.id = "runawayDairy"; dairy.style.position = "absolute"; dairy.style.zIndex = "9999";
+            
+            const runAway = (e) => {
+                e.preventDefault(); e.stopPropagation();
+                const newX = Math.random() * (window.innerWidth - 100); const newY = Math.random() * (window.innerHeight - 300) + 100;
+                dairy.style.position = "fixed"; dairy.style.left = newX + "px"; dairy.style.top = newY + "px"; dairy.style.transition = "all 0.2s ease";
+            };
+            dairy.addEventListener("mouseover", runAway); dairy.addEventListener("touchstart", runAway); dairy.addEventListener("click", runAway);
+            imgContainer.appendChild(kitkat); imgContainer.appendChild(dairy);
+            const hint = document.createElement("p"); hint.innerText = "(Click the chocolate!)"; hint.style.fontSize = "12px"; hint.style.color = "#fff"; btnContainer.appendChild(hint);
+        }
+        // --- TEDDY DAY (COMPLEX AUDIO & EXIT) ---
+        else if (data.special === "teddy") {
+            const img = document.createElement("img"); img.src = data.img; 
+            img.className = "week-img drive-in"; 
+            imgContainer.appendChild(img);
+            
+            const revAudio = document.getElementById("bikeRev");
+            const idleAudio = document.getElementById("bikeIdle");
 
-        // --- MEDIAPIPE TRACKING CALLBACKS ---
-        function onHandResults(results) {
-            trackedHands = [];
-            if (results.multiHandLandmarks) {
-                results.multiHandLandmarks.forEach(landmarks => {
-                    // Get center of hand (palm)
-                    const palm = landmarks[9];
-                    // Get pinch distance
-                    const thumb = landmarks[4];
-                    const index = landmarks[8];
-                    const pinch = Math.hypot(thumb.x - index.x, thumb.y - index.y);
-                    
-                    trackedHands.push({
-                        x: palm.x,
-                        y: palm.y,
-                        pinch: pinch
-                    });
-                });
-            }
-            updateAudioEffects();
-        }
+            // 1. Play Entry Sound
+            revAudio.currentTime = 0; revAudio.play();
+            
+            // 2. Switch to Idle after entry (~800ms)
+            setTimeout(() => {
+                revAudio.pause();
+                idleAudio.currentTime = 0; idleAudio.play();
+            }, 1000);
 
-        function onFaceResults(results) {
-            if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-                const landmarks = results.multiFaceLandmarks[0];
-                const eyeOuter = landmarks[33];
-                const eyeInner = landmarks[133];
-                const iris = landmarks[468]; // Center of left iris
+            // Add Entry Smoke
+            smokeInterval = setInterval(() => {
+                const smoke = document.createElement("div"); smoke.className = "smoke-particle";
+                smoke.style.bottom = (80 + Math.random() * 20) + "px";
+                imgContainer.appendChild(smoke); setTimeout(() => smoke.remove(), 1000);
+            }, 150);
+            
+            const btn = document.createElement("button"); 
+            btn.className = "actionBtn"; 
+            btn.innerText = data.btnText;
+            
+            // 3. Exit Logic
+            btn.onclick = function() {
+                idleAudio.pause();
+                revAudio.currentTime = 0; revAudio.play(); // Play Exit Zoom
+                
+                img.classList.remove("drive-in");
+                void img.offsetWidth; // Trigger Reflow
+                img.classList.add("drive-out");
+                
+                // More Smoke for Exit
+                let exitSmoke = setInterval(() => {
+                    const smoke = document.createElement("div"); smoke.className = "smoke-particle";
+                    smoke.style.bottom = (80 + Math.random() * 20) + "px";
+                    smoke.style.left = "50%";
+                    imgContainer.appendChild(smoke); setTimeout(() => smoke.remove(), 1000);
+                }, 100);
+                
+                setTimeout(() => {
+                    clearInterval(exitSmoke);
+                    nextDay();
+                }, 1200);
+            };
+            btnContainer.appendChild(btn);
+        }
+        // --- HUG DAY (FIXED REVERSE LOGIC) ---
+        else if (data.special === "hug") {
+            createStandardLayout(data.img, imgContainer, null);
+            
+            // BUTTON 1: TIGHT HUG (SPECIAL) - Placed First
+            const btnTight = document.createElement("button"); 
+            btnTight.className = "actionBtn"; 
+            btnTight.innerText = "Tight Hug 🤗";
+            btnTight.onclick = function() { 
+                document.getElementById("yaySound").play(); 
+                document.getElementById("hugMessage").style.display = "block"; 
+                setTimeout(() => { 
+                    document.getElementById("hugMessage").style.display = "none"; 
+                    nextDay(); 
+                }, 3000); 
+            };
+            btnContainer.appendChild(btnTight);
 
-                const eyeWidth = Math.abs(eyeOuter.x - eyeInner.x);
-                const irisPosition = Math.abs(iris.x - eyeInner.x);
-                
-                // Update global eye tracking ratio
-                eyeLookRatio = irisPosition / (eyeWidth || 0.01);
-                updateAudioEffects();
-            }
-        }
+            // BUTTON 2: SIDE HUG (NORMAL)
+            const btnSide = document.createElement("button"); 
+            btnSide.className = "actionBtn"; 
+            btnSide.innerText = "Side Hug 🫂"; 
+            btnSide.onclick = nextDay;
+            btnContainer.appendChild(btnSide);
+        }
+        // --- KISS DAY ---
+        else if (data.special === "kiss") {
+            kissInterval = setInterval(() => {
+                const kiss = document.createElement("div"); kiss.innerHTML = "💋"; kiss.className = "kiss-mark";
+                kiss.style.left = Math.random() * 90 + "vw"; kiss.style.top = Math.random() * 90 + "vh"; 
+                kiss.style.transform = `rotate(${Math.random()*360}deg)`;
+                document.body.appendChild(kiss); setTimeout(() => kiss.remove(), 1000);
+            }, 400);
+            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
+        }
+        // --- VALENTINE DAY ---
+        else if (data.special === "valentine") {
+            const rainDiv = document.getElementById("valentineRain");
+            rainDiv.style.display = "block";
+            spawnRain('valentineRain');
+            createStandardLayout(data.img, imgContainer, btnContainer, data.btnText);
+        }
+        else { createStandardLayout(data.img, imgContainer, btnContainer, data.btnText); }
+    }
 
-        // --- SETUP & EVENT LISTENERS ---
-        const startBtn = document.getElementById('start-btn');
-        const uiContainer = document.getElementById('ui-container');
-        const loadingText = document.getElementById('loading-text');
-        const musicControls = document.getElementById('music-controls');
+    function createStandardLayout(imgSrc, imgContainer, btnContainer, btnText) {
+        const img = document.createElement("img"); img.src = imgSrc; img.className = "week-img float";
+        imgContainer.appendChild(img);
+        if(btnContainer) createYesButton(btnContainer, btnText);
+    }
+    function createYesButton(container, text) {
+        const btn = document.createElement("button"); 
+        btn.className = "actionBtn"; 
+        btn.innerText = text || "Yes, I will! ❤️"; 
+        btn.onclick = nextDay;
+        container.appendChild(btn);
+    }
 
-        // Initialize MediaPipe
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        hands.onResults(onHandResults);
+    function nextDay() {
+        document.getElementById("sliceSound").currentTime = 0; document.getElementById("sliceSound").play();
+        currentDayIndex++;
+        if (currentDayIndex < loveData.length) { renderDay(); } 
+        else { cleanupAnimations(); document.getElementById("loveWeekOverlay").style.display = "none"; showFinalWhiteScreen(); }
+    }
 
-        const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
-        faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        faceMesh.onResults(onFaceResults);
-
-        startBtn.addEventListener('click', () => {
-            startBtn.classList.add('hidden');
-            loadingText.classList.remove('hidden');
-
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            initParticles();
-
-            const camera = new Camera(document.getElementById('videoElement'), {
-                onFrame: async () => {
-                    await hands.send({image: document.getElementById('videoElement')});
-                    await faceMesh.send({image: document.getElementById('videoElement')});
-                },
-                width: 1280,
-                height: 720
-            });
-
-            camera.start().then(() => {
-                uiContainer.style.opacity = '0';
-                setTimeout(() => uiContainer.classList.add('hidden'), 500);
-                musicControls.style.display = 'block'; // Show music button
-                renderLoop(); // Start particle engine
-            }).catch(err => {
-                alert("Camera access required for tracking capabilities.");
-            });
-        });
-
-        // Music Toggle Logic
-        musicToggleBtn.addEventListener('click', () => {
-            initAudioEngine(); // Ensure context is built (requires user interaction)
-
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            if (isPlaying) {
-                audioPlayer.pause();
-                musicToggleBtn.innerText = "Turn on the music";
-                musicToggleBtn.classList.remove('playing');
-                isPlaying = false;
-            } else {
-                audioPlayer.play().then(() => {
-                    musicToggleBtn.innerText = "Turn off the music";
-                    musicToggleBtn.classList.add('playing');
-                    isPlaying = true;
-                }).catch(e => {
-                    alert("Could not play babydoll.mp3. Make sure the file exists in the same folder.");
-                });
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    </script>
+    function showFinalWhiteScreen() {
+        const whiteScreen = document.getElementById("whiteScreen"); whiteScreen.style.opacity = "1"; whiteScreen.style.pointerEvents = "auto";
+        setTimeout(() => { document.getElementById("finalRedText").style.opacity = "1"; document.getElementById("finaleLoadingBox").style.opacity = "1"; document.getElementById("finaleBar").style.width = "100%"; }, 500);
+        setTimeout(() => { document.getElementById("finalRedText").style.opacity = "0"; document.getElementById("finaleLoadingBox").style.opacity = "0"; }, 5500); 
+        setTimeout(() => { document.getElementById("byeText").style.opacity = "1"; }, 6500); 
+    }
+</script>
 </body>
 </html>
