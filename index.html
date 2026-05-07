@@ -1,264 +1,463 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinematic 5-Finger Magic Tracking</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #030308; /* Deep cinematic black/blue */
-            color: white;
-            font-family: sans-serif;
-        }
-        canvas {
-            display: block;
-        }
-        .video-container {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 160px;
-            height: 120px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.2);
-            opacity: 0.3;
-            transform: scaleX(-1);
-            transition: opacity 0.3s ease;
-        }
-        .video-container:hover {
-            opacity: 1;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            pointer-events: none;
-            color: rgba(255,255,255,0.7);
-        }
-    </style>
-    
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- MediaPipe -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>When Adi is Bored</title>
+    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=ChaS0JTVFe28_TK6v3viA-9W09g3z6sJscTTBZh_xuB0IZTGJjHnDl7FFF4xoSoFF0uIpPZxRTFRTojIwAefFDpk9NoLFJkB1IMwsmximlvUrahGoCwn5skr_wQzso8AOG5jtiJeAe0i1707Mz4u-jcSAune4PtU7QHeyckO-AZkhaPpGto42KqS0IKL-7kWJJMAuMJiLMwjRu4s4hiHmGN3wiQt71GCtnSGEoO0cXbgwHPS253JYyBXl5Iiqf2p4nPNY8OD57-q8T8c-p_w4Q" charset="UTF-8"></script><style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030305; /* Deep dark cinematic background */
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ui-container {
+            position: absolute;
+            top: 20%;
+            z-index: 10;
+            text-align: center;
+            background: rgba(10, 10, 15, 0.7);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            transition: opacity 0.5s;
+        }
+
+        h1 {
+            margin-top: 0;
+            background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+        }
+
+        #start-btn {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: #000;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
+        }
+
+        /* Bottom Music Toggle */
+        #music-controls {
+            position: absolute;
+            bottom: 40px;
+            z-index: 20;
+            display: none; /* Hidden until camera starts */
+        }
+
+        .music-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .music-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .music-toggle.playing {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Do not mirror the whole canvas here, we handle it in JS so particles render correctly */
+        }
+
+        video { display: none; }
+        audio { display: none; }
+        .hidden { display: none !important; }
+    </style>
+
+    <!-- MediaPipe Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <div id="loading">Initializing Camera & AI...</div>
-    
-    <div class="video-container">
-        <video id="input_video" autoplay playsinline></video>
-    </div>
+    <div id="ui-container">
+        <h1>Audio React Engine</h1>
+        <p style="color: #aaa;">Ruk jao Initialize tracking to enter the environment.</p>
+        <button id="start-btn">Pehle Connect the Camera</button>
+        <p id="loading-text" class="hidden" style="color: #00f2fe;">Abhi Establishing connection...</p>
+    </div>
 
-    <script>
-        // --- 1. THREE.JS SCENE SETUP ---
-        const scene = new THREE.Scene();
-        // Add a slight ambient glow to the scene
-        scene.fog = new THREE.FogExp2(0x030308, 0.02);
+    <!-- The audio source -->
+    <audio id="audio-player" src="babydoll.mp3" loop></audio>
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 25;
+    <div id="music-controls">
+        <button id="music-toggle-btn" class="music-toggle">Music on karo pehle</button>
+    </div>
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        // Important for cinematic glowing effects
-        renderer.setPixelRatio(window.devicePixelRatio); 
-        document.body.appendChild(renderer.domElement);
+    <video id="videoElement" autoplay playsinline></video>
+    <canvas id="outputCanvas"></canvas>
 
-        // --- 2. PROCEDURAL GLOWING TEXTURE ---
-        // Generates a soft, glowing orb without needing external image files
-        function createGlowingTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 64;
-            const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
-            // Ethereal Pink/Purple/Cyan mix
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.2, 'rgba(255, 100, 200, 0.8)');
-            gradient.addColorStop(0.5, 'rgba(100, 50, 255, 0.2)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            context.fillStyle = gradient;
-            context.fillRect(0, 0, 64, 64);
-            return new THREE.CanvasTexture(canvas);
-        }
+    <script>
+        // --- GLOBALS & STATE ---
+        const canvas = document.getElementById('outputCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioPlayer = document.getElementById('audio-player');
+        const musicToggleBtn = document.getElementById('music-toggle-btn');
+        
+        let audioCtx, source, delay, feedback, pinchFilter, eyeFilter, analyser;
+        let audioInitialized = false;
+        let isPlaying = false;
+        
+        // Tracking data shared with the animation loop
+        let trackedHands = [];
+        let eyeLookRatio = 0.5;
 
-        // --- 3. CINEMATIC PARTICLE SYSTEM ---
-        const particleCount = 3000;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        
-        // We will store custom physics data for each particle here
-        const physicsData = []; 
+        // --- PARTICLE SYSTEM ---
+        const particles = [];
+        const PARTICLE_COUNT = 150;
+        let audioDataArray;
 
-        for (let i = 0; i < particleCount; i++) {
-            // Start particles scattered randomly
-            positions[i * 3] = (Math.random() - 0.5) * 50;
-            positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
-            positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+        class Particle {
+            constructor() {
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
+                this.vx = (Math.random() - 0.5) * 1;
+                this.vy = (Math.random() - 0.5) * 1;
+                this.baseRadius = Math.random() * 2 + 1;
+                this.color = `hsla(${200 + Math.random() * 60}, 100%, 70%, 0.8)`; // Blues & Purples
+            }
 
-            physicsData.push({
-                fingerIndex: i % 5, // Assign evenly to all 5 fingers
-                angle: Math.random() * Math.PI * 2,
-                radius: Math.random() * 3 + 0.5,
-                speed: Math.random() * 0.05 + 0.02,
-                yOffset: (Math.random() - 0.5) * 4
-            });
-        }
+            update(audioVolume) {
+                // Apply Audio Reactivity
+                let currentRadius = this.baseRadius + (audioVolume * 0.05);
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                // Apply Hand Gravity
+                trackedHands.forEach(hand => {
+                    // Convert normalized coordinates to screen space (mirrored X)
+                    let hx = (1 - hand.x) * window.innerWidth; 
+                    let hy = hand.y * window.innerHeight;
+                    
+                    let dx = hx - this.x;
+                    let dy = hy - this.y;
+                    let distance = Math.hypot(dx, dy);
+                    
+                    // Gravity pull if hand is close enough
+                    if (distance < 300) {
+                        let force = (300 - distance) / 300;
+                        this.vx += (dx / distance) * force * 0.5;
+                        this.vy += (dy / distance) * force * 0.5;
+                    }
+                });
 
-        const material = new THREE.PointsMaterial({
-            size: 0.8,
-            map: createGlowingTexture(),
-            blending: THREE.AdditiveBlending, // Makes overlapping particles brighter like light
-            depthWrite: false, // Prevents weird dark clipping 
-            transparent: true,
-            opacity: 0.8
-        });
+                // Friction to stop infinite acceleration
+                this.vx *= 0.95;
+                this.vy *= 0.95;
 
-        const particleSystem = new THREE.Points(geometry, material);
-        scene.add(particleSystem);
+                // Move
+                this.x += this.vx;
+                this.y += this.vy;
 
-        // Array to hold the target 3D positions of the 5 fingertips
-        // [Thumb, Index, Middle, Ring, Pinky]
-        const fingerTargets = [
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 0, 0)
-        ];
-        
-        let handDetected = false;
+                // Bounce off walls
+                if (this.x < 0 || this.x > window.innerWidth) this.vx *= -1;
+                if (this.y < 0 || this.y > window.innerHeight) this.vy *= -1;
 
-        // --- 4. MEDIAPIPE HAND TRACKING ---
-        const videoElement = document.getElementById('input_video');
-        const loadingElement = document.getElementById('loading');
+                this.draw(currentRadius);
+            }
 
-        // The MediaPipe indices for the tips of the 5 fingers
-        const FINGER_TIPS = [4, 8, 12, 16, 20];
+            draw(radius) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset for performance
+            }
+        }
 
-        function onResults(results) {
-            if(loadingElement) loadingElement.style.display = 'none';
+        function initParticles() {
+            for(let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Particle());
+            }
+        }
 
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                handDetected = true;
-                const landmarks = results.multiHandLandmarks[0];
-                
-                // Update the 5 target vectors based on the 5 fingertips
-                FINGER_TIPS.forEach((landmarkIndex, i) => {
-                    const point = landmarks[landmarkIndex];
-                    
-                    // Map 2D camera coordinates to 3D space
-                    // Adjusted scale to fit the screen bounds nicely
-                    fingerTargets[i].x = -(point.x - 0.5) * 50; 
-                    fingerTargets[i].y = -(point.y - 0.5) * 35;
-                    
-                    // Use the Z data from MediaPipe to push particles forward/backward based on hand depth
-                    fingerTargets[i].z = -point.z * 80; 
-                });
-            } else {
-                handDetected = false;
-            }
-        }
+        // --- WEB AUDIO API ENGINE ---
+        function initAudioEngine() {
+            if (audioInitialized) return;
+            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            source = audioCtx.createMediaElementSource(audioPlayer);
+            
+            // Analyser for particles
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            audioDataArray = new Uint8Array(analyser.frequencyBinCount);
 
-        const hands = new Hands({locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-        }});
-        
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1, // 1 is a good balance of speed and accuracy
-            minDetectionConfidence: 0.6,
-            minTrackingConfidence: 0.6
-        });
-        hands.onResults(onResults);
+            // Pinch Filter (Muffles sound)
+            pinchFilter = audioCtx.createBiquadFilter();
+            pinchFilter.type = 'lowpass';
+            pinchFilter.frequency.value = 20000; // Open by default
 
-        const cameraUtils = new Camera(videoElement, {
-            onFrame: async () => {
-                await hands.send({image: videoElement});
-            },
-            width: 640,
-            height: 480
-        });
-        cameraUtils.start();
+            // Eye Filter (Wah effect based on looking left/right)
+            eyeFilter = audioCtx.createBiquadFilter();
+            eyeFilter.type = 'peaking';
+            eyeFilter.frequency.value = 1000;
+            eyeFilter.Q.value = 5;
+            eyeFilter.gain.value = 10;
 
-        // --- 5. PHYSICS & ANIMATION LOOP ---
-        const positionAttribute = geometry.getAttribute('position');
+            // Echo / Delay System
+            delay = audioCtx.createDelay(2.0);
+            delay.delayTime.value = 0; // Off by default
+            
+            feedback = audioCtx.createGain();
+            feedback.gain.value = 0; // Echo intensity
+            
+            // Audio Routing
+            source.connect(analyser);
+            analyser.connect(eyeFilter);
+            eyeFilter.connect(pinchFilter);
+            
+            // Dry signal to output
+            pinchFilter.connect(audioCtx.destination);
+            
+            // Wet signal loop (Delay)
+            pinchFilter.connect(delay);
+            delay.connect(feedback);
+            feedback.connect(delay);
+            delay.connect(audioCtx.destination);
 
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            const time = Date.now() * 0.001;
+            audioInitialized = true;
+        }
 
-            // Update each individual particle
-            for (let i = 0; i < particleCount; i++) {
-                const phys = physicsData[i];
-                
-                let targetX, targetY, targetZ;
+        // --- RENDER LOOP ---
+        function renderLoop() {
+            ctx.fillStyle = 'rgba(3, 3, 5, 0.3)'; // Trailing effect for particles
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                if (handDetected) {
-                    // Pull particle toward its assigned finger
-                    const targetFinger = fingerTargets[phys.fingerIndex];
-                    
-                    // Add mathematical swirling (orbit) around the finger
-                    phys.angle += phys.speed;
-                    
-                    targetX = targetFinger.x + Math.cos(phys.angle + time) * phys.radius;
-                    targetY = targetFinger.y + phys.yOffset + Math.sin(time * 2 + phys.fingerIndex) * 2;
-                    targetZ = targetFinger.z + Math.sin(phys.angle + time) * phys.radius;
-                } else {
-                    // If no hand, drift slowly in a majestic, idle nebula shape
-                    phys.angle += phys.speed * 0.2;
-                    targetX = Math.cos(phys.angle + i * 0.01) * 15;
-                    targetY = Math.sin(phys.angle * 0.8 + i) * 15;
-                    targetZ = Math.sin(phys.angle * 1.2) * 15;
-                }
+            // Get audio volume for particles
+            let avgVolume = 0;
+            if (audioInitialized && isPlaying) {
+                analyser.getByteFrequencyData(audioDataArray);
+                let sum = audioDataArray.reduce((a, b) => a + b, 0);
+                avgVolume = sum / audioDataArray.length;
+            }
 
-                // Get current position
-                let px = positionAttribute.getX(i);
-                let py = positionAttribute.getY(i);
-                let pz = positionAttribute.getZ(i);
+            // Draw and update particles
+            particles.forEach(p => p.update(avgVolume));
 
-                // Lerp (smoothly interpolate) current position toward target position
-                // The 0.05 determines the "tightness" or latency of the magic following your hand
-                px += (targetX - px) * 0.08;
-                py += (targetY - py) * 0.08;
-                pz += (targetZ - pz) * 0.08;
+            // Draw Hands
+            trackedHands.forEach(hand => {
+                let hx = (1 - hand.x) * canvas.width; // Mirror X
+                let hy = hand.y * canvas.height;
+                
+                // Draw a glowing core at the hand position
+                ctx.beginPath();
+                ctx.arc(hx, hy, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#00f2fe';
+                ctx.fill();
+                ctx.shadowBlur = 0;
 
-                // Update geometry
-                positionAttribute.setXYZ(i, px, py, pz);
-            }
+                // Visual Pinch Indicator
+                if (hand.pinch < 0.1) {
+                    ctx.beginPath();
+                    ctx.arc(hx, hy, 40, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${1 - (hand.pinch/0.1)})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
 
-            // Tell Three.js the positions have changed so it renders the new frame
-            positionAttribute.needsUpdate = true;
-            
-            // Slowly rotate the entire scene for an extra cinematic feel
-            particleSystem.rotation.y = Math.sin(time * 0.2) * 0.1;
+            requestAnimationFrame(renderLoop);
+        }
 
-            renderer.render(scene, camera);
-        }
-        animate();
+        // --- AUDIO MANIPULATION FROM TRACKING ---
+        function updateAudioEffects() {
+            if (!audioInitialized || !isPlaying) return;
 
-        // --- 6. HANDLE RESIZE ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+            if (trackedHands.length > 0) {
+                let primaryHand = trackedHands[0];
+
+                // 1. Pinch messes with the Filter (Lowpass)
+                // Pinch distance: ~0.02 (closed) to ~0.15 (open)
+                let filterFreq = 20000; // default open
+                if (primaryHand.pinch < 0.15) {
+                    let squeeze = Math.max(0, 1 - (primaryHand.pinch / 0.15));
+                    // Map squeeze to a muffled sound (200Hz to 20000Hz)
+                    filterFreq = 20000 - (squeeze * 19500); 
+                }
+                pinchFilter.frequency.setTargetAtTime(filterFreq, audioCtx.currentTime, 0.1);
+
+                // 2. Hand X messes with the Echo (Feedback amount)
+                let echoAmount = primaryHand.x; // 0 to 1
+                delay.delayTime.setTargetAtTime(0.4, audioCtx.currentTime, 0.1); // 400ms echo
+                feedback.gain.setTargetAtTime(echoAmount * 0.8, audioCtx.currentTime, 0.1); // Max 80% feedback
+
+                // 3. Hand Y messes with Pitch (Playback Rate)
+                // Middle of screen = 1.0 (normal speed). Top = fast/high, Bottom = slow/deep
+                let rate = 1.5 - primaryHand.y; // Maps Y(0..1) to Rate(1.5..0.5)
+                audioPlayer.playbackRate = Math.max(0.5, Math.min(1.5, rate));
+
+            } else {
+                // Return to normal if no hands detected
+                pinchFilter.frequency.setTargetAtTime(20000, audioCtx.currentTime, 0.5);
+                feedback.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+                audioPlayer.playbackRate = 1.0;
+            }
+
+            // 4. Eye Tracking controls peaking filter frequency
+            // lookRatio is ~0.3 (left) to ~0.7 (right)
+            let eyeWahFreq = 400 + (eyeLookRatio * 3000); // Sweep between 400Hz and 3400Hz
+            eyeFilter.frequency.setTargetAtTime(eyeWahFreq, audioCtx.currentTime, 0.2);
+        }
+
+
+        // --- MEDIAPIPE TRACKING CALLBACKS ---
+        function onHandResults(results) {
+            trackedHands = [];
+            if (results.multiHandLandmarks) {
+                results.multiHandLandmarks.forEach(landmarks => {
+                    // Get center of hand (palm)
+                    const palm = landmarks[9];
+                    // Get pinch distance
+                    const thumb = landmarks[4];
+                    const index = landmarks[8];
+                    const pinch = Math.hypot(thumb.x - index.x, thumb.y - index.y);
+                    
+                    trackedHands.push({
+                        x: palm.x,
+                        y: palm.y,
+                        pinch: pinch
+                    });
+                });
+            }
+            updateAudioEffects();
+        }
+
+        function onFaceResults(results) {
+            if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                const landmarks = results.multiFaceLandmarks[0];
+                const eyeOuter = landmarks[33];
+                const eyeInner = landmarks[133];
+                const iris = landmarks[468]; // Center of left iris
+
+                const eyeWidth = Math.abs(eyeOuter.x - eyeInner.x);
+                const irisPosition = Math.abs(iris.x - eyeInner.x);
+                
+                // Update global eye tracking ratio
+                eyeLookRatio = irisPosition / (eyeWidth || 0.01);
+                updateAudioEffects();
+            }
+        }
+
+        // --- SETUP & EVENT LISTENERS ---
+        const startBtn = document.getElementById('start-btn');
+        const uiContainer = document.getElementById('ui-container');
+        const loadingText = document.getElementById('loading-text');
+        const musicControls = document.getElementById('music-controls');
+
+        // Initialize MediaPipe
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onHandResults);
+
+        const faceMesh = new FaceMesh({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`});
+        faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        faceMesh.onResults(onFaceResults);
+
+        startBtn.addEventListener('click', () => {
+            startBtn.classList.add('hidden');
+            loadingText.classList.remove('hidden');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            initParticles();
+
+            const camera = new Camera(document.getElementById('videoElement'), {
+                onFrame: async () => {
+                    await hands.send({image: document.getElementById('videoElement')});
+                    await faceMesh.send({image: document.getElementById('videoElement')});
+                },
+                width: 1280,
+                height: 720
+            });
+
+            camera.start().then(() => {
+                uiContainer.style.opacity = '0';
+                setTimeout(() => uiContainer.classList.add('hidden'), 500);
+                musicControls.style.display = 'block'; // Show music button
+                renderLoop(); // Start particle engine
+            }).catch(err => {
+                alert("Camera access required for tracking capabilities.");
+            });
+        });
+
+        // Music Toggle Logic
+        musicToggleBtn.addEventListener('click', () => {
+            initAudioEngine(); // Ensure context is built (requires user interaction)
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (isPlaying) {
+                audioPlayer.pause();
+                musicToggleBtn.innerText = "Turn on the music";
+                musicToggleBtn.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                audioPlayer.play().then(() => {
+                    musicToggleBtn.innerText = "Turn off the music";
+                    musicToggleBtn.classList.add('playing');
+                    isPlaying = true;
+                }).catch(e => {
+                    alert("Could not play babydoll.mp3. Make sure the file exists in the same folder.");
+                });
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
 </body>
 </html>
