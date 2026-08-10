@@ -1,122 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Start</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Reveal - Cinematic</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Creepster&family=Nosifer&family=Oswald:wght@700&family=Special+Elite&display=swap');
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    #startScreen {
-      text-align: center;
-    }
-
-    #startButton {
-      background: white;
-      color: black;
-      border: none;
-      padding: 18px 50px;
-      font-size: 24px;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    #startButton:hover {
-      transform: scale(1.05);
-    }
-
-    #countdown {
-      display: none;
-      font-size: 120px;
-      font-weight: bold;
-    }
-
-    #videoContainer {
-      display: none;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    #videoContainer iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div id="startScreen">
-    <button id="startButton">START</button>
-  </div>
-
-  <div id="countdown"></div>
-
-  <div id="videoContainer">
-    <iframe
-      src="https://www.youtube.com/embed/F3mg4LWUJ5A?autoplay=1&list=RDF3mg4LWUJ5A"
-      title="Barsaat - Banjaare X Spider Man: Brand New Day"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen>
-    </iframe>
-  </div>
-
-  <script>
-    const startButton = document.getElementById("startButton");
-    const startScreen = document.getElementById("startScreen");
-    const countdown = document.getElementById("countdown");
-    const videoContainer = document.getElementById("videoContainer");
-
-    startButton.addEventListener("click", () => {
-
-      // Hide START button
-      startScreen.style.display = "none";
-
-      // Show countdown
-      countdown.style.display = "block";
-
-      let count = 3;
-
-      countdown.textContent = count;
-
-      const timer = setInterval(() => {
-        count--;
-
-        if (count > 0) {
-          countdown.textContent = count;
-        } 
-        else {
-          clearInterval(timer);
-
-          // Show video
-          countdown.style.display = "none";
-          videoContainer.style.display = "block";
+        * {
+            box-sizing: border-box;
         }
 
-      }, 1000);
-    });
-  </script>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
 
+        /* Cinematic Letterbox (Top & Bottom Bars) */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 8vh;
+            background: #000;
+            z-index: 100;
+            pointer-events: none;
+        }
+        body::before { top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body::after { bottom: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* Slow Pulse Background */
+        .gradient-bg {
+            animation: slow-cinematic-pulse 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes slow-cinematic-pulse {
+            0% { background: radial-gradient(circle, #1c1c1c 0%, #000000 100%); }
+            50% { background: radial-gradient(circle, #2b2b2b 0%, #050505 85%, #000000 100%); }
+            100% { background: radial-gradient(circle, #101010 0%, #000000 100%); }
+        }
+
+        /* Start Button */
+        #start-btn {
+            padding: 22px 60px;
+            font-size: 28px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #888;
+            border: 1px solid #444;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 10;
+        }
+
+        #start-btn:hover {
+            color: #fff;
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        #text-container {
+            display: none;
+            width: 85%;
+            max-width: 1200px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Cinematic Text Fades & Slow Zooms */
+        .cinematic-text {
+            font-size: 3.5vw;
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.92);
+            transition: opacity 1.8s ease-in-out, transform 4s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            text-shadow: 0 0 20px rgba(0,0,0,0.9);
+            line-height: 1.4;
+        }
+
+        .cinematic-text.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        /* Rapid Climax Container */
+        #spam-container {
+            display: none;
+            font-size: 7.5vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+            letter-spacing: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio Elements -->
+    <audio id="loser-audio" src="loser.mp3" preload="auto"></audio>
+    <audio id="impact-audio" src="chuchu.mp3" preload="auto"></audio>
+
+    <!-- Start Button -->
+    <button id="start-btn">Start</button>
+
+    <!-- Timed Suspense Text -->
+    <div id="text-container">
+        <div class="cinematic-text" id="line1">All this mehnat of making this site was for what?</div>
+        <div class="cinematic-text" id="line2">For nothing?</div>
+        <div class="cinematic-text" id="line3">Nah...</div>
+        <div class="cinematic-text" id="line4">It was to be appreciated with a big...</div>
+        <div class="cinematic-text" id="line5" style="font-size: 9vw; color: #ff1111; text-shadow: 0 0 30px rgba(255,0,0,0.6);">FUCK OFF</div>
+        <div class="cinematic-text" id="line6" style="font-size: 6vw; letter-spacing: 12px;">And then a big LOL.</div>
+    </div>
+
+    <!-- Multilingual Climax -->
+    <div id="spam-container"></div>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const audio = document.getElementById('loser-audio');
+        const impactAudio = document.getElementById('impact-audio');
+        const textContainer = document.getElementById('text-container');
+        const spamContainer = document.getElementById('spam-container');
+
+        // Explicit non-softened translations
+        const fuckOffTranslations = [
+            "Fuck off!", 
+            "¡Vete a la mierda!", 
+            "Va te faire foutre!", 
+            "Verpiss dich!", 
+            "Vaffanculo!", 
+            "Пошел на хуй!", 
+            "Spierdalaj!", 
+            "Siktir git!", 
+            "Άντε γαμήσου!", 
+            "Vai tomar no cu!", 
+            "Krijg de tering!", 
+            "좆까!", 
+            "くそくらえ!", 
+            "滚开!", 
+            "Dra åt helvete!", 
+            "भाड़ में जा!", 
+            "Odjebi!", 
+            "Du-te-n pula mea!", 
+            "Painu vittuun!", 
+            "Jebi se!", 
+            "Gå ad helvede til!", 
+            "Húzz a faszba!", 
+            "Jděte do prdele!", 
+            "Chinga tu madre!"
+        ];
+
+        const fonts = [
+            "'Cinzel', serif", 
+            "'Creepster', cursive", 
+            "'Nosifer', display", 
+            "'Oswald', sans-serif", 
+            "'Special Elite', system-ui",
+            "Impact, fantasy",
+            "Courier New, monospace",
+            "Arial Black, sans-serif"
+        ];
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function playSequence() {
+            // Trigger Main Audio Immediately
+            audio.play().catch(e => console.log("Audio play error:", e));
+
+            // Hide Start Button smoothly
+            startBtn.style.opacity = '0';
+            await delay(800);
+            startBtn.style.display = 'none';
+
+            // Background & Container setup
+            document.body.classList.add('gradient-bg');
+            textContainer.style.display = 'block';
+
+            const l1 = document.getElementById('line1');
+            const l2 = document.getElementById('line2');
+            const l3 = document.getElementById('line3');
+            const l4 = document.getElementById('line4');
+            const l5 = document.getElementById('line5');
+            const l6 = document.getElementById('line6');
+
+            // --- SLOW CINEMATIC PACING ---
+            
+            // Line 1
+            l1.classList.add('show');
+            await delay(4500); 
+            l1.classList.remove('show');
+            await delay(1500); 
+
+            // Line 2
+            l2.classList.add('show');
+            await delay(3000);
+            l2.classList.remove('show');
+            await delay(1200);
+
+            // Line 3
+            l3.classList.add('show');
+            await delay(2500);
+            l3.classList.remove('show');
+            await delay(1500);
+
+            // Line 4
+            l4.classList.add('show');
+            await delay(4000);
+            l4.classList.remove('show');
+            await delay(1000);
+
+            // Line 5: FUCK OFF
+            l5.classList.add('show');
+            await delay(3500);
+            l5.classList.remove('show');
+            await delay(1200);
+
+            // Line 6: LOL
+            l6.classList.add('show');
+            await delay(3500);
+            l6.classList.remove('show');
+            await delay(2000);
+
+            // Transition into Multilingual Climax
+            textContainer.style.display = 'none';
+            spamContainer.style.display = 'block';
+            triggerChaos();
+        }
+
+        function triggerChaos() {
+            // Paced fast enough to feel overwhelming, but readable enough to feel dramatic
+            setInterval(() => {
+                const randomText = fuckOffTranslations[Math.floor(Math.random() * fuckOffTranslations.length)];
+                const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+                
+                spamContainer.innerText = randomText;
+                spamContainer.style.fontFamily = randomFont;
+
+                // --- TRIGGER IMPACT SOUND ---
+                // Resetting to 0 ensures rapid fire playback doesn't get ignored by the browser
+                impactAudio.currentTime = 0; 
+                impactAudio.play().catch(e => console.log("Impact audio play error:", e));
+
+                // Color accents
+                if (Math.random() > 0.75) {
+                    spamContainer.style.color = '#ff1111';
+                    spamContainer.style.textShadow = '0 0 30px rgba(255, 0, 0, 0.8)';
+                } else {
+                    spamContainer.style.color = '#ffffff';
+                    spamContainer.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.3)';
+                }
+
+            }, 250); // Shifts every 250ms
+        }
+
+        startBtn.addEventListener('click', playSequence);
+    </script>
 </body>
 </html>
