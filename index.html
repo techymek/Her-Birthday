@@ -21,6 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             text-align: center;
             overflow: hidden;
             font-family: 'Cinzel', serif;
@@ -109,12 +110,46 @@
         /* Rapid Climax Container */
         #spam-container {
             display: none;
-            font-size: 7.5vw;
+            font-size: 7vw;
             font-weight: 900;
             text-transform: uppercase;
             transition: opacity 0.3s ease;
             text-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
             letter-spacing: 4px;
+            margin-bottom: 40px;
+        }
+
+        /* Email Button Container */
+        #email-container {
+            display: none;
+            position: fixed;
+            bottom: 12vh;
+            z-index: 101;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #email-btn {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ff3333;
+            background: rgba(15, 0, 0, 0.8);
+            border: 2px solid #ff1111;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #email-btn:hover {
+            background: #ff1111;
+            color: #000;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.9);
+            transform: scale(1.08);
         }
     </style>
 </head>
@@ -134,11 +169,16 @@
         <div class="cinematic-text" id="line3">Nah...</div>
         <div class="cinematic-text" id="line4">It was to be appreciated with a big...</div>
         <div class="cinematic-text" id="line5" style="font-size: 9vw; color: #ff1111; text-shadow: 0 0 30px rgba(255,0,0,0.6);">FUCK OFF</div>
-        <div class="cinematic-text" id="line6" style="font-size: 6vw; letter-spacing: 12px;">And then a big LOL.</div>
+        <div class="cinematic-text" id="line6" style="font-size: 4vw; letter-spacing: 12px;">or is it just a comman expression?.</div>
     </div>
 
     <!-- Multilingual Climax -->
     <div id="spam-container"></div>
+
+    <!-- Email Action Button -->
+    <div id="email-container">
+        <button id="email-btn" onclick="sendFuckOffEmail()">Send a fuck off mail</button>
+    </div>
 
     <script>
         const startBtn = document.getElementById('start-btn');
@@ -146,6 +186,7 @@
         const impactAudio = document.getElementById('impact-audio');
         const textContainer = document.getElementById('text-container');
         const spamContainer = document.getElementById('spam-container');
+        const emailContainer = document.getElementById('email-container');
 
         // Explicit non-softened translations
         const fuckOffTranslations = [
@@ -172,7 +213,7 @@
             "Gå ad helvede til!", 
             "Húzz a faszba!", 
             "Jděte do prdele!", 
-            "Chinga tu madre!"
+            "chud!"
         ];
 
         const fonts = [
@@ -251,11 +292,15 @@
             // Transition into Multilingual Climax
             textContainer.style.display = 'none';
             spamContainer.style.display = 'block';
+            
+            // Reveal Email Button
+            emailContainer.style.display = 'block';
+            setTimeout(() => { emailContainer.style.opacity = '1'; }, 100);
+
             triggerChaos();
         }
 
         function triggerChaos() {
-            // Paced fast enough to feel overwhelming, but readable enough to feel dramatic
             setInterval(() => {
                 const randomText = fuckOffTranslations[Math.floor(Math.random() * fuckOffTranslations.length)];
                 const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
@@ -263,8 +308,7 @@
                 spamContainer.innerText = randomText;
                 spamContainer.style.fontFamily = randomFont;
 
-                // --- TRIGGER IMPACT SOUND ---
-                // Resetting to 0 ensures rapid fire playback doesn't get ignored by the browser
+                // Reset and play impact sound
                 impactAudio.currentTime = 0; 
                 impactAudio.play().catch(e => console.log("Impact audio play error:", e));
 
@@ -277,7 +321,26 @@
                     spamContainer.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.3)';
                 }
 
-            }, 250); // Shifts every 250ms
+            }, 250);
+        }
+
+        function sendFuckOffEmail() {
+            const recipient = "adarshsinghs731@GMAIL.COM";
+            const subject = "OFFICIAL FORMAL NOTICE: REGARDING YOUR PRESENCE";
+            const body = 
+`Abbe oh. Adarsh,
+
+I am writing this formal correspondence to officially communicate, with the utmost degree of professional clarity and precision, that you should respectfully fuck off.
+
+All the dedication, effort, and code put into building this site was designed for the singular purpose of delivering this message to you.
+
+Thank you for your immediate attention to this matter.
+
+Yours sincerely,
+Mis Mistake.`;
+
+            // Open default mail client with formatted email
+            window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
 
         startBtn.addEventListener('click', playSequence);
