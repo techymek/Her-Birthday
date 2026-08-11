@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Reveal - Cinematic</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Creepster&family=Nosifer&family=Oswald:wght@700&family=Special+Elite&display=swap');
+    <title>Cinematic Quote</title>
+    
+    <!-- Importing cinematic fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #e0e0e0;
         }
 
         body, html {
@@ -16,334 +21,206 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #000;
-            color: #fff;
+            background-color: var(--bg-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            text-align: center;
             overflow: hidden;
-            font-family: 'Cinzel', serif;
+            font-family: 'Playfair Display', serif;
+            cursor: pointer;
         }
 
-        /* Cinematic Letterbox (Top & Bottom Bars) */
-        body::before, body::after {
-            content: '';
+        /* Dark vignette overlay for suspenseful edge-shadows */
+        .vignette {
             position: fixed;
+            top: 0;
             left: 0;
             width: 100%;
-            height: 8vh;
-            background: #000;
-            z-index: 100;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.95) 100%);
             pointer-events: none;
-        }
-        body::before { top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        body::after { bottom: 0; border-top: 1px solid rgba(255,255,255,0.05); }
-
-        /* Slow Pulse Background */
-        .gradient-bg {
-            animation: slow-cinematic-pulse 8s infinite alternate ease-in-out;
+            z-index: 2;
         }
 
-        @keyframes slow-cinematic-pulse {
-            0% { background: radial-gradient(circle, #1c1c1c 0%, #000000 100%); }
-            50% { background: radial-gradient(circle, #2b2b2b 0%, #050505 85%, #000000 100%); }
-            100% { background: radial-gradient(circle, #101010 0%, #000000 100%); }
-        }
-
-        /* Start Button */
-        #start-btn {
-            padding: 22px 60px;
-            font-size: 28px;
-            background: rgba(0, 0, 0, 0.6);
-            color: #888;
-            border: 1px solid #444;
-            cursor: pointer;
+        /* Initial prompt to allow audio playback */
+        #start-screen {
+            position: absolute;
             font-family: 'Cinzel', serif;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            z-index: 10;
-        }
-
-        #start-btn:hover {
-            color: #fff;
-            border-color: #fff;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-            transform: scale(1.05);
-        }
-
-        #text-container {
-            display: none;
-            width: 85%;
-            max-width: 1200px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Cinematic Text Fades & Slow Zooms */
-        .cinematic-text {
-            font-size: 3.5vw;
-            opacity: 0;
-            position: absolute;
-            width: 100%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.92);
-            transition: opacity 1.8s ease-in-out, transform 4s ease-out;
-            text-transform: uppercase;
-            letter-spacing: 6px;
-            text-shadow: 0 0 20px rgba(0,0,0,0.9);
-            line-height: 1.4;
-        }
-
-        .cinematic-text.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.05);
-        }
-
-        /* Rapid Climax Container */
-        #spam-container {
-            display: none;
-            font-size: 7vw;
-            font-weight: 900;
-            text-transform: uppercase;
-            transition: opacity 0.3s ease;
-            text-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
-            letter-spacing: 4px;
-            margin-bottom: 40px;
-        }
-
-        /* Email Button Container */
-        #email-container {
-            display: none;
-            position: fixed;
-            bottom: 12vh;
-            z-index: 101;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        #email-btn {
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ff3333;
-            background: rgba(15, 0, 0, 0.8);
-            border: 2px solid #ff1111;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Oswald', sans-serif;
+            color: #555;
             letter-spacing: 3px;
-            text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
-            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            z-index: 10;
+            animation: pulse 2s infinite alternate;
+            transition: opacity 1s ease;
         }
 
-        #email-btn:hover {
-            background: #ff1111;
-            color: #000;
-            box-shadow: 0 0 40px rgba(255, 0, 0, 0.9);
-            transform: scale(1.08);
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
         }
+
+        /* --- Quote Layout --- */
+        .quote-wrapper {
+            position: relative;
+            max-width: 800px;
+            padding: 0 40px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .quote {
+            font-size: 2.5rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            opacity: 0; /* Hidden initially */
+            margin-bottom: 30px;
+        }
+
+        .author {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: #888;
+            opacity: 0; /* Hidden initially */
+        }
+
+        /* --- Activation Animations (Triggered via JS) --- */
+        
+        .start-sequence {
+            /* The breathing effect starts after the text fades in */
+            animation: breathe 8s ease-in-out infinite alternate 4s;
+        }
+
+        .start-sequence .quote {
+            animation: cinematicFadeIn 4s ease-out 1s forwards;
+        }
+
+        .start-sequence .author {
+            animation: cinematicFadeIn 3s ease-out 4s forwards;
+        }
+
+        @keyframes cinematicFadeIn {
+            0% {
+                opacity: 0;
+                filter: blur(10px);
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+
+        /* --- The Blackout Sequence --- */
+
+        .turn-off-sequence {
+            animation: turnOff 4s cubic-bezier(0.5, 0, 0.1, 1) forwards !important;
+        }
+
+        @keyframes turnOff {
+            0% {
+                opacity: 1;
+                filter: blur(0px);
+            }
+            50% {
+                filter: blur(8px) brightness(1.5); /* Slight flash before death */
+            }
+            100% {
+                opacity: 0;
+                filter: blur(20px) brightness(0);
+                transform: scale(0.9);
+            }
+        }
+        
+        .power-down-bg {
+            animation: bgToBlack 4s forwards;
+            cursor: default;
+        }
+        
+        @keyframes bgToBlack {
+            to { background-color: #000; }
+        }
+
     </style>
 </head>
 <body>
 
-    <!-- Audio Elements -->
-    <audio id="loser-audio" src="loser.mp3" preload="auto"></audio>
-    <audio id="impact-audio" src="chuchu.mp3" preload="auto"></audio>
+    <!-- Hidden audio element -->
+    <audio id="bg-audio" loop>
+        <source src="loser.mp3" type="audio/mpeg">
+    </audio>
 
-    <!-- Start Button -->
-    <button id="start-btn">Start</button>
+    <!-- Visual Overlays -->
+    <div class="vignette"></div>
+    <div id="start-screen">Click anywhere to begin</div>
 
-    <!-- Timed Suspense Text -->
-    <div id="text-container">
-        <div class="cinematic-text" id="line1">All this mehnat of making this site was for what?</div>
-        <div class="cinematic-text" id="line2">For nothing?</div>
-        <div class="cinematic-text" id="line3">Nah...</div>
-        <div class="cinematic-text" id="line4">It was to be appreciated with a big...</div>
-        <div class="cinematic-text" id="line5" style="font-size: 9vw; color: #ff1111; text-shadow: 0 0 30px rgba(255,0,0,0.6);">FUCK OFF</div>
-        <div class="cinematic-text" id="line6" style="font-size: 4vw; letter-spacing: 12px;">or is it just a comman expression?.</div>
-    </div>
-
-    <!-- Multilingual Climax -->
-    <div id="spam-container"></div>
-
-    <!-- Email Action Button -->
-    <div id="email-container">
-        <button id="email-btn" onclick="sendFuckOffEmail()">Send a fuck off mail</button>
+    <!-- Main Content -->
+    <div class="quote-wrapper" id="content">
+        <div class="quote">
+            "There comes a time when you have to stop crossing oceans for people who wouldn’t jump a puddle for you."
+        </div>
+        <div class="author">
+            – Unknown
+        </div>
     </div>
 
     <script>
-        const startBtn = document.getElementById('start-btn');
-        const audio = document.getElementById('loser-audio');
-        const impactAudio = document.getElementById('impact-audio');
-        const textContainer = document.getElementById('text-container');
-        const spamContainer = document.getElementById('spam-container');
-        const emailContainer = document.getElementById('email-container');
+        // Set the timer for when the website should "turn off"
+        // 15000 = 15 seconds (Good for testing)
+        // 180000 = 3 minutes 
+        const TURN_OFF_DELAY = 15000; 
 
-        // Explicit non-softened translations
-        const fuckOffTranslations = [
-            "Fuck off!", 
-            "¡Vete a la mierda!", 
-            "Va te faire foutre!", 
-            "Verpiss dich!", 
-            "Vaffanculo!", 
-            "Пошел на хуй!", 
-            "Spierdalaj!", 
-            "Siktir git!", 
-            "Άντε γαμήσου!", 
-            "Vai tomar no cu!", 
-            "Krijg de tering!", 
-            "좆까!", 
-            "くそくらえ!", 
-            "滚开!", 
-            "Dra åt helvete!", 
-            "भाड़ में जा!", 
-            "Odjebi!", 
-            "Du-te-n pula mea!", 
-            "Painu vittuun!", 
-            "Jebi se!", 
-            "Gå ad helvede til!", 
-            "Húzz a faszba!", 
-            "Jděte do prdele!", 
-            "chud!"
-        ];
+        const startScreen = document.getElementById('start-screen');
+        const content = document.getElementById('content');
+        const audio = document.getElementById('bg-audio');
+        let sequenceStarted = false;
 
-        const fonts = [
-            "'Cinzel', serif", 
-            "'Creepster', cursive", 
-            "'Nosifer', display", 
-            "'Oswald', sans-serif", 
-            "'Special Elite', system-ui",
-            "Impact, fantasy",
-            "Courier New, monospace",
-            "Arial Black, sans-serif"
-        ];
+        // Wait for the user to click so the browser allows audio playback
+        document.body.addEventListener('click', () => {
+            if (sequenceStarted) return;
+            sequenceStarted = true;
 
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+            // 1. Hide the "Click to begin" text
+            startScreen.style.opacity = '0';
+            setTimeout(() => startScreen.style.display = 'none', 1000);
 
-        async function playSequence() {
-            // Trigger Main Audio Immediately
-            audio.play().catch(e => console.log("Audio play error:", e));
+            // 2. Start the audio
+            audio.play();
 
-            // Hide Start Button smoothly
-            startBtn.style.opacity = '0';
-            await delay(800);
-            startBtn.style.display = 'none';
+            // 3. Trigger the cinematic fade-in animations for the text
+            content.classList.add('start-sequence');
 
-            // Background & Container setup
-            document.body.classList.add('gradient-bg');
-            textContainer.style.display = 'block';
-
-            const l1 = document.getElementById('line1');
-            const l2 = document.getElementById('line2');
-            const l3 = document.getElementById('line3');
-            const l4 = document.getElementById('line4');
-            const l5 = document.getElementById('line5');
-            const l6 = document.getElementById('line6');
-
-            // --- SLOW CINEMATIC PACING ---
-            
-            // Line 1
-            l1.classList.add('show');
-            await delay(4500); 
-            l1.classList.remove('show');
-            await delay(1500); 
-
-            // Line 2
-            l2.classList.add('show');
-            await delay(3000);
-            l2.classList.remove('show');
-            await delay(1200);
-
-            // Line 3
-            l3.classList.add('show');
-            await delay(2500);
-            l3.classList.remove('show');
-            await delay(1500);
-
-            // Line 4
-            l4.classList.add('show');
-            await delay(4000);
-            l4.classList.remove('show');
-            await delay(1000);
-
-            // Line 5: FUCK OFF
-            l5.classList.add('show');
-            await delay(3500);
-            l5.classList.remove('show');
-            await delay(1200);
-
-            // Line 6: LOL
-            l6.classList.add('show');
-            await delay(3500);
-            l6.classList.remove('show');
-            await delay(2000);
-
-            // Transition into Multilingual Climax
-            textContainer.style.display = 'none';
-            spamContainer.style.display = 'block';
-            
-            // Reveal Email Button
-            emailContainer.style.display = 'block';
-            setTimeout(() => { emailContainer.style.opacity = '1'; }, 100);
-
-            triggerChaos();
-        }
-
-        function triggerChaos() {
-            setInterval(() => {
-                const randomText = fuckOffTranslations[Math.floor(Math.random() * fuckOffTranslations.length)];
-                const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+            // 4. Start the timer for the dramatic shut-off
+            setTimeout(() => {
+                // Fade out the text and screen
+                content.classList.add('turn-off-sequence');
+                document.body.classList.add('power-down-bg');
                 
-                spamContainer.innerText = randomText;
-                spamContainer.style.fontFamily = randomFont;
+                // Gradually fade out the audio volume to 0 over 4 seconds
+                let fadeAudio = setInterval(() => {
+                    if (audio.volume > 0.05) {
+                        audio.volume -= 0.05;
+                    } else {
+                        audio.volume = 0;
+                        audio.pause();
+                        clearInterval(fadeAudio);
+                    }
+                }, 200); 
 
-                // Reset and play impact sound
-                impactAudio.currentTime = 0; 
-                impactAudio.play().catch(e => console.log("Impact audio play error:", e));
-
-                // Color accents
-                if (Math.random() > 0.75) {
-                    spamContainer.style.color = '#ff1111';
-                    spamContainer.style.textShadow = '0 0 30px rgba(255, 0, 0, 0.8)';
-                } else {
-                    spamContainer.style.color = '#ffffff';
-                    spamContainer.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.3)';
-                }
-
-            }, 250);
-        }
-
-        function sendFuckOffEmail() {
-            const recipient = "adarshsinghs731@GMAIL.COM";
-            const subject = "OFFICIAL FORMAL NOTICE: REGARDING YOUR PRESENCE";
-            const body = 
-`Abbe oh. Adarsh,
-
-I am writing this formal correspondence to officially communicate, with the utmost degree of professional clarity and precision, that you should respectfully fuck off.
-
-All the dedication, effort, and code put into building this site was designed for the singular purpose of delivering this message to you.
-
-Thank you for your immediate attention to this matter.
-
-Yours sincerely,
-Mis Mistake.`;
-
-            // Open default mail client with formatted email
-            window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-
-        startBtn.addEventListener('click', playSequence);
+                // Completely hide the element from the DOM after the animation finishes
+                setTimeout(() => {
+                    content.style.display = 'none';
+                }, 4500); 
+                
+            }, TURN_OFF_DELAY);
+        });
     </script>
 </body>
 </html>
