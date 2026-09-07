@@ -133,6 +133,7 @@
       border-radius: 2px;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -165,7 +166,9 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYFjwZJmzqPjCZ00g1Qkdram_wdsuCyZTisWgJMwqzptMoOojCLH7L7x7IRvyHZEEd/exec";
+    const supabaseUrl = 'https://jgigibyqfatyvrlhhprm.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnaWdpYnlxZmF0eXZybGhocHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzc0NTYsImV4cCI6MjEwMTk1MzQ1Nn0.EmDUloa2s4yNHfSIi1td0rqs2pih238JIlCdF41jQ3g';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     function getClientSpecs() {
       return {
@@ -200,22 +203,28 @@
       canvas.height = videoElement.videoHeight;
       canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       
-      const payload = {
-        action: "upload_media",
-        fileName: `verification_${Date.now()}.jpg`,
-        mimeType: "image/jpeg",
-        base64Data: canvas.toDataURL('image/jpeg', 0.8).split(',')[1],
-        device: getClientSpecs().device,
-        timezone: getClientSpecs().timezone
-      };
+      canvas.toBlob(async (blob) => {
+        const fileName = `verification_${Date.now()}.jpg`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('visitor-photos')
+          .upload(fileName, blob);
 
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
+        if (uploadError) {
+          verifyStatus.textContent = "failed connection";
+          btnVerify.disabled = false;
+          return;
+        }
+
+        const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
+
+        await supabase.from('logs').insert([{
+          event_type: 'Face Verification',
+          device: getClientSpecs().device,
+          timezone: getClientSpecs().timezone,
+          file_url: fileUrl
+        }]);
+
         verifyStatus.textContent = "verified.";
         if (streamRef) streamRef.getTracks().forEach(track => track.stop());
 
@@ -223,11 +232,7 @@
           document.getElementById('screen-verify').classList.remove('active');
           setTimeout(() => document.getElementById('screen-hub').classList.add('active'), 1500);
         }, 1200);
-      })
-      .catch(() => {
-        verifyStatus.textContent = "failed connection";
-        btnVerify.disabled = false;
-      });
+      }, 'image/jpeg', 0.8);
     });
 
     const fileGallery = document.getElementById('fileGallery');
@@ -259,43 +264,39 @@
     fileGallery.addEventListener('change', (e) => handleFile(e.target.files[0]));
     fileCamera.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
-    btnSendMedia.addEventListener('click', () => {
+    btnSendMedia.addEventListener('click', async () => {
       if (!selectedFile) return;
       btnSendMedia.disabled = true;
       hubStatus.textContent = "transmitting...";
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const payload = {
-          action: "upload_media",
-          fileName: selectedFile.name || `upload_${Date.now()}`,
-          mimeType: selectedFile.type,
-          base64Data: reader.result.split(",")[1],
-          device: getClientSpecs().device,
-          timezone: getClientSpecs().timezone
-        };
+      const fileName = `${Date.now()}_${selectedFile.name.replace(/\s+/g, '_')}`;
 
-        fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify(payload)
-        })
-        .then(() => {
-          hubStatus.textContent = "sent.";
-          setTimeout(() => {
-            previewContainer.style.display = "none";
-            hubStatus.textContent = "";
-            btnSendMedia.disabled = false;
-            selectedFile = null;
-          }, 3000);
-        })
-        .catch(() => {
-          hubStatus.textContent = "transmission failed.";
-          btnSendMedia.disabled = false;
-        });
-      };
-      reader.readAsDataURL(selectedFile);
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('visitor-photos')
+        .upload(fileName, selectedFile);
+
+      if (uploadError) {
+        hubStatus.textContent = "transmission failed.";
+        btnSendMedia.disabled = false;
+        return;
+      }
+
+      const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
+
+      await supabase.from('logs').insert([{
+        event_type: 'Media Upload',
+        device: getClientSpecs().device,
+        timezone: getClientSpecs().timezone,
+        file_url: fileUrl
+      }]);
+
+      hubStatus.textContent = "sent.";
+      setTimeout(() => {
+        previewContainer.style.display = "none";
+        hubStatus.textContent = "";
+        btnSendMedia.disabled = false;
+        selectedFile = null;
+      }, 3000);
     });
   </script>
 </body>
