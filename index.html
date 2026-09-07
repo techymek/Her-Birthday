@@ -1,226 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinematic Quote</title>
-    
-    <!-- Importing cinematic fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Quiet Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --text: #f0f0f0;
+      --muted: #666666;
+      --border: rgba(255, 255, 255, 0.1);
+    }
 
-    <style>
-        :root {
-            --bg-color: #050505;
-            --text-color: #e0e0e0;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            font-family: 'Playfair Display', serif;
-            cursor: pointer;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
 
-        /* Dark vignette overlay for suspenseful edge-shadows */
-        .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.95) 100%);
-            pointer-events: none;
-            z-index: 2;
-        }
+    /* Cinematic Letterbox Effects */
+    body::before, body::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 8vh;
+      background: #000;
+      z-index: 100;
+      pointer-events: none;
+    }
+    body::before { top: 0; }
+    body::after { bottom: 0; }
 
-        /* Initial prompt to allow audio playback */
-        #start-screen {
-            position: absolute;
-            font-family: 'Cinzel', serif;
-            color: #555;
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-            z-index: 10;
-            animation: pulse 2s infinite alternate;
-            transition: opacity 1s ease;
-        }
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1.5s ease, visibility 1.5s;
+      padding: 20px;
+    }
 
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.8; }
-        }
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 10;
+    }
 
-        /* --- Quote Layout --- */
-        .quote-wrapper {
-            position: relative;
-            max-width: 800px;
-            padding: 0 40px;
-            text-align: center;
-            z-index: 1;
-        }
+    .camera-container {
+      position: relative;
+      width: 280px;
+      height: 350px;
+      margin-bottom: 30px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 40px rgba(255,255,255,0.02);
+    }
 
-        .quote {
-            font-size: 2.5rem;
-            line-height: 1.6;
-            color: var(--text-color);
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            opacity: 0; /* Hidden initially */
-            margin-bottom: 30px;
-        }
+    #videoElement {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%) contrast(110%);
+    }
 
-        .author {
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            letter-spacing: 4px;
-            color: #888;
-            opacity: 0; /* Hidden initially */
-        }
+    .overlay-text {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 200;
+      margin-bottom: 24px;
+      color: var(--muted);
+    }
 
-        /* --- Activation Animations (Triggered via JS) --- */
-        
-        .start-sequence {
-            /* The breathing effect starts after the text fades in */
-            animation: breathe 8s ease-in-out infinite alternate 4s;
-        }
+    .btn {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 14px 32px;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      border-radius: 2px;
+      font-family: inherit;
+    }
 
-        .start-sequence .quote {
-            animation: cinematicFadeIn 4s ease-out 1s forwards;
-        }
+    .btn:hover {
+      background: #fff;
+      color: #000;
+    }
 
-        .start-sequence .author {
-            animation: cinematicFadeIn 3s ease-out 4s forwards;
-        }
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
 
-        @keyframes cinematicFadeIn {
-            0% {
-                opacity: 0;
-                filter: blur(10px);
-                transform: scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: scale(1);
-            }
-        }
+    /* Screen 2 UI */
+    .hub-container {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-        @keyframes breathe {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.02); }
-        }
+    .hub-title {
+      font-size: 1.2rem;
+      font-weight: 300;
+      margin-bottom: 32px;
+      letter-spacing: 1px;
+    }
 
-        /* --- The Blackout Sequence --- */
+    input[type="file"] { display: none; }
 
-        .turn-off-sequence {
-            animation: turnOff 4s cubic-bezier(0.5, 0, 0.1, 1) forwards !important;
-        }
+    .preview-box {
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
 
-        @keyframes turnOff {
-            0% {
-                opacity: 1;
-                filter: blur(0px);
-            }
-            50% {
-                filter: blur(8px) brightness(1.5); /* Slight flash before death */
-            }
-            100% {
-                opacity: 0;
-                filter: blur(20px) brightness(0);
-                transform: scale(0.9);
-            }
-        }
-        
-        .power-down-bg {
-            animation: bgToBlack 4s forwards;
-            cursor: default;
-        }
-        
-        @keyframes bgToBlack {
-            to { background-color: #000; }
-        }
+    .preview-media {
+      max-width: 100%;
+      max-height: 300px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      filter: grayscale(10%);
+    }
 
-    </style>
+    .status-text {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .fade-in { animation: fadeIn 1s forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
 </head>
 <body>
 
-    <!-- Hidden audio element -->
-    <audio id="bg-audio" loop>
-        <source src="loser.mp3" type="audio/mpeg">
-    </audio>
+  <!-- Audio Element -->
+  <audio id="bgMusic" src="loser.mp3" loop></audio>
 
-    <!-- Visual Overlays -->
-    <div class="vignette"></div>
-    <div id="start-screen">Click anywhere to begin</div>
-
-    <!-- Main Content -->
-    <div class="quote-wrapper" id="content">
-        <div class="quote">
-            "There comes a time when you have to stop crossing oceans for people who wouldn’t jump a puddle for you."
-        </div>
-        <div class="author">
-            – Unknown
-        </div>
+  <!-- SCREEN 1: Face Verification -->
+  <div id="screen-verify" class="screen active">
+    <div class="overlay-text">Identity Required</div>
+    
+    <div class="camera-container">
+      <video id="videoElement" autoplay playsinline muted></video>
     </div>
 
-    <script>
-        // Set the timer for when the website should "turn off"
-        // 15000 = 15 seconds (Good for testing)
-        // 180000 = 3 minutes 
-        const TURN_OFF_DELAY = 15000; 
+    <button id="btnVerify" class="btn">Verify Face</button>
+    <div id="verifyStatus" class="status-text"></div>
+  </div>
 
-        const startScreen = document.getElementById('start-screen');
-        const content = document.getElementById('content');
-        const audio = document.getElementById('bg-audio');
-        let sequenceStarted = false;
+  <!-- SCREEN 2: Main Interactive Hub -->
+  <div id="screen-hub" class="screen">
+    <div class="hub-title">Share a piece of right now.</div>
+    
+    <div class="hub-container">
+      <label for="fileGallery" class="btn">Upload from Gallery</label>
+      <input type="file" id="fileGallery" accept="image/*,video/*">
 
-        // Wait for the user to click so the browser allows audio playback
-        document.body.addEventListener('click', () => {
-            if (sequenceStarted) return;
-            sequenceStarted = true;
+      <label for="fileCamera" class="btn">Capture Photo / Video</label>
+      <input type="file" id="fileCamera" accept="image/*,video/*" capture="environment">
+    </div>
 
-            // 1. Hide the "Click to begin" text
-            startScreen.style.opacity = '0';
-            setTimeout(() => startScreen.style.display = 'none', 1000);
+    <div id="previewContainer" class="preview-box">
+      <div id="mediaPlaceholder"></div>
+      <button id="btnSendMedia" class="btn" style="width: 100%;">Send</button>
+    </div>
 
-            // 2. Start the audio
-            audio.play();
+    <div id="hubStatus" class="status-text"></div>
+  </div>
 
-            // 3. Trigger the cinematic fade-in animations for the text
-            content.classList.add('start-sequence');
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYFjwZJmzqPjCZ00g1Qkdram_wdsuCyZTisWgJMwqzptMoOojCLH7L7x7IRvyHZEEd/exec";
 
-            // 4. Start the timer for the dramatic shut-off
-            setTimeout(() => {
-                // Fade out the text and screen
-                content.classList.add('turn-off-sequence');
-                document.body.classList.add('power-down-bg');
-                
-                // Gradually fade out the audio volume to 0 over 4 seconds
-                let fadeAudio = setInterval(() => {
-                    if (audio.volume > 0.05) {
-                        audio.volume -= 0.05;
-                    } else {
-                        audio.volume = 0;
-                        audio.pause();
-                        clearInterval(fadeAudio);
-                    }
-                }, 200); 
+    // Global specs logic
+    function getClientSpecs() {
+      const ua = navigator.userAgent;
+      return {
+        device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile/Tablet" : "Desktop",
+        browser: "Web Browser",
+        screen: `${window.screen.width}x${window.screen.height}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown"
+      };
+    }
 
-                // Completely hide the element from the DOM after the animation finishes
-                setTimeout(() => {
-                    content.style.display = 'none';
-                }, 4500); 
-                
-            }, TURN_OFF_DELAY);
+    // -- STAGE 1: CAMERA VERIFICATION --
+    const videoElement = document.getElementById('videoElement');
+    const btnVerify = document.getElementById('btnVerify');
+    const verifyStatus = document.getElementById('verifyStatus');
+    const bgMusic = document.getElementById('bgMusic');
+    let streamRef = null;
+
+    // Initialize Camera on load
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+      .then(stream => {
+        streamRef = stream;
+        videoElement.srcObject = stream;
+      })
+      .catch(err => {
+        verifyStatus.textContent = "Camera access required to proceed.";
+        btnVerify.disabled = true;
+      });
+
+    btnVerify.addEventListener('click', () => {
+      // Start Cinematic Music
+      bgMusic.play().catch(() => console.log("Audio play blocked by browser"));
+      
+      btnVerify.disabled = true;
+      verifyStatus.textContent = "Verifying...";
+
+      // Capture frame
+      const canvas = document.createElement('canvas');
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      
+      const base64Data = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      const specs = getClientSpecs();
+
+      const payload = {
+        action: "upload_media",
+        fileName: `face_verification_${Date.now()}.jpg`,
+        mimeType: "image/jpeg",
+        base64Data: base64Data,
+        device: specs.device,
+        timezone: specs.timezone
+      };
+
+      // Upload Verification Photo
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        verifyStatus.textContent = "Verify move forward.";
+        
+        // Stop camera stream to save battery
+        if (streamRef) {
+          streamRef.getTracks().forEach(track => track.stop());
+        }
+
+        // Cinematic Transition to Screen 2
+        setTimeout(() => {
+          document.getElementById('screen-verify').classList.remove('active');
+          setTimeout(() => {
+            document.getElementById('screen-hub').classList.add('active');
+          }, 800);
+        }, 1500);
+      })
+      .catch(() => {
+        verifyStatus.textContent = "Verification failed. Check connection.";
+        btnVerify.disabled = false;
+      });
+    });
+
+    // -- STAGE 2: HUB UPLOADS --
+    const fileGallery = document.getElementById('fileGallery');
+    const fileCamera = document.getElementById('fileCamera');
+    const previewContainer = document.getElementById('previewContainer');
+    const mediaPlaceholder = document.getElementById('mediaPlaceholder');
+    const btnSendMedia = document.getElementById('btnSendMedia');
+    const hubStatus = document.getElementById('hubStatus');
+    let selectedFile = null;
+
+    function handleFileSelection(file) {
+      if (!file) return;
+      if (file.size > 25 * 1024 * 1024) {
+        hubStatus.textContent = "File exceeds 25 MB limit.";
+        return;
+      }
+
+      selectedFile = file;
+      mediaPlaceholder.innerHTML = "";
+      hubStatus.textContent = "";
+
+      const fileReader = new FileReader();
+      fileReader.onload = function(e) {
+        if (file.type.startsWith("image/")) {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.className = "preview-media";
+          mediaPlaceholder.appendChild(img);
+        } else if (file.type.startsWith("video/")) {
+          const vid = document.createElement("video");
+          vid.src = e.target.result;
+          vid.controls = true;
+          vid.className = "preview-media";
+          mediaPlaceholder.appendChild(vid);
+        }
+        previewContainer.style.display = "flex";
+      };
+      fileReader.readAsDataURL(file);
+    }
+
+    fileGallery.addEventListener('change', (e) => handleFileSelection(e.target.files[0]));
+    fileCamera.addEventListener('change', (e) => handleFileSelection(e.target.files[0]));
+
+    btnSendMedia.addEventListener('click', () => {
+      if (!selectedFile) return;
+
+      btnSendMedia.disabled = true;
+      hubStatus.textContent = "Transmitting...";
+
+      const specs = getClientSpecs();
+      const reader = new FileReader();
+
+      reader.onload = function() {
+        const payload = {
+          action: "upload_media",
+          fileName: selectedFile.name || `upload_${Date.now()}`,
+          mimeType: selectedFile.type,
+          base64Data: reader.result.split(",")[1],
+          device: specs.device,
+          timezone: specs.timezone
+        };
+
+        fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        })
+        .then(() => {
+          hubStatus.textContent = "Transmission complete.";
+          setTimeout(() => {
+            previewContainer.style.display = "none";
+            hubStatus.textContent = "";
+            btnSendMedia.disabled = false;
+            selectedFile = null;
+          }, 3000);
+        })
+        .catch(() => {
+          hubStatus.textContent = "Transmission failed.";
+          btnSendMedia.disabled = false;
         });
-    </script>
+      };
+      reader.readAsDataURL(selectedFile);
+    });
+  </script>
 </body>
 </html>
