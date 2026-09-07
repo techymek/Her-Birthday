@@ -183,17 +183,29 @@
     const bgMusic = document.getElementById('bgMusic');
     let streamRef = null;
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-      .then(stream => {
-        streamRef = stream;
-        videoElement.srcObject = stream;
-      })
-      .catch(() => {
-        verifyStatus.textContent = "camera access required";
-        btnVerify.disabled = true;
-      });
+    // Safely request camera (Fixes the iPhone silent crash)
+    async function initCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        verifyStatus.textContent = "Error: HTTPS connection required.";
+        return;
+      }
+      try {
+        streamRef = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        videoElement.srcObject = streamRef;
+      } catch (err) {
+        verifyStatus.textContent = "Camera access required.";
+      }
+    }
+    
+    initCamera();
 
     btnVerify.addEventListener('click', () => {
+      if (!streamRef) {
+        verifyStatus.textContent = "Please allow camera access first.";
+        initCamera(); // Try again on button click
+        return;
+      }
+
       bgMusic.play().catch(() => {});
       btnVerify.disabled = true;
       verifyStatus.textContent = "verifying...";
@@ -211,7 +223,7 @@
           .upload(fileName, blob);
 
         if (uploadError) {
-          verifyStatus.textContent = "failed connection";
+          verifyStatus.textContent = "failed connection. try again.";
           btnVerify.disabled = false;
           return;
         }
@@ -226,7 +238,7 @@
         }]);
 
         verifyStatus.textContent = "verified.";
-        if (streamRef) streamRef.getTracks().forEach(track => track.stop());
+        streamRef.getTracks().forEach(track => track.stop());
 
         setTimeout(() => {
           document.getElementById('screen-verify').classList.remove('active');
@@ -235,6 +247,7 @@
       }, 'image/jpeg', 0.8);
     });
 
+    // --- HUB UPLOAD LOGIC ---
     const fileGallery = document.getElementById('fileGallery');
     const fileCamera = document.getElementById('fileCamera');
     const previewContainer = document.getElementById('previewContainer');
