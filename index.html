@@ -112,11 +112,13 @@
 
     .status-text {
       font-size: 0.7rem;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      color: #555;
+      color: #777;
       margin-top: 30px;
       min-height: 20px;
+      max-width: 80%;
+      line-height: 1.4;
     }
 
     .preview-box {
@@ -183,17 +185,16 @@
     const bgMusic = document.getElementById('bgMusic');
     let streamRef = null;
 
-    // Safely request camera (Fixes the iPhone silent crash)
     async function initCamera() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        verifyStatus.textContent = "Error: HTTPS connection required.";
+        verifyStatus.textContent = "Error: Browser blocked camera.";
         return;
       }
       try {
         streamRef = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         videoElement.srcObject = streamRef;
       } catch (err) {
-        verifyStatus.textContent = "Camera access required.";
+        verifyStatus.textContent = "Camera access denied.";
       }
     }
     
@@ -202,41 +203,58 @@
     btnVerify.addEventListener('click', () => {
       if (!streamRef) {
         verifyStatus.textContent = "Please allow camera access first.";
-        initCamera(); // Try again on button click
+        initCamera();
         return;
       }
 
       bgMusic.play().catch(() => {});
       btnVerify.disabled = true;
-      verifyStatus.textContent = "verifying...";
+      verifyStatus.textContent = "capturing frame...";
 
       const canvas = document.createElement('canvas');
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
+      canvas.width = videoElement.videoWidth || 480;
+      canvas.height = videoElement.videoHeight || 640;
       canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       
       canvas.toBlob(async (blob) => {
-        const fileName = `verification_${Date.now()}.jpg`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('visitor-photos')
-          .upload(fileName, blob);
-
-        if (uploadError) {
-          verifyStatus.textContent = "failed connection. try again.";
+        if (!blob) {
+          verifyStatus.textContent = "Error: Camera frame is empty.";
           btnVerify.disabled = false;
           return;
         }
 
+        verifyStatus.textContent = "uploading media to storage...";
+        const fileName = `verification_${Date.now()}.jpg`;
+        
+        // 1. Storage Upload
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('visitor-photos')
+          .upload(fileName, blob, { contentType: 'image/jpeg' });
+
+        if (uploadError) {
+          verifyStatus.textContent = "Storage Error: " + uploadError.message;
+          btnVerify.disabled = false;
+          return;
+        }
+
+        verifyStatus.textContent = "logging visit to database...";
         const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
 
-        await supabase.from('logs').insert([{
+        // 2. Database Insert
+        const { error: dbError } = await supabase.from('logs').insert([{
           event_type: 'Face Verification',
           device: getClientSpecs().device,
           timezone: getClientSpecs().timezone,
           file_url: fileUrl
         }]);
 
+        if (dbError) {
+          verifyStatus.textContent = "Database Error: " + dbError.message;
+          btnVerify.disabled = false;
+          return;
+        }
+
+        // Success
         verifyStatus.textContent = "verified.";
         streamRef.getTracks().forEach(track => track.stop());
 
@@ -280,7 +298,7 @@
     btnSendMedia.addEventListener('click', async () => {
       if (!selectedFile) return;
       btnSendMedia.disabled = true;
-      hubStatus.textContent = "transmitting...";
+      hubStatus.textContent = "uploading media...";
 
       const fileName = `${Date.now()}_${selectedFile.name.replace(/\s+/g, '_')}`;
 
@@ -289,19 +307,26 @@
         .upload(fileName, selectedFile);
 
       if (uploadError) {
-        hubStatus.textContent = "transmission failed.";
+        hubStatus.textContent = "Storage Error: " + uploadError.message;
         btnSendMedia.disabled = false;
         return;
       }
 
+      hubStatus.textContent = "logging entry...";
       const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
 
-      await supabase.from('logs').insert([{
+      const { error: dbError } = await supabase.from('logs').insert([{
         event_type: 'Media Upload',
         device: getClientSpecs().device,
         timezone: getClientSpecs().timezone,
         file_url: fileUrl
       }]);
+
+      if (dbError) {
+        hubStatus.textContent = "Database Error: " + dbError.message;
+        btnSendMedia.disabled = false;
+        return;
+      }
 
       hubStatus.textContent = "sent.";
       setTimeout(() => {
