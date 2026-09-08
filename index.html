@@ -1,279 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&family=Inter:wght@200;300&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background-color: #030303;
-      color: #eaeaea;
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-
-    .screen {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 2s ease, visibility 2s;
-      z-index: 10;
-    }
-
-    .screen.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .camera-wrapper {
-      position: absolute;
-      top: 15%;
-      width: 100vw;
-      height: 60vh;
-      z-index: -1;
-    }
-
-    #videoElement {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: grayscale(100%) contrast(130%) brightness(60%);
-      opacity: 0.8;
-    }
-
-    .btn {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: pointer;
-      padding: 14px 28px;
-      margin-top: 20px;
-      transition: all 0.5s ease;
-      z-index: 20;
-    }
-
-    .btn:hover {
-      background: #fff;
-      color: #000;
-    }
-
-    .status-text {
-      font-size: 0.75rem;
-      letter-spacing: 1px;
-      color: #aaa;
-      margin-top: 20px;
-      z-index: 20;
-      max-width: 80%;
-    }
-
-    .title-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-style: italic;
-      color: #ffffff;
-      margin-bottom: 30px;
-    }
-
-    .preview-box {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-    }
-
-    .preview-media {
-      max-width: 80vw;
-      max-height: 250px;
-      border-radius: 2px;
-    }
-
-    input[type="file"] { display: none; }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Place</title>
+<style>
+:root{--bg:#09090b;--text:#f5f5f5;--muted:#a1a1aa;--line:#27272a}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow-x:hidden}
+.stage{min-height:100vh;display:grid;place-items:center;padding:24px;position:relative}
+.wrap{width:min(720px,100%);position:relative;z-index:2}
+.card{border:1px solid var(--line);border-radius:28px;padding:32px;background:rgba(12,12,15,.72);backdrop-filter:blur(18px);box-shadow:0 30px 100px rgba(0,0,0,.45)}
+h1{font-size:clamp(38px,10vw,72px);letter-spacing:-.055em;line-height:.95;margin:0 0 16px}
+h2{font-size:24px;margin:0 0 10px}
+p{color:var(--muted);line-height:1.65}
+.hidden{display:none!important}
+button,.file-label{appearance:none;border:1px solid #3f3f46;background:#18181b;color:#fff;padding:14px 18px;border-radius:14px;font:inherit;font-weight:700;cursor:pointer}
+button.primary,.file-label.primary{background:#fff;color:#09090b;border-color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+input[type=file]{display:none}
+.video-wrap{margin-top:22px;position:relative;overflow:hidden;border-radius:20px;border:1px solid var(--line);background:#000}
+video{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.preview{margin-top:18px}
+.preview img,.preview video{max-height:430px;object-fit:contain;border-radius:18px;background:#000}
+.status{min-height:24px;margin-top:14px;font-size:14px;color:#ddd}
+.consent{display:flex;gap:10px;margin-top:20px;color:#aaa;font-size:13px;line-height:1.5}
+.consent input{margin-top:4px}
+.notice{font-size:12px;color:#777;margin-top:24px}
+.fade{animation:fade .9s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:560px){.card{padding:24px}.actions{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
-  <audio id="bgMusic" src="loser.mp3" loop></audio>
+<main class="stage">
+<div class="wrap">
 
-  <!-- SCREEN 1 -->
-  <div id="screen-verify" class="screen active">
-    <div class="camera-wrapper">
-      <video id="videoElement" autoplay playsinline muted></video>
-    </div>
-    
-    <button id="btnVerify" class="btn">Verify</button>
-    <div id="verifyStatus" class="status-text"></div>
+<section id="gate" class="card fade">
+  <h1>Before you enter.</h1>
+  <p>
+    This page can use your camera for an optional photo verification.
+    Your camera is not accessed until you choose to enable it and press Verify.
+  </p>
+
+  <div class="consent">
+    <input id="cameraConsent" type="checkbox">
+    <label for="cameraConsent">I understand that camera access requires my permission and that pressing Verify will capture one photo for this site.</label>
   </div>
 
-  <!-- SCREEN 2 -->
-  <div id="screen-hub" class="screen">
-    <div class="title-text">share a piece of right now</div>
-    
-    <label for="fileGallery" class="btn">Select from Gallery</label>
-    <input type="file" id="fileGallery" accept="image/*,video/*">
+  <button id="startCamera" class="primary" type="button" style="margin-top:20px;width:100%">
+    Enable camera
+  </button>
 
-    <label for="fileCamera" class="btn">Use Camera</label>
-    <input type="file" id="fileCamera" accept="image/*,video/*" capture="environment">
-
-    <div id="previewContainer" class="preview-box">
-      <div id="mediaPlaceholder"></div>
-      <button id="btnSendMedia" class="btn" style="margin-top: 20px;">Send</button>
+  <div id="cameraArea" class="hidden">
+    <div class="video-wrap">
+      <video id="camera" autoplay playsinline muted></video>
     </div>
-
-    <div id="hubStatus" class="status-text" style="color: #ccc;"></div>
+    <button id="verify" class="primary" type="button" style="width:100%;margin-top:14px">
+      Verify
+    </button>
   </div>
 
-  <script>
-    const supabaseUrl = 'https://jgigibyqfatyvrlhhprm.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnaWdpYnlxZmF0eXZybGhocHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzc0NTYsImV4cCI6MjEwMTk1MzQ1Nn0.EmDUloa2s4yNHfSIi1td0rqs2pih238JIlCdF41jQ3g';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  <div id="gateStatus" class="status" aria-live="polite"></div>
+  <p class="notice">
+    Opening this page creates a visit log containing the time and basic browser/device information.
+    Precise location is never requested automatically.
+  </p>
+</section>
 
-    const videoElement = document.getElementById('videoElement');
-    const btnVerify = document.getElementById('btnVerify');
-    const verifyStatus = document.getElementById('verifyStatus');
-    const bgMusic = document.getElementById('bgMusic');
-    let streamRef = null;
+<section id="hub" class="card hidden fade">
+  <h2>A little place.</h2>
+  <p>If you want to leave a random photo or video, choose one below.</p>
 
-    async function initCamera() {
-      try {
-        streamRef = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-        videoElement.srcObject = streamRef;
-      } catch (err) {
-        verifyStatus.textContent = "Camera unavailable (Proceeding in text-verify mode)";
-      }
+  <div class="actions">
+    <label class="file-label" for="gallery">Select from Gallery</label>
+    <label class="file-label" for="cameraFile">Use Camera</label>
+    <input id="gallery" type="file" accept="image/*,video/*">
+    <input id="cameraFile" type="file" accept="image/*,video/*" capture="environment">
+  </div>
+
+  <div id="preview" class="preview hidden">
+    <div id="previewBox"></div>
+    <button id="upload" class="primary" type="button" style="width:100%;margin-top:14px">
+      Send it
+    </button>
+  </div>
+
+  <div class="consent">
+    <input id="locationConsent" type="checkbox">
+    <label for="locationConsent">I choose to share my location with this submission.</label>
+  </div>
+
+  <div id="hubStatus" class="status" aria-live="polite"></div>
+
+  <p class="notice">
+    Photos and videos are uploaded only after you choose a file or camera action and press Send it.
+    Location requires separate browser permission.
+  </p>
+</section>
+
+</div>
+</main>
+
+<audio id="music" src="loser.mp3" loop preload="auto"></audio>
+
+<script>
+const SUPABASE_URL = "https://jgigibyqfatyvrlhhprm.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnaWdpYnlxZmF0eXZybGhocHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzc0NTYsImV4cCI6MjEwMTk1MzQ1Nn0.EmDUloa2s4yNHfSIi1td0rqs2pih238JIlCdF41jQ3g";
+
+const LOG_TABLE = "logs";
+const BUCKET = "visitor-photos";
+
+const authHeaders = () => ({
+  "apikey": SUPABASE_KEY,
+  "Authorization": "Bearer " + SUPABASE_KEY
+});
+
+function deviceInfo(){
+  const ua = navigator.userAgent || "";
+  let device =
+    /iPhone/i.test(ua) ? "iPhone" :
+    /iPad/i.test(ua) ? "iPad" :
+    /Android/i.test(ua) ? "Android" :
+    /Windows/i.test(ua) ? "Windows PC" :
+    /Macintosh|Mac OS X/i.test(ua) ? "Mac" :
+    /Linux/i.test(ua) ? "Linux PC" : "Other";
+
+  let browser =
+    /Edg/i.test(ua) ? "Edge" :
+    /Chrome/i.test(ua) ? "Chrome" :
+    /Safari/i.test(ua) && !/Chrome/i.test(ua) ? "Safari" :
+    /Firefox/i.test(ua) ? "Firefox" : "Other";
+
+  return {
+    device,
+    browser,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    language: navigator.language || "",
+    screen: `${screen.width}x${screen.height}`,
+    referrer: document.referrer || ""
+  };
+}
+
+async function logEvent(event, extra = {}){
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/${LOG_TABLE}`, {
+      method:"POST",
+      headers:{
+        ...authHeaders(),
+        "Content-Type":"application/json",
+        "Prefer":"return=minimal"
+      },
+      body:JSON.stringify({
+        event,
+        ...deviceInfo(),
+        ...extra
+      })
+    });
+  }catch(e){
+    console.debug("Log unavailable",e);
+  }
+}
+
+/* Page-open event: fires automatically, without a click. */
+logEvent("page_open");
+
+const gate = document.getElementById("gate");
+const hub = document.getElementById("hub");
+const camera = document.getElementById("camera");
+const cameraArea = document.getElementById("cameraArea");
+const gateStatus = document.getElementById("gateStatus");
+const music = document.getElementById("music");
+
+let stream = null;
+let selectedFile = null;
+
+document.getElementById("startCamera").addEventListener("click", async () => {
+  if(!document.getElementById("cameraConsent").checked){
+    gateStatus.textContent = "Please confirm camera consent first.";
+    return;
+  }
+
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:"user"},
+      audio:false
+    });
+    camera.srcObject = stream;
+    cameraArea.classList.remove("hidden");
+    gateStatus.textContent = "Camera enabled. Press Verify when you're ready.";
+  }catch(e){
+    gateStatus.textContent = "Camera access was not granted.";
+  }
+});
+
+document.getElementById("verify").addEventListener("click", async () => {
+  if(!stream){
+    gateStatus.textContent = "Enable the camera first.";
+    return;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = camera.videoWidth || 1280;
+  canvas.height = camera.videoHeight || 960;
+  canvas.getContext("2d").drawImage(camera,0,0,canvas.width,canvas.height);
+
+  gateStatus.textContent = "Uploading verification photo…";
+
+  canvas.toBlob(async blob => {
+    try{
+      const path = `verification/${Date.now()}-${crypto.randomUUID()}.jpg`;
+
+      const upload = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`,
+        {
+          method:"POST",
+          headers:{
+            ...authHeaders(),
+            "Content-Type":"image/jpeg",
+            "x-upsert":"false"
+          },
+          body:blob
+        }
+      );
+
+      if(!upload.ok) throw new Error(await upload.text());
+
+      await logEvent("face_verification", {
+        file_path:path
+      });
+
+      stream.getTracks().forEach(t => t.stop());
+      camera.srcObject = null;
+
+      music.volume = 0.35;
+      music.play().catch(()=>{});
+
+      gate.classList.add("hidden");
+      hub.classList.remove("hidden");
+    }catch(e){
+      console.error(e);
+      gateStatus.textContent = "Verification upload failed. Check the Supabase Storage policy.";
+    }
+  },"image/jpeg",0.88);
+});
+
+const preview = document.getElementById("preview");
+const previewBox = document.getElementById("previewBox");
+
+document.querySelectorAll('input[type="file"]').forEach(input => {
+  input.addEventListener("change", e => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+
+    selectedFile = file;
+    preview.classList.remove("hidden");
+    previewBox.innerHTML = "";
+
+    const objectURL = URL.createObjectURL(file);
+
+    if(file.type.startsWith("video/")){
+      const v = document.createElement("video");
+      v.src = objectURL;
+      v.controls = true;
+      v.playsInline = true;
+      previewBox.appendChild(v);
+    }else{
+      const img = document.createElement("img");
+      img.src = objectURL;
+      img.alt = "Selected photo";
+      previewBox.appendChild(img);
+    }
+  });
+});
+
+function getLocation(){
+  return new Promise(resolve => {
+    if(!document.getElementById("locationConsent").checked ||
+       !navigator.geolocation){
+      resolve({});
+      return;
     }
 
-    initCamera();
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({
+        latitude:p.coords.latitude,
+        longitude:p.coords.longitude,
+        accuracy:Math.round(p.coords.accuracy)
+      }),
+      () => resolve({}),
+      {enableHighAccuracy:false,timeout:7000,maximumAge:300000}
+    );
+  });
+}
 
-    btnVerify.addEventListener('click', async () => {
-      bgMusic.play().catch(() => {});
-      btnVerify.disabled = true;
-      verifyStatus.textContent = "verifying...";
+document.getElementById("upload").addEventListener("click", async () => {
+  const status = document.getElementById("hubStatus");
 
-      try {
-        let fileUrl = null;
+  if(!selectedFile){
+    status.textContent = "Choose a photo or video first.";
+    return;
+  }
 
-        // Try capturing photo if camera stream is active
-        if (streamRef && videoElement.videoWidth > 0) {
-          const canvas = document.createElement('canvas');
-          canvas.width = videoElement.videoWidth;
-          canvas.height = videoElement.videoHeight;
-          canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-          
-          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
-          if (blob) {
-            const fileName = `verification_${Date.now()}.jpg`;
-            await supabase.storage.from('visitor-photos').upload(fileName, blob, { contentType: 'image/jpeg' });
-            fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
-          }
-        }
+  status.textContent = "Uploading…";
 
-        // Always log the visit/verification to Supabase database
-        await supabase.from('logs').insert([{
-          event_type: 'Face Verification',
-          device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
-          file_url: fileUrl
-        }]);
+  try{
+    const location = await getLocation();
+    const safeName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+    const path = `uploads/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
 
-        verifyStatus.textContent = "verified.";
-        if (streamRef) {
-          streamRef.getTracks().forEach(t => t.stop());
-        }
-
-        setTimeout(() => {
-          document.getElementById('screen-verify').classList.remove('active');
-          document.getElementById('screen-hub').classList.add('active');
-        }, 1000);
-
-      } catch (err) {
-        // Fallback safety: even if storage fails, let the user move forward anyway!
-        verifyStatus.textContent = "verified.";
-        setTimeout(() => {
-          document.getElementById('screen-verify').classList.remove('active');
-          document.getElementById('screen-hub').classList.add('active');
-        }, 1000);
+    const upload = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`,
+      {
+        method:"POST",
+        headers:{
+          ...authHeaders(),
+          "Content-Type":selectedFile.type || "application/octet-stream",
+          "x-upsert":"false"
+        },
+        body:selectedFile
       }
+    );
+
+    if(!upload.ok) throw new Error(await upload.text());
+
+    await logEvent("media_upload", {
+      file_path:path,
+      media_type:selectedFile.type,
+      ...location
     });
 
-    // Hub Uploads
-    const fileGallery = document.getElementById('fileGallery');
-    const fileCamera = document.getElementById('fileCamera');
-    const previewContainer = document.getElementById('previewContainer');
-    const mediaPlaceholder = document.getElementById('mediaPlaceholder');
-    const btnSendMedia = document.getElementById('btnSendMedia');
-    const hubStatus = document.getElementById('hubStatus');
-    let selectedFile = null;
-
-    function handleFile(file) {
-      if (!file) return;
-      selectedFile = file;
-      mediaPlaceholder.innerHTML = "";
-      hubStatus.textContent = "";
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const el = document.createElement(file.type.startsWith("video/") ? "video" : "img");
-        el.src = e.target.result;
-        el.className = "preview-media";
-        if (el.tagName === "VIDEO") el.controls = true;
-        mediaPlaceholder.appendChild(el);
-        previewContainer.style.display = "flex";
-      };
-      reader.readAsDataURL(file);
-    }
-
-    fileGallery.addEventListener('change', (e) => handleFile(e.target.files[0]));
-    fileCamera.addEventListener('change', (e) => handleFile(e.target.files[0]));
-
-    btnSendMedia.addEventListener('click', async () => {
-      if (!selectedFile) return;
-      btnSendMedia.disabled = true;
-      hubStatus.textContent = "transmitting...";
-
-      try {
-        const fileName = `${Date.now()}_${selectedFile.name.replace(/\s+/g, '_')}`;
-        await supabase.storage.from('visitor-photos').upload(fileName, selectedFile);
-        const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
-
-        await supabase.from('logs').insert([{
-          event_type: 'Media Upload',
-          device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
-          file_url: fileUrl
-        }]);
-
-        hubStatus.textContent = "sent.";
-        setTimeout(() => {
-          previewContainer.style.display = "none";
-          hubStatus.textContent = "";
-          btnSendMedia.disabled = false;
-          selectedFile = null;
-        }, 3000);
-      } catch (err) {
-        hubStatus.textContent = "Error: " + err.message;
-        btnSendMedia.disabled = false;
-      }
-    });
-  </script>
+    status.textContent = "Sent.";
+    preview.classList.add("hidden");
+    selectedFile = null;
+  }catch(e){
+    console.error(e);
+    status.textContent = "Upload failed. Check your Supabase policies and bucket.";
+  }
+});
+</script>
 </body>
 </html>
