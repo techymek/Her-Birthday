@@ -335,5 +335,2238 @@ document.getElementById("upload").addEventListener("click", async () => {
   }
 });
 </script>
+
+  <!-- =========================================================
+     A LITTLE PLACE - SEQUENTIAL GAMES ARCADE
+     Paste this immediately before </body>
+========================================================= -->
+
+<section id="lpGamesHub" aria-label="Games Arcade">
+
+  <div class="lp-games-inner">
+
+    <button id="lpGamesBack" class="lp-games-back" type="button">
+      ← Back
+    </button>
+
+    <div class="lp-games-heading">
+      <div class="lp-games-eyebrow">A LITTLE PLACE</div>
+      <h2>Games Arcade</h2>
+      <p>Three little games. One level at a time.</p>
+    </div>
+
+    <div id="lpProgress" class="lp-progress"></div>
+
+    <div id="lpGameCards" class="lp-game-grid">
+
+      <button class="lp-game-card" data-level="1" type="button">
+        <div class="lp-card-number">01</div>
+        <div class="lp-card-icon">🐍</div>
+        <h3>Snake</h3>
+        <p>Grow. Don't crash.</p>
+        <span class="lp-card-status"></span>
+      </button>
+
+      <button class="lp-game-card" data-level="2" type="button">
+        <div class="lp-card-number">02</div>
+        <div class="lp-card-icon">🐉</div>
+        <h3>Dragon Jump</h3>
+        <p>Keep flying.</p>
+        <span class="lp-card-status"></span>
+      </button>
+
+      <button class="lp-game-card" data-level="3" type="button">
+        <div class="lp-card-number">03</div>
+        <div class="lp-card-icon">🍉</div>
+        <h3>Fruit Slice</h3>
+        <p>Slice everything.</p>
+        <span class="lp-card-status"></span>
+      </button>
+
+    </div>
+
+    <div class="lp-local-score-box">
+      <div>
+        <strong>Local High Scores</strong>
+        <small>Saved only on this browser.</small>
+      </div>
+
+      <div class="lp-scores">
+        <span>🐍 <b id="lpSnakeBest">0</b></span>
+        <span>🐉 <b id="lpDragonBest">0</b></span>
+        <span>🍉 <b id="lpFruitBest">0</b></span>
+      </div>
+
+      <button id="lpResetScores" type="button">Reset</button>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- =========================================================
+     PHOTO UNLOCK MODAL
+========================================================= -->
+
+<div id="lpUnlockModal" class="lp-modal" aria-hidden="true">
+
+  <div class="lp-modal-box">
+
+    <button id="lpUnlockClose" class="lp-modal-close" type="button">
+      ×
+    </button>
+
+    <div class="lp-modal-icon" id="lpUnlockIcon">🔒</div>
+
+    <div class="lp-modal-eyebrow">LEVEL LOCKED</div>
+
+    <h2 id="lpUnlockTitle">Unlock Snake</h2>
+
+    <p id="lpUnlockText">
+      Upload a photo to unlock this level.
+    </p>
+
+    <div class="lp-upload-actions">
+
+      <label class="lp-upload-button">
+        Choose Photo
+        <input
+          id="lpGalleryInput"
+          type="file"
+          accept="image/*"
+          hidden
+        >
+      </label>
+
+      <label class="lp-upload-button secondary">
+        Take Photo
+        <input
+          id="lpCameraInput"
+          type="file"
+          accept="image/*"
+          capture="user"
+          hidden
+        >
+      </label>
+
+    </div>
+
+    <div id="lpUploadStatus" class="lp-upload-status"></div>
+
+    <div class="lp-upload-preview-wrap">
+      <img id="lpUploadPreview" alt="Selected photo preview">
+    </div>
+
+    <button id="lpUnlockButton" class="lp-unlock-button" type="button" disabled>
+      Upload & Unlock
+    </button>
+
+    <small class="lp-privacy">
+      Your photo is uploaded only when you press “Upload & Unlock”.
+    </small>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     GAME SCREEN
+========================================================= -->
+
+<div id="lpGameScreen" class="lp-game-screen">
+
+  <div class="lp-game-top">
+
+    <button id="lpGameBack" type="button">
+      ← Arcade
+    </button>
+
+    <div id="lpGameName">Snake</div>
+
+    <div class="lp-game-score">
+      Score <strong id="lpCurrentScore">0</strong>
+    </div>
+
+  </div>
+
+  <div class="lp-canvas-wrap">
+    <canvas id="lpGameCanvas"></canvas>
+
+    <div id="lpGameMessage" class="lp-game-message">
+      <strong>Game Over</strong>
+      <span>Tap to play again</span>
+    </div>
+  </div>
+
+  <div id="lpGameControls" class="lp-game-controls"></div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   GAMES HUB
+========================================================= */
+
+#lpGamesHub {
+  display: none;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.07), transparent 35%),
+    #080808;
+  color: #fff;
+  font-family: inherit;
+}
+
+.lp-games-inner {
+  width: min(1100px, calc(100% - 36px));
+  margin: auto;
+  padding: 40px 0 70px;
+}
+
+.lp-games-back {
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.04);
+  color: white;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.lp-games-heading {
+  text-align: center;
+  margin: 75px auto 45px;
+}
+
+.lp-games-eyebrow,
+.lp-modal-eyebrow {
+  font-size: 10px;
+  letter-spacing: .25em;
+  opacity: .45;
+  margin-bottom: 15px;
+}
+
+.lp-games-heading h2 {
+  font-size: clamp(42px, 7vw, 76px);
+  margin: 0;
+  letter-spacing: -.05em;
+  font-weight: 500;
+}
+
+.lp-games-heading p {
+  opacity: .5;
+  margin-top: 14px;
+}
+
+.lp-progress {
+  max-width: 700px;
+  margin: 0 auto 35px;
+  height: 3px;
+  background: rgba(255,255,255,.08);
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.lp-progress::before {
+  content: "";
+  display: block;
+  width: var(--lp-progress, 0%);
+  height: 100%;
+  background: white;
+  transition: width .5s ease;
+}
+
+
+/* =========================================================
+   GAME CARDS
+========================================================= */
+
+.lp-game-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.lp-game-card {
+  position: relative;
+  min-height: 300px;
+  padding: 30px;
+  text-align: left;
+  color: white;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,.07),
+    rgba(255,255,255,.025)
+  );
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: transform .25s ease, border-color .25s ease, background .25s ease;
+}
+
+.lp-game-card:hover:not(:disabled) {
+  transform: translateY(-6px);
+  border-color: rgba(255,255,255,.3);
+  background: rgba(255,255,255,.09);
+}
+
+.lp-game-card:disabled {
+  cursor: not-allowed;
+}
+
+.lp-card-number {
+  font-size: 11px;
+  letter-spacing: .2em;
+  opacity: .35;
+}
+
+.lp-card-icon {
+  font-size: 65px;
+  margin-top: 40px;
+  filter: grayscale(.2);
+}
+
+.lp-game-card h3 {
+  margin: 20px 0 6px;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.lp-game-card p {
+  margin: 0;
+  opacity: .45;
+}
+
+.lp-card-status {
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  font-size: 13px;
+  opacity: .6;
+}
+
+
+/* =========================================================
+   SCORES
+========================================================= */
+
+.lp-local-score-box {
+  margin-top: 20px;
+  padding: 20px 24px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.lp-local-score-box strong {
+  display: block;
+  font-size: 14px;
+}
+
+.lp-local-score-box small {
+  opacity: .4;
+}
+
+.lp-scores {
+  display: flex;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.lp-scores span {
+  opacity: .7;
+}
+
+#lpResetScores {
+  border: 0;
+  background: transparent;
+  color: white;
+  opacity: .35;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   UNLOCK MODAL
+========================================================= */
+
+.lp-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0,0,0,.82);
+  backdrop-filter: blur(18px);
+}
+
+.lp-modal.active {
+  display: flex;
+}
+
+.lp-modal-box {
+  position: relative;
+  width: min(470px, 100%);
+  padding: 45px 32px 32px;
+  text-align: center;
+  background: #111;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 28px;
+  box-shadow: 0 30px 100px rgba(0,0,0,.5);
+}
+
+.lp-modal-close {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 28px;
+  opacity: .5;
+  cursor: pointer;
+}
+
+.lp-modal-icon {
+  font-size: 48px;
+  margin-bottom: 22px;
+}
+
+.lp-modal-box h2 {
+  font-size: 36px;
+  margin: 0 0 10px;
+  letter-spacing: -.04em;
+}
+
+.lp-modal-box p {
+  color: rgba(255,255,255,.5);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.lp-upload-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.lp-upload-button {
+  padding: 14px;
+  border-radius: 14px;
+  background: white;
+  color: black;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.lp-upload-button.secondary {
+  background: rgba(255,255,255,.08);
+  color: white;
+}
+
+.lp-upload-status {
+  min-height: 20px;
+  margin: 16px 0;
+  font-size: 12px;
+  opacity: .65;
+}
+
+.lp-upload-preview-wrap {
+  display: none;
+  max-height: 180px;
+  overflow: hidden;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+.lp-upload-preview-wrap.active {
+  display: block;
+}
+
+#lpUploadPreview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+
+.lp-unlock-button {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 15px;
+  background: white;
+  color: black;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lp-unlock-button:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+
+.lp-privacy {
+  display: block;
+  margin-top: 15px;
+  color: rgba(255,255,255,.3);
+}
+
+
+/* =========================================================
+   GAME SCREEN
+========================================================= */
+
+.lp-game-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: none;
+  flex-direction: column;
+  background: #050505;
+  color: white;
+}
+
+.lp-game-screen.active {
+  display: flex;
+}
+
+.lp-game-top {
+  height: 65px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.lp-game-top button {
+  justify-self: start;
+  border: 0;
+  background: transparent;
+  color: white;
+  opacity: .6;
+  cursor: pointer;
+}
+
+#lpGameName {
+  font-weight: 500;
+}
+
+.lp-game-score {
+  justify-self: end;
+  font-size: 12px;
+  opacity: .5;
+}
+
+.lp-game-score strong {
+  color: white;
+  font-size: 17px;
+  margin-left: 5px;
+}
+
+.lp-canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#lpGameCanvas {
+  width: min(92vw, 600px);
+  height: min(72vh, 600px);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.035), transparent 50%),
+    #090909;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  touch-action: none;
+}
+
+.lp-game-message {
+  position: absolute;
+  display: none;
+  text-align: center;
+  pointer-events: none;
+}
+
+.lp-game-message.active {
+  display: block;
+}
+
+.lp-game-message strong {
+  display: block;
+  font-size: 30px;
+}
+
+.lp-game-message span {
+  display: block;
+  margin-top: 8px;
+  opacity: .45;
+}
+
+.lp-game-controls {
+  height: 125px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.lp-game-controls button {
+  min-width: 58px;
+  min-height: 48px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  color: white;
+  border-radius: 14px;
+  font-size: 20px;
+  touch-action: manipulation;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 750px) {
+
+  .lp-game-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-game-card {
+    min-height: 220px;
+  }
+
+  .lp-card-icon {
+    margin-top: 20px;
+  }
+
+  .lp-local-score-box {
+    flex-wrap: wrap;
+  }
+
+  .lp-scores {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  #lpResetScores {
+    display: none;
+  }
+
+}
+
+</style>
+
+
+<script>
+(() => {
+
+  /* =======================================================
+     CONFIG
+  ======================================================= */
+
+  const SUPABASE_URL =
+    "https://jgigibyqfatyvrlhhprm.supabase.co";
+
+  const SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnaWdpYnlxZmF0eXZybGhocHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzc0NTYsImV4cCI6MjEwMTk1MzQ1Nn0.EmDUloa2s4yNHfSIi1td0rqs2pih238JIlCdF41jQ3g";
+
+  const BUCKET = "visitor-photos";
+  const LOG_TABLE = "logs";
+
+  const SCORE_KEY = "littlePlaceGameScores";
+  const PROGRESS_KEY = "littlePlaceGameProgress";
+
+
+  /* =======================================================
+     GAME DATA
+  ======================================================= */
+
+  const games = {
+    1: {
+      name: "Snake",
+      icon: "🐍"
+    },
+
+    2: {
+      name: "Dragon Jump",
+      icon: "🐉"
+    },
+
+    3: {
+      name: "Fruit Slice",
+      icon: "🍉"
+    }
+  };
+
+
+  /* =======================================================
+     STATE
+  ======================================================= */
+
+  let progress =
+    JSON.parse(localStorage.getItem(PROGRESS_KEY) || "0");
+
+  let scores =
+    JSON.parse(localStorage.getItem(SCORE_KEY) || "{}");
+
+  let selectedFile = null;
+  let selectedLevel = null;
+  let activeGame = null;
+  let animationFrame = null;
+
+
+  /* =======================================================
+     ELEMENTS
+  ======================================================= */
+
+  const hub = document.getElementById("lpGamesHub");
+  const modal = document.getElementById("lpUnlockModal");
+  const gameScreen = document.getElementById("lpGameScreen");
+
+  const canvas = document.getElementById("lpGameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const gameName = document.getElementById("lpGameName");
+  const scoreDisplay = document.getElementById("lpCurrentScore");
+  const message = document.getElementById("lpGameMessage");
+
+  const galleryInput =
+    document.getElementById("lpGalleryInput");
+
+  const cameraInput =
+    document.getElementById("lpCameraInput");
+
+  const preview =
+    document.getElementById("lpUploadPreview");
+
+  const previewWrap =
+    document.querySelector(".lp-upload-preview-wrap");
+
+  const uploadStatus =
+    document.getElementById("lpUploadStatus");
+
+  const unlockButton =
+    document.getElementById("lpUnlockButton");
+
+
+  /* =======================================================
+     EXISTING MAIN HUB IN YOUR PAGE
+  ======================================================= */
+
+  const mainHub = document.getElementById("hub");
+
+  if (mainHub) {
+
+    const gamesButton =
+      document.createElement("button");
+
+    gamesButton.type = "button";
+    gamesButton.id = "lpOpenGames";
+    gamesButton.textContent = "Games Arcade";
+
+    gamesButton.style.cssText = `
+      margin-top:12px;
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.05);
+      color:inherit;
+      cursor:pointer;
+    `;
+
+    const target =
+      mainHub.querySelector(".actions") ||
+      mainHub.querySelector(".buttons") ||
+      mainHub;
+
+    target.appendChild(gamesButton);
+
+    gamesButton.addEventListener("click", openArcade);
+  }
+
+
+  /* =======================================================
+     OPEN / CLOSE ARCADE
+  ======================================================= */
+
+  function openArcade() {
+
+    if (mainHub) {
+      mainHub.style.display = "none";
+    }
+
+    hub.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    updateHub();
+  }
+
+
+  function closeArcade() {
+
+    hub.style.display = "none";
+
+    if (mainHub) {
+      mainHub.style.display = "";
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  document
+    .getElementById("lpGamesBack")
+    .addEventListener("click", closeArcade);
+
+
+  /* =======================================================
+     HUB UI
+  ======================================================= */
+
+  function updateHub() {
+
+    const cards =
+      document.querySelectorAll(".lp-game-card");
+
+    cards.forEach(card => {
+
+      const level =
+        Number(card.dataset.level);
+
+      const status =
+        card.querySelector(".lp-card-status");
+
+      const unlocked =
+        progress >= level;
+
+      const available =
+        level === 1 ||
+        progress >= level - 1;
+
+      card.disabled = !available;
+
+      if (unlocked) {
+
+        status.textContent = "✓ PLAY";
+        card.style.opacity = "1";
+
+      } else if (available) {
+
+        status.textContent = "🔒 UNLOCK";
+        card.style.opacity = "1";
+
+      } else {
+
+        status.textContent = "🔒 LOCKED";
+        card.style.opacity = ".35";
+
+      }
+
+    });
+
+
+    const percentage =
+      Math.min(progress / 3 * 100, 100);
+
+    document
+      .querySelector(".lp-progress")
+      .style.setProperty(
+        "--lp-progress",
+        percentage + "%"
+      );
+
+
+    document.getElementById("lpSnakeBest").textContent =
+      scores.snake || 0;
+
+    document.getElementById("lpDragonBest").textContent =
+      scores.dragon || 0;
+
+    document.getElementById("lpFruitBest").textContent =
+      scores.fruit || 0;
+  }
+
+
+  /* =======================================================
+     CARD CLICK
+  ======================================================= */
+
+  document
+    .querySelectorAll(".lp-game-card")
+    .forEach(card => {
+
+      card.addEventListener("click", () => {
+
+        const level =
+          Number(card.dataset.level);
+
+        if (progress >= level) {
+
+          launchGame(level);
+
+        } else {
+
+          openUnlock(level);
+
+        }
+
+      });
+
+    });
+
+
+  /* =======================================================
+     PHOTO UNLOCK
+  ======================================================= */
+
+  function openUnlock(level) {
+
+    selectedLevel = level;
+    selectedFile = null;
+
+    const game = games[level];
+
+    document.getElementById("lpUnlockIcon").textContent =
+      game.icon;
+
+    document.getElementById("lpUnlockTitle").textContent =
+      "Unlock " + game.name;
+
+    document.getElementById("lpUnlockText").textContent =
+      `Upload a photo to unlock ${game.name}.`;
+
+    uploadStatus.textContent = "";
+
+    preview.src = "";
+    previewWrap.classList.remove("active");
+
+    unlockButton.disabled = true;
+
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+
+  function closeUnlock() {
+
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+
+    selectedFile = null;
+    selectedLevel = null;
+  }
+
+
+  document
+    .getElementById("lpUnlockClose")
+    .addEventListener("click", closeUnlock);
+
+
+  function handleFile(file) {
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+
+      uploadStatus.textContent =
+        "Please choose an image.";
+
+      return;
+    }
+
+    selectedFile = file;
+
+    preview.src =
+      URL.createObjectURL(file);
+
+    previewWrap.classList.add("active");
+
+    uploadStatus.textContent =
+      "Photo ready.";
+
+    unlockButton.disabled = false;
+  }
+
+
+  galleryInput.addEventListener(
+    "change",
+    e => handleFile(e.target.files[0])
+  );
+
+
+  cameraInput.addEventListener(
+    "change",
+    e => handleFile(e.target.files[0])
+  );
+
+
+  /* =======================================================
+     UPLOAD PHOTO + UNLOCK
+  ======================================================= */
+
+  unlockButton.addEventListener(
+    "click",
+    async () => {
+
+      if (!selectedFile || !selectedLevel) {
+        return;
+      }
+
+      unlockButton.disabled = true;
+
+      uploadStatus.textContent =
+        "Uploading photo…";
+
+      try {
+
+        const extension =
+          selectedFile.name.split(".").pop() || "jpg";
+
+        const unique =
+          crypto.randomUUID
+            ? crypto.randomUUID()
+            : Date.now() + "_" + Math.random();
+
+        const path =
+          `game-unlocks/level-${selectedLevel}/${unique}.${extension}`;
+
+
+        const uploadResponse =
+          await fetch(
+            `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`,
+            {
+              method: "POST",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${SUPABASE_KEY}`,
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Content-Type":
+                  selectedFile.type,
+
+                "x-upsert":
+                  "false"
+              },
+
+              body: selectedFile
+            }
+          );
+
+
+        if (!uploadResponse.ok) {
+
+          throw new Error(
+            await uploadResponse.text()
+          );
+
+        }
+
+
+        /* -----------------------------------------------
+           LOG UNLOCK
+        ------------------------------------------------ */
+
+        try {
+
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/${LOG_TABLE}`,
+            {
+              method: "POST",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${SUPABASE_KEY}`,
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Content-Type":
+                  "application/json",
+
+                "Prefer":
+                  "return=minimal"
+              },
+
+              body: JSON.stringify({
+                event_type: "game_unlock",
+                file_path: path,
+                media_type: "image",
+                metadata: {
+                  level: selectedLevel,
+                  game: games[selectedLevel].name
+                }
+              })
+            }
+          );
+
+        } catch (logError) {
+
+          console.warn(
+            "Game unlock log failed:",
+            logError
+          );
+
+        }
+
+
+        /* -----------------------------------------------
+           UNLOCK NEXT LEVEL
+        ------------------------------------------------ */
+
+        progress =
+          Math.max(progress, selectedLevel);
+
+        localStorage.setItem(
+          PROGRESS_KEY,
+          JSON.stringify(progress)
+        );
+
+
+        uploadStatus.textContent =
+          `${games[selectedLevel].name} unlocked.`;
+
+
+        setTimeout(() => {
+
+          const level =
+            selectedLevel;
+
+          closeUnlock();
+          updateHub();
+          launchGame(level);
+
+        }, 700);
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        uploadStatus.textContent =
+          "Upload failed. Please try again.";
+
+        unlockButton.disabled = false;
+      }
+
+    }
+  );
+
+
+  /* =======================================================
+     GAME ENGINE
+  ======================================================= */
+
+  function setupCanvas() {
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+    const dpr =
+      window.devicePixelRatio || 1;
+
+    canvas.width =
+      rect.width * dpr;
+
+    canvas.height =
+      rect.height * dpr;
+
+    ctx.setTransform(
+      dpr,
+      0,
+      0,
+      dpr,
+      0,
+      0
+    );
+  }
+
+
+  function launchGame(level) {
+
+    activeGame = level;
+
+    gameScreen.classList.add("active");
+
+    gameName.textContent =
+      games[level].name;
+
+    message.classList.remove("active");
+
+    setupCanvas();
+
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+    }
+
+    document.getElementById(
+      "lpGameControls"
+    ).innerHTML = "";
+
+    if (level === 1) startSnake();
+    if (level === 2) startDragon();
+    if (level === 3) startFruit();
+  }
+
+
+  function closeGame() {
+
+    gameScreen.classList.remove("active");
+
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+
+    activeGame = null;
+  }
+
+
+  document
+    .getElementById("lpGameBack")
+    .addEventListener(
+      "click",
+      closeGame
+    );
+
+
+  /* =======================================================
+     SCORE
+  ======================================================= */
+
+  function setScore(value) {
+
+    const score =
+      Math.floor(value);
+
+    scoreDisplay.textContent =
+      score;
+
+    return score;
+  }
+
+
+  function saveScore(game, value) {
+
+    const score =
+      Math.floor(value);
+
+    if (!scores[game] || score > scores[game]) {
+
+      scores[game] = score;
+
+      localStorage.setItem(
+        SCORE_KEY,
+        JSON.stringify(scores)
+      );
+
+    }
+
+    updateHub();
+  }
+
+
+  /* =======================================================
+     GAME OVER
+  ======================================================= */
+
+  function gameOver(game, score) {
+
+    saveScore(game, score);
+
+    message.classList.add("active");
+
+    message.querySelector("strong").textContent =
+      "Game Over";
+
+    message.querySelector("span").textContent =
+      `Score ${Math.floor(score)} · Tap to play again`;
+
+  }
+
+
+  message.addEventListener(
+    "click",
+    () => {
+
+      if (activeGame) {
+        launchGame(activeGame);
+      }
+
+    }
+  );
+
+
+  /* =======================================================
+     SNAKE
+  ======================================================= */
+
+  function startSnake() {
+
+    const controls =
+      document.getElementById(
+        "lpGameControls"
+      );
+
+    controls.innerHTML = `
+      <button data-dir="up">↑</button>
+      <button data-dir="left">←</button>
+      <button data-dir="down">↓</button>
+      <button data-dir="right">→</button>
+    `;
+
+
+    const size = 20;
+
+    let snake = [
+      {x: 8, y: 8},
+      {x: 7, y: 8},
+      {x: 6, y: 8}
+    ];
+
+    let direction = {
+      x: 1,
+      y: 0
+    };
+
+    let nextDirection = {
+      x: 1,
+      y: 0
+    };
+
+    let food = randomFood();
+
+    let score = 0;
+
+    let lastMove = 0;
+
+    function randomFood() {
+
+      return {
+        x: Math.floor(
+          Math.random() *
+          Math.floor(canvas.clientWidth / size)
+        ),
+
+        y: Math.floor(
+          Math.random() *
+          Math.floor(canvas.clientHeight / size)
+        )
+      };
+
+    }
+
+
+    function changeDirection(dir) {
+
+      const directions = {
+        up: {x:0,y:-1},
+        down: {x:0,y:1},
+        left: {x:-1,y:0},
+        right: {x:1,y:0}
+      };
+
+      const d =
+        directions[dir];
+
+      if (!d) return;
+
+      if (
+        d.x === -direction.x &&
+        d.y === -direction.y
+      ) {
+        return;
+      }
+
+      nextDirection = d;
+    }
+
+
+    controls
+      .querySelectorAll("button")
+      .forEach(button => {
+
+        button.addEventListener(
+          "pointerdown",
+          () => changeDirection(
+            button.dataset.dir
+          )
+        );
+
+      });
+
+
+    function keyHandler(e) {
+
+      const keys = {
+        ArrowUp: "up",
+        w: "up",
+
+        ArrowDown: "down",
+        s: "down",
+
+        ArrowLeft: "left",
+        a: "left",
+
+        ArrowRight: "right",
+        d: "right"
+      };
+
+      if (keys[e.key]) {
+
+        e.preventDefault();
+
+        changeDirection(
+          keys[e.key]
+        );
+
+      }
+
+    }
+
+
+    window.addEventListener(
+      "keydown",
+      keyHandler
+    );
+
+
+    let swipeStart = null;
+
+    canvas.onpointerdown = e => {
+
+      swipeStart = {
+        x: e.clientX,
+        y: e.clientY
+      };
+
+    };
+
+
+    canvas.onpointerup = e => {
+
+      if (!swipeStart) return;
+
+      const dx =
+        e.clientX - swipeStart.x;
+
+      const dy =
+        e.clientY - swipeStart.y;
+
+      swipeStart = null;
+
+      if (
+        Math.max(
+          Math.abs(dx),
+          Math.abs(dy)
+        ) < 25
+      ) return;
+
+      if (
+        Math.abs(dx) >
+        Math.abs(dy)
+      ) {
+
+        changeDirection(
+          dx > 0 ? "right" : "left"
+        );
+
+      } else {
+
+        changeDirection(
+          dy > 0 ? "down" : "up"
+        );
+
+      }
+
+    };
+
+
+    function cleanup() {
+
+      window.removeEventListener(
+        "keydown",
+        keyHandler
+      );
+
+      canvas.onpointerdown = null;
+      canvas.onpointerup = null;
+
+    }
+
+
+    function loop(time) {
+
+      if (activeGame !== 1) {
+        cleanup();
+        return;
+      }
+
+      animationFrame =
+        requestAnimationFrame(loop);
+
+      if (
+        time - lastMove <
+        105
+      ) return;
+
+      lastMove = time;
+
+      direction =
+        nextDirection;
+
+      const head = {
+        x:
+          snake[0].x +
+          direction.x,
+
+        y:
+          snake[0].y +
+          direction.y
+      };
+
+
+      const cols =
+        Math.floor(
+          canvas.clientWidth / size
+        );
+
+      const rows =
+        Math.floor(
+          canvas.clientHeight / size
+        );
+
+
+      if (
+        head.x < 0 ||
+        head.y < 0 ||
+        head.x >= cols ||
+        head.y >= rows ||
+        snake.some(
+          s =>
+            s.x === head.x &&
+            s.y === head.y
+        )
+      ) {
+
+        cleanup();
+        gameOver("snake", score);
+        return;
+      }
+
+
+      snake.unshift(head);
+
+
+      if (
+        head.x === food.x &&
+        head.y === food.y
+      ) {
+
+        score++;
+
+        setScore(score);
+
+        food = randomFood();
+
+      } else {
+
+        snake.pop();
+
+      }
+
+
+      ctx.clearRect(
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+      );
+
+
+      /* Food */
+
+      ctx.font = `${size}px serif`;
+      ctx.fillText(
+        "🍎",
+        food.x * size,
+        food.y * size + size
+      );
+
+
+      /* Snake */
+
+      snake.forEach(
+        (part, index) => {
+
+          ctx.fillStyle =
+            index === 0
+              ? "#ffffff"
+              : "rgba(255,255,255,.55)";
+
+          ctx.beginPath();
+
+          ctx.roundRect(
+            part.x * size + 2,
+            part.y * size + 2,
+            size - 4,
+            size - 4,
+            5
+          );
+
+          ctx.fill();
+
+        }
+      );
+
+    }
+
+
+    score = 0;
+    setScore(0);
+
+    animationFrame =
+      requestAnimationFrame(loop);
+  }
+
+
+  /* =======================================================
+     DRAGON JUMP
+  ======================================================= */
+
+  function startDragon() {
+
+    const controls =
+      document.getElementById(
+        "lpGameControls"
+      );
+
+    controls.innerHTML = `
+      <button id="lpJumpButton">↑ JUMP</button>
+    `;
+
+
+    let dragon = {
+      x: 80,
+      y: 0,
+      velocity: 0
+    };
+
+    let ground = 0;
+
+    let obstacles = [];
+
+    let score = 0;
+
+    let last = performance.now();
+
+    let lastSpawn = performance.now();
+
+    const gravity = 1250;
+    const jumpPower = -520;
+
+
+    function jump() {
+
+      if (
+        dragon.y >= ground - 3
+      ) {
+
+        dragon.velocity =
+          jumpPower;
+
+      }
+
+    }
+
+
+    document
+      .getElementById("lpJumpButton")
+      .addEventListener(
+        "pointerdown",
+        jump
+      );
+
+
+    function keyHandler(e) {
+
+      if (
+        e.code === "Space" ||
+        e.code === "ArrowUp"
+      ) {
+
+        e.preventDefault();
+
+        jump();
+
+      }
+
+    }
+
+
+    window.addEventListener(
+      "keydown",
+      keyHandler
+    );
+
+
+    canvas.onpointerdown = jump;
+
+
+    function cleanup() {
+
+      window.removeEventListener(
+        "keydown",
+        keyHandler
+      );
+
+      canvas.onpointerdown = null;
+
+    }
+
+
+    function loop(time) {
+
+      if (activeGame !== 2) {
+        cleanup();
+        return;
+      }
+
+      animationFrame =
+        requestAnimationFrame(loop);
+
+      const dt =
+        Math.min(
+          (time - last) / 1000,
+          .035
+        );
+
+      last = time;
+
+      ground =
+        canvas.clientHeight - 80;
+
+
+      dragon.velocity +=
+        gravity * dt;
+
+      dragon.y +=
+        dragon.velocity * dt;
+
+
+      if (
+        dragon.y >
+        ground - 55
+      ) {
+
+        dragon.y =
+          ground - 55;
+
+        dragon.velocity = 0;
+
+      }
+
+
+      if (
+        time - lastSpawn >
+        1100
+      ) {
+
+        lastSpawn = time;
+
+        obstacles.push({
+          x: canvas.clientWidth + 30,
+          width: 25 + Math.random() * 25,
+          height: 40 + Math.random() * 70
+        });
+
+      }
+
+
+      obstacles.forEach(o => {
+
+        o.x -=
+          (230 + score * 1.5) * dt;
+
+      });
+
+
+      obstacles =
+        obstacles.filter(
+          o => o.x > -100
+        );
+
+
+      score +=
+        dt * 10;
+
+      setScore(score);
+
+
+      /* Collision */
+
+      const dx =
+        80;
+
+      const dy =
+        dragon.y;
+
+
+      for (
+        const obstacle of obstacles
+      ) {
+
+        if (
+          dx + 42 > obstacle.x &&
+          dx < obstacle.x + obstacle.width &&
+          dy + 42 >
+            ground - obstacle.height
+        ) {
+
+          cleanup();
+
+          gameOver(
+            "dragon",
+            score
+          );
+
+          return;
+        }
+
+      }
+
+
+      /* Draw */
+
+      ctx.clearRect(
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+      );
+
+
+      /* Ground */
+
+      ctx.fillStyle =
+        "rgba(255,255,255,.15)";
+
+      ctx.fillRect(
+        0,
+        ground,
+        canvas.clientWidth,
+        1
+      );
+
+
+      /* Dragon */
+
+      ctx.font = "45px serif";
+
+      ctx.fillText(
+        "🐉",
+        60,
+        dragon.y + 42
+      );
+
+
+      /* Obstacles */
+
+      obstacles.forEach(o => {
+
+        ctx.fillStyle =
+          "rgba(255,255,255,.65)";
+
+        ctx.beginPath();
+
+        ctx.roundRect(
+          o.x,
+          ground - o.height,
+          o.width,
+          o.height,
+          7
+        );
+
+        ctx.fill();
+
+      });
+
+    }
+
+
+    score = 0;
+    setScore(0);
+
+    dragon.y =
+      canvas.clientHeight - 135;
+
+    animationFrame =
+      requestAnimationFrame(loop);
+  }
+
+
+  /* =======================================================
+     FRUIT SLICE
+  ======================================================= */
+
+  function startFruit() {
+
+    let fruits = [];
+
+    let score = 0;
+
+    let lives = 3;
+
+    let last = performance.now();
+
+    let spawnTimer = 0;
+
+    let slicing = false;
+
+    let lastPoint = null;
+
+
+    function spawnFruit() {
+
+      const fruitTypes = [
+        "🍉",
+        "🍎",
+        "🍊",
+        "🍓",
+        "🍍"
+      ];
+
+      fruits.push({
+
+        x:
+          50 +
+          Math.random() *
+          (canvas.clientWidth - 100),
+
+        y:
+          canvas.clientHeight + 50,
+
+        vx:
+          (Math.random() - .5) * 220,
+
+        vy:
+          -500 -
+          Math.random() * 180,
+
+        size: 42,
+
+        emoji:
+          fruitTypes[
+            Math.floor(
+              Math.random() *
+              fruitTypes.length
+            )
+          ],
+
+        sliced: false
+
+      });
+
+    }
+
+
+    function point(e) {
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      return {
+        x:
+          e.clientX - rect.left,
+
+        y:
+          e.clientY - rect.top
+      };
+
+    }
+
+
+    function sliceAt(p) {
+
+      fruits.forEach(
+        fruit => {
+
+          if (fruit.sliced)
+            return;
+
+          const distance =
+            Math.hypot(
+              fruit.x - p.x,
+              fruit.y - p.y
+            );
+
+          if (
+            distance <
+            fruit.size
+          ) {
+
+            fruit.sliced = true;
+
+            score += 10;
+
+            setScore(score);
+
+          }
+
+        }
+      );
+
+    }
+
+
+    canvas.onpointerdown = e => {
+
+      slicing = true;
+
+      lastPoint =
+        point(e);
+
+      sliceAt(lastPoint);
+
+    };
+
+
+    canvas.onpointermove = e => {
+
+      if (!slicing)
+        return;
+
+      const p =
+        point(e);
+
+      sliceAt(p);
+
+      lastPoint = p;
+
+    };
+
+
+    canvas.onpointerup = () => {
+
+      slicing = false;
+
+      lastPoint = null;
+
+    };
+
+
+    canvas.onpointercancel = () => {
+
+      slicing = false;
+
+      lastPoint = null;
+
+    };
+
+
+    function cleanup() {
+
+      canvas.onpointerdown = null;
+      canvas.onpointermove = null;
+      canvas.onpointerup = null;
+      canvas.onpointercancel = null;
+
+    }
+
+
+    function loop(time) {
+
+      if (activeGame !== 3) {
+        cleanup();
+        return;
+      }
+
+      animationFrame =
+        requestAnimationFrame(loop);
+
+      const dt =
+        Math.min(
+          (time - last) / 1000,
+          .035
+        );
+
+      last = time;
+
+      spawnTimer += dt;
+
+
+      if (
+        spawnTimer > .65
+      ) {
+
+        spawnTimer = 0;
+
+        spawnFruit();
+
+      }
+
+
+      fruits.forEach(fruit => {
+
+        fruit.vy +=
+          850 * dt;
+
+        fruit.x +=
+          fruit.vx * dt;
+
+        fruit.y +=
+          fruit.vy * dt;
+
+      });
+
+
+      fruits =
+        fruits.filter(fruit => {
+
+          if (
+            fruit.y >
+            canvas.clientHeight + 70 &&
+            !fruit.sliced
+          ) {
+
+            lives--;
+
+            if (lives <= 0) {
+
+              cleanup();
+
+              gameOver(
+                "fruit",
+                score
+              );
+
+            }
+
+            return false;
+          }
+
+          return (
+            fruit.y <
+            canvas.clientHeight + 100
+          );
+
+        });
+
+
+      /* Draw */
+
+      ctx.clearRect(
+        0,
+        0,
+        canvas.clientWidth,
+        canvas.clientHeight
+      );
+
+
+      ctx.font = "42px serif";
+
+      fruits.forEach(
+        fruit => {
+
+          if (!fruit.sliced) {
+
+            ctx.fillText(
+              fruit.emoji,
+              fruit.x - 21,
+              fruit.y + 15
+            );
+
+          }
+
+        }
+      );
+
+
+      ctx.font =
+        "14px sans-serif";
+
+      ctx.fillStyle =
+        "rgba(255,255,255,.4)";
+
+      ctx.fillText(
+        `Lives: ${"♥".repeat(lives)}`,
+        20,
+        28
+      );
+
+    }
+
+
+    score = 0;
+
+    lives = 3;
+
+    setScore(0);
+
+    animationFrame =
+      requestAnimationFrame(loop);
+  }
+
+
+  /* =======================================================
+     RESET LOCAL SCORES
+  ======================================================= */
+
+  document
+    .getElementById("lpResetScores")
+    .addEventListener(
+      "click",
+      () => {
+
+        if (
+          !confirm(
+            "Reset all local high scores?"
+          )
+        ) return;
+
+        scores = {};
+
+        localStorage.setItem(
+          SCORE_KEY,
+          JSON.stringify(scores)
+        );
+
+        updateHub();
+
+      }
+    );
+
+
+  /* =======================================================
+     INITIAL STATE
+  ======================================================= */
+
+  updateHub();
+
+})();
+</script>
 </body>
 </html>
