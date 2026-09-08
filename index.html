@@ -65,10 +65,6 @@ video{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
   </div>
 
   <div id="gateStatus" class="status" aria-live="polite"></div>
-  <p class="notice">
-    Opening this page creates a visit log containing the time and basic browser/device information.
-    Precise location is never requested automatically.
-  </p>
 </section>
 
 <section id="hub" class="card hidden fade">
@@ -165,7 +161,6 @@ async function logEvent(event, extra = {}){
   }
 }
 
-/* Page-open event: fires automatically, without a click. */
 logEvent("page_open");
 
 const gate = document.getElementById("gate");
@@ -280,7 +275,7 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
 function getLocation(){
   return new Promise(resolve => {
     if(!document.getElementById("locationConsent").checked ||
-       !navigator.geolocation){
+        !navigator.geolocation){
       resolve({});
       return;
     }
